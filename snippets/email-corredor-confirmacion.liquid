@@ -1,0 +1,304 @@
+{% comment %}
+  Email de Confirmación Individual para Corredor
+  DHMEXRACES 2026
+
+  Variables esperadas:
+  - corredor_nombre
+  - corredor_email
+  - corredor_telefono
+  - corredor_categoria
+  - corredor_equipo
+  - corredor_fecha_nacimiento
+  - sede_nombre
+  - sede_fecha
+  - order_number
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmación de Inscripción - DHMEXRACES</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #000000;
+      color: #FFFFFF;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px 20px;
+      background: linear-gradient(135deg, rgba(255, 77, 0, 0.2) 0%, rgba(255, 184, 0, 0.1) 100%);
+      border-radius: 12px;
+    }
+    .logo-text {
+      font-size: 1.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF4D00, #FFB800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 10px;
+    }
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #FFFFFF;
+      margin: 20px 0 10px 0;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.125rem;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 77, 0, 0.3);
+      border-radius: 12px;
+      padding: 30px;
+      margin-bottom: 20px;
+    }
+    .card h2 {
+      color: #FF4D00;
+      margin-top: 0;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .info-row:last-child {
+      border-bottom: none;
+    }
+    .info-label {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .info-value {
+      color: #FFFFFF;
+      font-weight: 600;
+      text-align: right;
+    }
+    .highlight {
+      color: #FFB800;
+      font-weight: 700;
+      font-size: 1.125rem;
+    }
+    .success-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #00ff00, #00cc00);
+      color: #000;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .btn {
+      display: inline-block;
+      padding: 16px 40px;
+      background: linear-gradient(135deg, #FF4D00, #FFB800);
+      color: #000;
+      font-weight: 700;
+      border-radius: 8px;
+      text-decoration: none;
+      margin-top: 20px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .btn:hover {
+      opacity: 0.9;
+    }
+    .important-info {
+      background: rgba(255, 184, 0, 0.1);
+      border-left: 4px solid #FFB800;
+      padding: 20px;
+      margin: 20px 0;
+      border-radius: 8px;
+    }
+    .important-info h3 {
+      color: #FFB800;
+      margin-top: 0;
+      font-size: 1.125rem;
+    }
+    .important-info ul {
+      margin: 10px 0;
+      padding-left: 20px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    .important-info li {
+      margin: 8px 0;
+    }
+    .footer {
+      text-align: center;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+      margin-top: 40px;
+      padding-top: 30px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .footer p {
+      margin: 5px 0;
+    }
+    .social-links {
+      margin: 20px 0;
+    }
+    .social-links a {
+      color: #FF4D00;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+      h1 {
+        font-size: 2rem;
+      }
+      .card {
+        padding: 20px;
+      }
+      .info-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+      .info-value {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo-text">COPA SCOTT DHMEXRACES 2026</div>
+      <h1>¡Inscripción Confirmada!</h1>
+      <p class="subtitle">Te esperamos en la pista 🏁</p>
+    </div>
+
+    <div style="text-align: center; margin-bottom: 30px;">
+      <span class="success-badge">✓ Registro Exitoso</span>
+    </div>
+
+    <div class="card">
+      <h2>📋 Datos del Corredor</h2>
+      <div class="info-row">
+        <span class="info-label">Nombre:</span>
+        <span class="info-value">{{ corredor_nombre | default: 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Categoría:</span>
+        <span class="info-value highlight">{{ corredor_categoria | default: 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Equipo:</span>
+        <span class="info-value">{{ corredor_equipo | default: 'Sin equipo' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Email:</span>
+        <span class="info-value">{{ corredor_email | default: 'N/A' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Teléfono:</span>
+        <span class="info-value">{{ corredor_telefono | default: 'N/A' }}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🏁 Información del Evento</h2>
+      <div class="info-row">
+        <span class="info-label">Sede:</span>
+        <span class="info-value">{{ sede_nombre | default: 'Por confirmar' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Fecha:</span>
+        <span class="info-value">{{ sede_fecha | default: 'Por confirmar' }}</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Número de Pedido:</span>
+        <span class="info-value">#{{ order_number | default: 'N/A' }}</span>
+      </div>
+    </div>
+
+    <div class="important-info">
+      <h3>📢 Información Importante</h3>
+      <ul>
+        <li><strong>Validación:</strong> Deberás presentar identificación oficial el día del evento</li>
+        <li><strong>Equipamiento:</strong> Es obligatorio el uso de casco y equipo de protección completo</li>
+        <li><strong>Registro en sitio:</strong> Llega mínimo 1 hora antes para el registro presencial</li>
+        <li><strong>Número de competidor:</strong> Se asignará el día del evento</li>
+        <li><strong>Consulta el reglamento:</strong> Disponible en nuestra página web</li>
+      </ul>
+    </div>
+
+    <div style="text-align: center; padding: 30px 0;">
+      <p style="color: rgba(255, 255, 255, 0.8); font-size: 1.25rem; margin-bottom: 20px;">
+        <strong>¡Prepárate para la adrenalina! 🔥</strong>
+      </p>
+      <a href="https://dhmexraces1.myshopify.com/pages/ranking" class="btn">
+        Ver Ranking Actual
+      </a>
+    </div>
+
+    <div class="card" style="background: rgba(255, 77, 0, 0.05);">
+      <h2>💰 Premios del Campeonato</h2>
+      <div style="text-align: center; padding: 20px 0;">
+        <div style="font-size: 3rem; font-weight: 900; color: #FFB800; margin-bottom: 10px;">
+          $500,000 MXN
+        </div>
+        <div style="color: rgba(255, 255, 255, 0.8);">
+          En premios totales distribuidos en 5 sedes
+        </div>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Por Sede:</span>
+        <span class="info-value highlight">$100,000 MXN</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Total Sedes:</span>
+        <span class="info-value">5 fechas</span>
+      </div>
+      <div class="info-row">
+        <span class="info-label">Categorías:</span>
+        <span class="info-value">13 categorías</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p><strong>COPA SCOTT DHMEXRACES 2026</strong></p>
+      <p>El campeonato nacional de downhill MTB más grande de México</p>
+
+      <div class="social-links">
+        <a href="https://dhmexraces1.myshopify.com">Sitio Web</a> •
+        <a href="https://dhmexraces1.myshopify.com/pages/ranking">Ranking</a> •
+        <a href="https://dhmexraces1.myshopify.com/pages/ranking-overall">Overall</a>
+      </div>
+
+      <p style="margin-top: 20px; font-size: 0.75rem;">
+        Este es un email de confirmación automático. No responder a este mensaje.<br>
+        Para soporte, contacta a: soporte@dhmexraces.com
+      </p>
+
+      <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.3);">
+        © 2026 DHMEXRACES. Todos los derechos reservados.
+      </p>
+    </div>
+  </div>
+</body>
+</html>

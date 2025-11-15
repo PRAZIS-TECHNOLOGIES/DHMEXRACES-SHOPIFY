@@ -468,11 +468,55 @@ Todas las páginas de ranking ahora incluyen los 5 bloques de sedes por defecto:
 
 ---
 
+## 📧 Sistema de Confirmación de Emails Individuales
+
+### Descripción
+Sistema completo para enviar confirmaciones de inscripción a cada corredor registrado, además del email estándar al comprador.
+
+### Documentación Completa
+Ver archivo: **[CONFIRMACION-EMAILS.md](./CONFIRMACION-EMAILS.md)**
+
+### Características:
+- ✅ Email individual a cada corredor con sus datos
+- ✅ Plantilla HTML profesional con branding DHMEXRACES
+- ✅ Datos guardados en `cart.attributes.registration_data`
+- ✅ Compatible con Shopify webhooks
+- ✅ Integración con Zapier/Make.com/Script personalizado
+
+### Archivos:
+- `CONFIRMACION-EMAILS.md` - Documentación completa del sistema
+- `snippets/email-corredor-confirmacion.liquid` - Plantilla HTML de email
+
+### Opciones de Implementación:
+1. **Shopify Flow** (requiere Shopify Plus)
+2. **Zapier/Make.com** (RECOMENDADO - $19.99/mes)
+3. **Script Node.js/Python personalizado**
+
+### Datos Capturados por Corredor:
+- Nombre completo
+- Email
+- Teléfono
+- Fecha de nacimiento
+- Equipo
+- Categoría
+- Sede/Evento
+
+### Flujo:
+1. Usuario completa formulario de registro
+2. Datos se guardan en carrito como JSON
+3. Al completar checkout, datos pasan al pedido
+4. Webhook dispara envío de emails
+5. Cada corredor recibe email individual
+6. Comprador recibe email estándar de Shopify
+
+---
+
 ## 🔄 Próximos Pasos (V.4)
 
+- [ ] Configurar webhooks para emails de confirmación (Zapier/Make.com)
 - [ ] Crear productos para las 4 sedes restantes
 - [ ] Agregar video al hero
-- [ ] Implementar sistema de notificaciones
+- [ ] Implementar sistema de notificaciones en sitio
 - [ ] Agregar galería de fotos/videos
 - [ ] Implementar blog/noticias
 - [ ] SEO optimization
