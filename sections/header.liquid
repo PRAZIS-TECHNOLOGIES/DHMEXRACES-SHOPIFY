@@ -14,9 +14,8 @@
     </a>
 
     <nav class="header__menu">
-      {% for link in section.settings.menu.links %}
-        <a href="{{ link.url }}" class="header__menu-link">{{ link.title }}</a>
-      {% endfor %}
+      <a href="/" class="header__menu-link">Home</a>
+      <a href="/products/inscripcion-guanajuato-2026" class="header__menu-link">Inscripciones</a>
       <a href="/pages/ranking" class="header__menu-link">Ranking</a>
     </nav>
 
@@ -54,9 +53,9 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 1.5rem 2rem;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    justify-content: space-between;
     gap: 2rem;
   }
 
@@ -65,6 +64,7 @@
     align-items: center;
     text-decoration: none;
     transition: transform 0.3s ease;
+    justify-self: start;
   }
 
   .header__logo:hover {
@@ -93,8 +93,7 @@
     display: flex;
     align-items: center;
     gap: 2rem;
-    flex: 1;
-    justify-content: center;
+    justify-self: center;
   }
 
   .header__menu-link {
@@ -131,6 +130,7 @@
     display: flex;
     align-items: center;
     gap: 1.5rem;
+    justify-self: end;
   }
 
   .header__icon {
@@ -170,6 +170,7 @@
   @media (max-width: 768px) {
     .header__container {
       padding: 1rem;
+      grid-template-columns: 1fr auto;
     }
 
     .header__menu {
@@ -182,6 +183,10 @@
 
     .header__logo-text {
       font-size: 1.2rem;
+    }
+
+    .header__icons {
+      justify-self: end;
     }
   }
 {% endstylesheet %}
