@@ -7,46 +7,46 @@
         "subtitle": "Resultados oficiales de todas las fechas del campeonato DHMEXRACES 2026"
       },
       "blocks": {
-        "race_1": {
+        "race_1_gto": {
           "type": "race",
           "settings": {
-            "race_name": "Guanajuato",
+            "race_name": "SEDE 1 - Guanajuato",
             "race_date": "21-22 Febrero 2026",
             "status": "upcoming",
             "results_data": ""
           }
         },
-        "race_2": {
+        "race_2_puebla": {
           "type": "race",
           "settings": {
-            "race_name": "Puebla",
+            "race_name": "SEDE 2 - Puebla",
             "race_date": "21-22 Marzo 2026",
             "status": "upcoming",
             "results_data": ""
           }
         },
-        "race_3": {
+        "race_3_gdl": {
           "type": "race",
           "settings": {
-            "race_name": "Guadalajara",
+            "race_name": "SEDE 3 - Guadalajara",
             "race_date": "30-31 Mayo 2026",
             "status": "upcoming",
             "results_data": ""
           }
         },
-        "race_4": {
+        "race_4_ixtapan": {
           "type": "race",
           "settings": {
-            "race_name": "Ixtapan de la Sal",
+            "race_name": "SEDE 4 - Ixtapan de la Sal",
             "race_date": "18-19 Julio 2026",
             "status": "upcoming",
             "results_data": ""
           }
         },
-        "race_5": {
+        "race_5_taxco": {
           "type": "race",
           "settings": {
-            "race_name": "Taxco",
+            "race_name": "SEDE 5 - Taxco",
             "race_date": "24-25 Octubre 2026 - GRAN FINAL",
             "status": "upcoming",
             "results_data": ""
@@ -54,11 +54,11 @@
         }
       },
       "block_order": [
-        "race_1",
-        "race_2",
-        "race_3",
-        "race_4",
-        "race_5"
+        "race_1_gto",
+        "race_2_puebla",
+        "race_3_gdl",
+        "race_4_ixtapan",
+        "race_5_taxco"
       ]
     }
   },

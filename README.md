@@ -268,6 +268,16 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
 7. ✅ Link de Ranking en header
 8. ✅ 5 sedes configuradas en ranking
 
+### V.3 RANKING OVERALL & TEAMS (15 Nov 2025)
+1. ✅ Sistema de Ranking Overall acumulado
+2. ✅ Campo "Equipo" agregado a tablas de ranking
+3. ✅ Excel converter actualizado a 6 columnas (con equipo)
+4. ✅ Botón "VER OVERALL" en página de ranking
+5. ✅ Cálculo automático de puntos acumulados
+6. ✅ Filtros por categoría en overall
+7. ✅ Fix de visibilidad de tarjetas upcoming
+8. ✅ Templates con 5 bloques pre-configurados
+
 ### Warnings Menores
 - Remote assets (AOS CDN) - No crítico
 - Missing video URL en hero - Opcional
@@ -326,9 +336,9 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
    - Copia el resultado generado
    - Pega en Shopify Theme Customizer
 
-**Formato de datos:**
+**Formato de datos (6 columnas con equipo):**
 ```
-1|Juan Pérez|Elite|2:15:30|100||2|María González|Elite Femenil|2:20:45|80||3|Carlos López|Elite|2:25:15|60
+1|Juan Pérez|Elite|Team Scott|2:15:30|100||2|María González|Elite Femenil|Shimano Racing|2:20:45|80
 ```
 
 **Filtros por categoría:**
@@ -363,19 +373,102 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
 - Drag & drop
 - Copia al portapapeles con un click
 
-**Formato Excel requerido:**
-| Posición | Nombre | Categoría | Tiempo | Puntos |
-|----------|---------|-----------|---------|---------|
-| 1 | Juan | Elite | 2:15:30 | 100 |
+**Formato Excel requerido (ACTUALIZADO - 6 columnas):**
+| Posición | Nombre | Categoría | Equipo | Tiempo | Puntos |
+|----------|---------|-----------|--------|---------|---------|
+| 1 | Juan | Elite | Team Scott | 2:15:30 | 100 |
+| 2 | María | Amateur | Shimano | 2:20:45 | 80 |
 
 **Salida generada:**
 ```
-1|Juan|Elite|2:15:30|100||2|María|Amateur|2:20:45|80
+1|Juan|Elite|Team Scott|2:15:30|100||2|María|Amateur|Shimano|2:20:45|80
 ```
+
+### 5. Sistema de Ranking Overall
+
+**Ubicación:** `/pages/ranking-overall`
+
+**Características:**
+- Calcula automáticamente el ranking acumulado de TODAS las sedes
+- Toma el MEJOR resultado de cada corredor por sede
+- Suma solo los mejores resultados para el puntaje total
+- Filtros automáticos por categoría
+- Estilos de podio (oro, plata, bronce)
+- Muestra equipo de cada corredor
+- Diferencia de puntos vs. líder
+
+**Cómo funciona:**
+1. Hace fetch a `/pages/ranking` vía JavaScript
+2. Extrae todos los resultados de las sedes completadas
+3. Agrupa por sede y por corredor
+4. Calcula el MEJOR puntaje de cada corredor en cada sede
+5. Suma los mejores puntajes de todas las sedes
+6. Ordena por puntaje total descendente
+
+**Ejemplo de cálculo:**
+```
+Corredor: "gibran" - Categoría: "elite"
+
+SEDE 1 - Guanajuato:
+- Aparición 1: 100 puntos
+- Aparición 2: 101 puntos
+- Aparición 3: 102 puntos
+- Aparición 4: 103 puntos
+→ MEJOR: 103 puntos
+
+SEDE 2 - Puebla:
+- Aparición 1: 100 puntos
+- Aparición 2: 101 puntos
+- Aparición 3: 102 puntos
+- Aparición 4: 103 puntos
+→ MEJOR: 103 puntos
+
+TOTAL OVERALL: 103 + 103 = 206 puntos ✅
+```
+
+**Archivos involucrados:**
+- `sections/ranking-overall.liquid` - Sección principal de overall
+- `templates/page.ranking-overall.json` - Template de la página
+- `sections/ranking.liquid` - Botón "VER OVERALL" agregado
+
+**Campos mostrados:**
+- Posición
+- Nombre del corredor
+- Categoría
+- Equipo
+- Puntos totales
+- Diferencia con el líder
 
 ---
 
-## 🔄 Próximos Pasos (V.3)
+## 🔧 Fixes y Mejoras Técnicas (V.3)
+
+### Fix de Visibilidad de Tarjetas Upcoming
+**Problema:** Al cambiar una sede de "upcoming" a "completed", las demás sedes configuradas como "upcoming" se volvían invisibles.
+
+**Solución implementada:**
+1. Agregado `display: block !important` a `.ranking-card`
+2. Agregado `visibility: visible !important` y `opacity: 1 !important`
+3. Fondo naranja visible para tarjetas upcoming: `rgba(255, 77, 0, 0.1)`
+4. Borde más grueso: `2px solid rgba(255, 77, 0, 0.3)`
+5. `min-height: 300px` en secciones upcoming
+6. Template pre-configurado con 5 bloques de sedes
+
+**Archivos modificados:**
+- `sections/ranking.liquid` - CSS con !important flags
+- `templates/page.ranking.json` - 5 bloques pre-configurados
+
+### Templates Pre-configurados
+Todas las páginas de ranking ahora incluyen los 5 bloques de sedes por defecto:
+1. SEDE 1 - Guanajuato (21-22 Febrero 2026)
+2. SEDE 2 - Puebla (21-22 Marzo 2026)
+3. SEDE 3 - Guadalajara (30-31 Mayo 2026)
+4. SEDE 4 - Ixtapan de la Sal (18-19 Julio 2026)
+5. SEDE 5 - Taxco (24-25 Octubre 2026 - GRAN FINAL)
+
+---
+
+## 🔄 Próximos Pasos (V.4)
 
 - [ ] Crear productos para las 4 sedes restantes
 - [ ] Agregar video al hero
@@ -384,8 +477,8 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
 - [ ] Implementar blog/noticias
 - [ ] SEO optimization
 - [ ] Performance optimization
-- [ ] Integración con sistema de puntos
 - [ ] Dashboard de administración de inscripciones
+- [ ] Sistema de puntos automático por posición
 
 ---
 

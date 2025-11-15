@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "ranking-overall": {
+      "type": "ranking-overall",
+      "settings": {
+        "title": "Ranking Overall 2026",
+        "subtitle": "Clasificación general acumulada de todas las fechas del campeonato"
+      }
+    }
+  },
+  "order": [
+    "ranking-overall"
+  ]
+}
