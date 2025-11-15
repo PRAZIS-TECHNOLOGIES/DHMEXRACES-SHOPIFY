@@ -1,144 +1,161 @@
 {% comment %}
-  Product page for DHMEXRACES race registrations
+  Product page for DHMEXRACES race registrations - Professional Design
 {% endcomment %}
 
-<section class="product-race">
-  <div class="product-race__glow"></div>
-  <div class="product-race__container">
+<section class="product">
+  <div class="product__container">
 
     {%- comment -%} Product Gallery {%- endcomment -%}
-    <div class="product-race__gallery">
+    <div class="product__gallery">
       {% if product.images.size > 0 %}
-        <div class="product-race__main-image">
+        <div class="product__main-image">
           <img
-            src="{{ product.featured_image | image_url: width: 1000 }}"
+            src="{{ product.featured_image | image_url: width: 1200 }}"
             alt="{{ product.title }}"
             id="mainProductImage"
-            class="product-race__image"
-            width="1000"
-            height="600">
+            class="product__image"
+            width="1200"
+            height="800">
         </div>
 
         {% if product.images.size > 1 %}
-          <div class="product-race__thumbnails">
+          <div class="product__thumbnails">
             {% for image in product.images %}
               <button
                 type="button"
-                class="product-race__thumbnail {% if forloop.first %}active{% endif %}"
-                data-image="{{ image | image_url: width: 1000 }}"
+                class="product__thumbnail {% if forloop.first %}active{% endif %}"
+                data-image="{{ image | image_url: width: 1200 }}"
                 onclick="changeMainImage(this)">
-                <img src="{{ image | image_url: width: 150 }}" alt="{{ product.title }}" width="150" height="100">
+                <img src="{{ image | image_url: width: 200 }}" alt="{{ product.title }}" width="200" height="150">
               </button>
             {% endfor %}
           </div>
         {% endif %}
       {% else %}
-        <div class="product-race__placeholder">
+        <div class="product__placeholder">
           <span>{{ product.title }}</span>
         </div>
       {% endif %}
     </div>
 
     {%- comment -%} Product Info & Form {%- endcomment -%}
-    <div class="product-race__info">
+    <div class="product__info">
 
       {%- comment -%} Race Badge {%- endcomment -%}
       {% if product.metafields.custom.race_round != blank %}
-        <div class="product-race__badge">
+        <div class="product__badge">
           {{ product.metafields.custom.race_round }}
         </div>
       {% endif %}
 
       {%- comment -%} Title {%- endcomment -%}
-      <h1 class="product-race__title">{{ product.title }}</h1>
+      <h1 class="product__title">{{ product.title }}</h1>
 
       {%- comment -%} Race Details {%- endcomment -%}
-      <div class="product-race__details">
-        {% if product.metafields.custom.race_date != blank %}
-          <div class="product-race__detail">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M6 2V5M14 2V5M3 8H17M5 4H15C16.1046 4 17 4.89543 17 6V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-            <span>{{ product.metafields.custom.race_date }}</span>
-          </div>
-        {% endif %}
+      {% if product.metafields.custom.race_date != blank or product.metafields.custom.race_location != blank %}
+        <div class="product__details">
+          {% if product.metafields.custom.race_date != blank %}
+            <div class="product__detail">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M6 2V5M14 2V5M3 8H17M5 4H15C16.1046 4 17 4.89543 17 6V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>{{ product.metafields.custom.race_date }}</span>
+            </div>
+          {% endif %}
 
-        {% if product.metafields.custom.race_location != blank %}
-          <div class="product-race__detail">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 2C7.23858 2 5 4.23858 5 7C5 11.5 10 18 10 18C10 18 15 11.5 15 7C15 4.23858 12.7614 2 10 2Z" stroke="currentColor" stroke-width="2"/>
-              <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="2"/>
-            </svg>
-            <span>{{ product.metafields.custom.race_location }}</span>
-          </div>
-        {% endif %}
-      </div>
+          {% if product.metafields.custom.race_location != blank %}
+            <div class="product__detail">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2C7.23858 2 5 4.23858 5 7C5 11.5 10 18 10 18C10 18 15 11.5 15 7C15 4.23858 12.7614 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>{{ product.metafields.custom.race_location }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
 
       {%- comment -%} Description {%- endcomment -%}
-      <div class="product-race__description">
-        {{ product.description }}
-      </div>
-
-      {%- comment -%} Price {%- endcomment -%}
-      <div class="product-race__price-container">
-        <div class="product-race__price" id="productPrice">
-          {{ product.selected_or_first_available_variant.price | money }}
+      {% if product.description != blank %}
+        <div class="product__description">
+          {{ product.description }}
         </div>
-        <span class="product-race__price-label">MXN por inscripción</span>
+      {% endif %}
+
+      {%- comment -%} Price Card {%- endcomment -%}
+      <div class="product__price-card">
+        <div class="product__price-label">Precio por inscripción</div>
+        <div style="display: flex; align-items: baseline;">
+          <div class="product__price" id="productPrice">
+            {{ product.selected_or_first_available_variant.price | money }}
+          </div>
+          <span class="product__price-currency">MXN</span>
+        </div>
       </div>
 
       {%- comment -%} Add to Cart Form {%- endcomment -%}
-      {% form 'product', product, class: 'product-race__form' %}
+      {% form 'product', product, class: 'product__form' %}
         {% assign current_variant = product.selected_or_first_available_variant %}
 
-        {%- comment -%} Category Selector {%- endcomment -%}
+        {%- comment -%} Category Selector - Button Style {%- endcomment -%}
         {% if product.variants.size > 1 %}
-          <div class="product-race__field">
-            <label for="categorySelect" class="product-race__label">
+          <div class="product__field">
+            <label class="product__label">
               Categoría
             </label>
-            <select
-              name="id"
-              id="categorySelect"
-              class="product-race__select"
-              onchange="updatePrice(this)">
+            <input type="hidden" name="id" id="selectedVariantId" value="{{ current_variant.id }}">
+            <div class="product__categories">
               {% for variant in product.variants %}
-                <option
-                  value="{{ variant.id }}"
+                <button
+                  type="button"
+                  class="product__category {% if variant == current_variant %}active{% endif %} {% unless variant.available %}disabled{% endunless %}"
+                  data-variant-id="{{ variant.id }}"
                   data-price="{{ variant.price | money }}"
-                  {% if variant == current_variant %}selected{% endif %}
-                  {% unless variant.available %}disabled{% endunless %}>
-                  {{ variant.title }}{% unless variant.available %} - AGOTADO{% endunless %}
-                </option>
+                  {% unless variant.available %}disabled{% endunless %}
+                  onclick="selectCategory(this)">
+                  {{ variant.title }}
+                  {% unless variant.available %}
+                    <span class="product__category-sold">Agotado</span>
+                  {% endunless %}
+                </button>
               {% endfor %}
-            </select>
+            </div>
           </div>
         {% else %}
           <input type="hidden" name="id" value="{{ current_variant.id }}">
         {% endif %}
 
         {%- comment -%} Quantity {%- endcomment -%}
-        <div class="product-race__field">
-          <label for="quantity" class="product-race__label">
-            Cantidad de inscripciones
+        <div class="product__field">
+          <label for="quantity" class="product__label">
+            Cantidad
           </label>
-          <div class="product-race__quantity">
-            <button type="button" class="product-race__qty-btn" onclick="decreaseQty()">-</button>
+          <div class="product__quantity">
+            <button type="button" class="product__qty-btn" onclick="decreaseQty()" aria-label="Disminuir cantidad">
+              <svg width="16" height="2" viewBox="0 0 16 2" fill="none">
+                <path d="M0 1H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
             <input
               type="number"
               name="quantity"
               id="quantity"
               min="1"
               value="1"
-              class="product-race__qty-input">
-            <button type="button" class="product-race__qty-btn" onclick="increaseQty()">+</button>
+              class="product__qty-input"
+              readonly>
+            <button type="button" class="product__qty-btn" onclick="increaseQty()" aria-label="Aumentar cantidad">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 0V16M0 8H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
           </div>
         </div>
 
         {%- comment -%} Submit Button {%- endcomment -%}
         <button
           type="submit"
-          class="product-race__submit"
+          class="product__submit"
           {% unless current_variant.available %}disabled{% endunless %}>
           {% if current_variant.available %}
             Inscribirse Ahora
@@ -147,11 +164,26 @@
           {% endif %}
         </button>
 
-        {%- comment -%} Additional Info {%- endcomment -%}
-        <div class="product-race__footer">
-          <p>Mecánica Neutral Shimano</p>
-          <p>Puntos para campeonato nacional</p>
-          <p>Premios en efectivo</p>
+        {%- comment -%} Benefits {%- endcomment -%}
+        <div class="product__benefits">
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Mecánica Neutral Shimano</span>
+          </div>
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Puntos campeonato nacional</span>
+          </div>
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Premios en efectivo</span>
+          </div>
         </div>
       {% endform %}
     </div>
@@ -164,16 +196,27 @@
     const newImage = button.getAttribute('data-image');
     document.getElementById('mainProductImage').src = newImage;
 
-    // Update active thumbnail
-    document.querySelectorAll('.product-race__thumbnail').forEach(thumb => {
+    document.querySelectorAll('.product__thumbnail').forEach(thumb => {
       thumb.classList.remove('active');
     });
     button.classList.add('active');
   }
 
-  function updatePrice(select) {
-    const selectedOption = select.options[select.selectedIndex];
-    const price = selectedOption.getAttribute('data-price');
+  function selectCategory(button) {
+    if (button.disabled) return;
+
+    // Update active state
+    document.querySelectorAll('.product__category').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    button.classList.add('active');
+
+    // Update hidden input with variant ID
+    const variantId = button.getAttribute('data-variant-id');
+    document.getElementById('selectedVariantId').value = variantId;
+
+    // Update price
+    const price = button.getAttribute('data-price');
     document.getElementById('productPrice').textContent = price;
   }
 
@@ -188,603 +231,442 @@
       input.value = parseInt(input.value) - 1;
     }
   }
+
+  // Auto-select category if coming from registration page
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectedCategory = sessionStorage.getItem('selectedCategory');
+    if (selectedCategory) {
+      // Find button with matching category name
+      const buttons = document.querySelectorAll('.product__category');
+      buttons.forEach(button => {
+        const buttonText = button.textContent.trim().replace(/\s+/g, ' ');
+        const categoryText = selectedCategory.trim().replace(/\s+/g, ' ');
+
+        if (buttonText.includes(categoryText) || categoryText.includes(buttonText)) {
+          // Click the button to select it
+          button.click();
+          // Scroll to the form
+          setTimeout(() => {
+            button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+      });
+      // Clear the sessionStorage
+      sessionStorage.removeItem('selectedCategory');
+    }
+  });
 </script>
 
 {% stylesheet %}
-  .product-race {
+  /* Product Section */
+  .product {
     min-height: 100vh;
-    padding: 120px 20px 80px;
+    padding: 140px 24px 80px;
     background: #000000;
-    position: relative;
-    overflow: hidden;
   }
 
-  .product-race__glow {
-    position: absolute;
-    width: 800px;
-    height: 800px;
-    background: radial-gradient(circle, rgba(255, 77, 0, 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    top: -200px;
-    right: -200px;
-    animation: float 20s ease-in-out infinite;
-    pointer-events: none;
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(-100px, 100px) scale(1.1); }
-    66% { transform: translate(100px, -100px) scale(0.9); }
-  }
-
-  .product-race__container {
-    max-width: 1600px;
+  .product__container {
+    max-width: 1280px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 5rem;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 80px;
     align-items: start;
-    position: relative;
-    z-index: 1;
   }
 
   /* Gallery */
-  .product-race__gallery {
+  .product__gallery {
     position: sticky;
-    top: 120px;
+    top: 140px;
   }
 
-  .product-race__main-image {
-    border-radius: 40px;
+  .product__main-image {
+    border-radius: 24px;
     overflow: hidden;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
-    border: 3px solid transparent;
-    background-clip: padding-box;
-    margin-bottom: 2rem;
-    aspect-ratio: 4/3;
-    position: relative;
-    box-shadow:
-      0 30px 90px rgba(0, 0, 0, 0.8),
-      0 0 0 1px rgba(255, 77, 0, 0.3),
-      inset 0 0 60px rgba(255, 77, 0, 0.05);
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    background: #111;
+    margin-bottom: 20px;
+    aspect-ratio: 3/2;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 
-  .product-race__main-image::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.2) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    z-index: 1;
-    pointer-events: none;
+  .product__main-image:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
   }
 
-  .product-race__main-image:hover {
-    transform: scale(1.02);
-    box-shadow:
-      0 40px 120px rgba(255, 77, 0, 0.3),
-      0 0 0 1px rgba(255, 77, 0, 0.6),
-      inset 0 0 80px rgba(255, 77, 0, 0.1);
-  }
-
-  .product-race__main-image:hover::before {
-    opacity: 1;
-  }
-
-  .product-race__image {
+  .product__image {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    position: relative;
-    z-index: 0;
   }
 
-  .product-race__thumbnails {
+  .product__thumbnails {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-    gap: 1.25rem;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
   }
 
-  .product-race__thumbnail {
-    border: 3px solid rgba(255, 255, 255, 0.08);
-    border-radius: 20px;
+  .product__thumbnail {
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.02);
+    background: #111;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease;
     padding: 0;
-    aspect-ratio: 1;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    aspect-ratio: 3/2;
   }
 
-  .product-race__thumbnail::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.3), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 1;
+  .product__thumbnail:hover {
+    border-color: rgba(255, 77, 0, 0.4);
+    transform: translateY(-2px);
   }
 
-  .product-race__thumbnail:hover {
-    border-color: rgba(255, 77, 0, 0.5);
-    transform: translateY(-5px) scale(1.05);
-    box-shadow:
-      0 20px 50px rgba(255, 77, 0, 0.3),
-      0 0 0 1px rgba(255, 77, 0, 0.5);
-  }
-
-  .product-race__thumbnail:hover::before {
-    opacity: 1;
-  }
-
-  .product-race__thumbnail.active {
+  .product__thumbnail.active {
     border-color: #FF4D00;
-    transform: translateY(-5px) scale(1.1);
-    box-shadow:
-      0 25px 60px rgba(255, 77, 0, 0.5),
-      0 0 0 2px #FF4D00,
-      inset 0 0 20px rgba(255, 77, 0, 0.2);
+    box-shadow: 0 0 0 1px #FF4D00;
   }
 
-  .product-race__thumbnail.active::before {
-    opacity: 1;
-  }
-
-  .product-race__thumbnail img {
+  .product__thumbnail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-    position: relative;
-    z-index: 0;
   }
 
-  .product-race__placeholder {
-    aspect-ratio: 4/3;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
-    border-radius: 30px;
+  .product__placeholder {
+    aspect-ratio: 3/2;
+    background: #111;
+    border-radius: 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid rgba(255, 77, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.06);
   }
 
-  .product-race__placeholder span {
-    font-size: 2rem;
-    font-weight: 900;
+  .product__placeholder span {
+    font-size: 1.5rem;
+    font-weight: 700;
     color: #FF4D00;
     text-transform: uppercase;
   }
 
   /* Info Section */
-  .product-race__info {
+  .product__info {
     color: #FFFFFF;
   }
 
-  .product-race__badge {
+  .product__badge {
     display: inline-block;
-    background: linear-gradient(135deg, #FF4D00, #FFB800);
+    background: #FF4D00;
     color: #000000;
-    font-weight: 900;
-    font-size: 0.875rem;
-    padding: 0.75rem 2rem;
-    border-radius: 100px;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 8px 16px;
+    border-radius: 6px;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 2rem;
-    box-shadow:
-      0 10px 40px rgba(255, 77, 0, 0.4),
-      inset 0 -2px 10px rgba(0, 0, 0, 0.3);
-    position: relative;
-    overflow: hidden;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
   }
 
-  .product-race__badge::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-    animation: shimmerBadge 3s infinite;
-  }
-
-  @keyframes shimmerBadge {
-    0% { left: -100%; }
-    100% { left: 100%; }
-  }
-
-  .product-race__title {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    font-weight: 900;
-    margin-bottom: 2rem;
-    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    text-transform: uppercase;
+  .product__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.1;
     letter-spacing: -0.02em;
-    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.3));
-    position: relative;
+    color: #FFFFFF;
   }
 
-  .product-race__details {
+  .product__details {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .product-race__detail {
+  .product__detail {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    color: #CCCCCC;
-    font-size: 1.125rem;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
   }
 
-  .product-race__detail svg {
+  .product__detail svg {
     color: #FF4D00;
     flex-shrink: 0;
   }
 
-  .product-race__description {
-    color: #CCCCCC;
+  .product__description {
+    color: rgba(255, 255, 255, 0.7);
     line-height: 1.7;
-    margin-bottom: 2rem;
-    font-size: 1.125rem;
-  }
-
-  .product-race__price-container {
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.15), rgba(255, 136, 0, 0.05));
-    border: 3px solid transparent;
-    border-radius: 30px;
-    padding: 2.5rem 3rem;
-    margin-bottom: 3rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-      0 20px 60px rgba(255, 77, 0, 0.2),
-      inset 0 0 60px rgba(255, 77, 0, 0.1);
-  }
-
-  .product-race__price-container::before {
-    content: '';
-    position: absolute;
-    top: -3px;
-    left: -3px;
-    right: -3px;
-    bottom: -3px;
-    border-radius: 30px;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.6), rgba(255, 184, 0, 0.4));
-    z-index: -1;
-  }
-
-  .product-race__price {
-    font-size: clamp(3rem, 8vw, 4.5rem);
-    font-weight: 900;
-    background: linear-gradient(135deg, #FF4D00 0%, #FFB800 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    margin-bottom: 0.75rem;
-    filter: drop-shadow(0 0 20px rgba(255, 77, 0, 0.5));
-  }
-
-  .product-race__price-label {
-    color: #CCCCCC;
+    margin-bottom: 32px;
     font-size: 1rem;
+  }
+
+  /* Price Card */
+  .product__price-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 77, 0, 0.2);
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .product__price-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.05em;
     font-weight: 600;
+  }
+
+  .product__price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #FF4D00;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .product__price-currency {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    margin-left: 6px;
   }
 
   /* Form */
-  .product-race__form {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 77, 0, 0.02));
-    border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 40px;
-    padding: 3rem;
-    backdrop-filter: blur(20px);
-    box-shadow:
-      0 30px 90px rgba(0, 0, 0, 0.6),
-      inset 0 0 40px rgba(255, 77, 0, 0.05);
+  .product__form {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .product__field {
+    margin-bottom: 24px;
+  }
+
+  .product__label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+  }
+
+  .product__categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .product__category {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
     position: relative;
   }
 
-  .product-race__form::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(255, 77, 0, 0.5), transparent);
+  .product__category:hover:not(.disabled) {
+    border-color: rgba(255, 77, 0, 0.5);
+    background: rgba(255, 77, 0, 0.08);
+    transform: translateY(-1px);
   }
 
-  .product-race__field {
-    margin-bottom: 2rem;
+  .product__category.active {
+    background: #FF4D00;
+    border-color: #FF4D00;
+    color: #000000;
+    box-shadow: 0 4px 12px rgba(255, 77, 0, 0.3);
   }
 
-  .product-race__label {
+  .product__category.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  .product__category-sold {
     display: block;
-    font-weight: 700;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: #FF4D00;
-    margin-bottom: 0.75rem;
+    font-size: 0.7rem;
+    margin-top: 4px;
+    opacity: 0.7;
   }
 
-  .product-race__select {
-    width: 100%;
-    padding: 1.25rem 1.75rem;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
+  .product__quantity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .product__qty-btn {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 77, 0, 0.1);
+    border: 1px solid rgba(255, 77, 0, 0.3);
+    border-radius: 12px;
+    color: #FF4D00;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product__qty-btn:hover {
+    background: rgba(255, 77, 0, 0.2);
+    border-color: #FF4D00;
+    transform: scale(1.05);
+  }
+
+  .product__qty-btn:active {
+    transform: scale(0.95);
+  }
+
+  .product__qty-input {
+    flex: 1;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
     color: #FFFFFF;
     font-size: 1.125rem;
     font-weight: 600;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  }
-
-  .product-race__select:hover {
-    border-color: rgba(255, 77, 0, 0.5);
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
-    transform: translateY(-2px);
-    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.2);
-  }
-
-  .product-race__select:focus {
-    border-color: #FF4D00;
-    outline: none;
-    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.3), 0 0 0 4px rgba(255, 77, 0, 0.1);
-  }
-
-  .product-race__quantity {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .product-race__qty-btn {
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.3), rgba(255, 77, 0, 0.15));
-    border: 3px solid rgba(255, 77, 0, 0.6);
-    border-radius: 18px;
-    color: #FF4D00;
-    font-size: 1.75rem;
-    font-weight: 900;
-    cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.2);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .product-race__qty-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.5), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-
-  .product-race__qty-btn:hover {
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.5), rgba(255, 77, 0, 0.3));
-    border-color: #FF4D00;
-    transform: translateY(-3px) scale(1.05);
-    box-shadow:
-      0 15px 40px rgba(255, 77, 0, 0.4),
-      0 0 0 1px #FF4D00;
-  }
-
-  .product-race__qty-btn:hover::before {
-    opacity: 1;
-  }
-
-  .product-race__qty-btn:active {
-    transform: translateY(-1px) scale(0.98);
-  }
-
-  .product-race__qty-input {
-    flex: 1;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    border-radius: 20px;
-    color: #FFFFFF;
-    font-size: 1.5rem;
-    font-weight: 900;
     text-align: center;
     transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
   }
 
-  .product-race__qty-input:focus {
+  .product__qty-input:focus {
     border-color: #FF4D00;
     outline: none;
-    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.3), 0 0 0 4px rgba(255, 77, 0, 0.1);
+    box-shadow: 0 0 0 3px rgba(255, 77, 0, 0.1);
   }
 
-  .product-race__submit {
+  .product__submit {
     width: 100%;
-    padding: 2rem 3rem;
-    background: linear-gradient(135deg, #FF4D00 0%, #FF8800 50%, #FFB800 100%);
+    padding: 18px 32px;
+    background: #FF4D00;
     border: none;
-    border-radius: 100px;
+    border-radius: 12px;
     color: #000000;
-    font-size: 1.5rem;
-    font-weight: 900;
+    font-size: 1.125rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.15em;
+    letter-spacing: 0.05em;
     cursor: pointer;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    box-shadow:
-      0 20px 60px rgba(255, 77, 0, 0.5),
-      0 0 0 1px rgba(255, 77, 0, 0.3),
-      inset 0 -3px 15px rgba(0, 0, 0, 0.3),
-      inset 0 2px 10px rgba(255, 255, 255, 0.3);
-    margin-bottom: 2.5rem;
-    position: relative;
-    overflow: hidden;
+    transition: all 0.3s ease;
+    margin-bottom: 24px;
   }
 
-  .product-race__submit::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
+  .product__submit:hover:not(:disabled) {
+    background: #FF6A00;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(255, 77, 0, 0.3);
   }
 
-  .product-race__submit:hover:not(:disabled)::before {
-    width: 300px;
-    height: 300px;
+  .product__submit:active:not(:disabled) {
+    transform: translateY(0);
   }
 
-  .product-race__submit:hover:not(:disabled) {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow:
-      0 30px 80px rgba(255, 77, 0, 0.7),
-      0 0 0 2px #FFB800,
-      inset 0 -3px 15px rgba(0, 0, 0, 0.3),
-      inset 0 2px 10px rgba(255, 255, 255, 0.4);
-  }
-
-  .product-race__submit:active:not(:disabled) {
-    transform: translateY(-2px) scale(0.98);
-  }
-
-  .product-race__submit:disabled {
+  .product__submit:disabled {
     opacity: 0.4;
     cursor: not-allowed;
-    filter: grayscale(1);
   }
 
-  .product-race__footer {
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.05), transparent);
-    border: 2px solid rgba(255, 77, 0, 0.2);
-    border-radius: 20px;
-    padding: 1.5rem 2rem;
-    color: #CCCCCC;
-    font-size: 0.95rem;
-    line-height: 2;
-    font-weight: 500;
+  .product__benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
   }
 
-  .product-race__footer p {
-    margin-bottom: 0.75rem;
+  .product__benefit {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
   }
 
-  .product-race__footer p:last-child {
-    margin-bottom: 0;
-  }
-
-  .product-race__footer p::before {
-    content: '✓';
+  .product__benefit svg {
     color: #FF4D00;
-    font-weight: 900;
-    font-size: 1.25rem;
+    flex-shrink: 0;
   }
 
   /* Mobile */
   @media (max-width: 968px) {
-    .product-race {
-      padding: 100px 15px 60px;
+    .product {
+      padding: 100px 16px 60px;
     }
 
-    .product-race__glow {
-      width: 500px;
-      height: 500px;
-      top: -100px;
-      right: -100px;
-    }
-
-    .product-race__container {
+    .product__container {
       grid-template-columns: 1fr;
-      gap: 3rem;
+      gap: 40px;
     }
 
-    .product-race__gallery {
+    .product__gallery {
       position: relative;
       top: 0;
     }
 
-    .product-race__main-image {
-      border-radius: 30px;
+    .product__title {
+      font-size: 2rem;
     }
 
-    .product-race__thumbnails {
-      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-      gap: 1rem;
+    .product__price-card {
+      padding: 16px 20px;
     }
 
-    .product-race__title {
-      font-size: 2.5rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .product-race__price-container {
-      padding: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .product-race__price {
-      font-size: 3rem;
-    }
-
-    .product-race__form {
-      padding: 2rem;
-      border-radius: 30px;
-    }
-
-    .product-race__submit {
-      font-size: 1.25rem;
-      padding: 1.5rem 2.5rem;
-    }
-
-    .product-race__qty-btn {
-      width: 50px;
-      height: 50px;
+    .product__price {
       font-size: 1.5rem;
+    }
+
+    .product__price-label {
+      font-size: 0.75rem;
+    }
+
+    .product__form {
+      padding: 24px;
+    }
+
+    .product__thumbnails {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .product__categories {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .product__category {
+      padding: 12px 14px;
+      font-size: 0.85rem;
     }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "Product Race",
+  "name": "Product",
   "settings": [],
   "disabled_on": {
     "groups": ["header", "footer"]

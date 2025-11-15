@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "registration-form": {
+      "type": "registration-form",
+      "settings": {}
+    }
+  },
+  "order": [
+    "registration-form"
+  ]
+}

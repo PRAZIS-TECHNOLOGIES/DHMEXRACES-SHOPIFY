@@ -1,0 +1,68 @@
+{
+  "sections": {
+    "ranking": {
+      "type": "ranking",
+      "settings": {
+        "title": "Ranking de Carreras",
+        "subtitle": "Resultados oficiales de todas las fechas del campeonato DHMEXRACES 2026"
+      },
+      "blocks": {
+        "race_1": {
+          "type": "race",
+          "settings": {
+            "race_name": "Guanajuato",
+            "race_date": "21-22 Febrero 2026",
+            "status": "upcoming",
+            "results_data": ""
+          }
+        },
+        "race_2": {
+          "type": "race",
+          "settings": {
+            "race_name": "Puebla",
+            "race_date": "21-22 Marzo 2026",
+            "status": "upcoming",
+            "results_data": ""
+          }
+        },
+        "race_3": {
+          "type": "race",
+          "settings": {
+            "race_name": "Guadalajara",
+            "race_date": "30-31 Mayo 2026",
+            "status": "upcoming",
+            "results_data": ""
+          }
+        },
+        "race_4": {
+          "type": "race",
+          "settings": {
+            "race_name": "Ixtapan de la Sal",
+            "race_date": "18-19 Julio 2026",
+            "status": "upcoming",
+            "results_data": ""
+          }
+        },
+        "race_5": {
+          "type": "race",
+          "settings": {
+            "race_name": "Taxco",
+            "race_date": "24-25 Octubre 2026 - GRAN FINAL",
+            "status": "upcoming",
+            "results_data": ""
+          }
+        }
+      },
+      "block_order": [
+        "race_1",
+        "race_2",
+        "race_3",
+        "race_4",
+        "race_5"
+      ]
+    }
+  },
+  "order": [
+    "ranking"
+  ]
+}

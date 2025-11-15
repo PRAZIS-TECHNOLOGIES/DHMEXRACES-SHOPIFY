@@ -52,16 +52,20 @@ dhmexraces-custom/
 │   └── en.default.schema.json    # Schema de traducciones
 │
 ├── sections/
-│   ├── 404.liquid                # Página de error 404
-│   ├── header.liquid             # Header del sitio
-│   ├── header-group.json         # Configuración del header
-│   ├── footer.liquid             # Footer del sitio
-│   ├── footer-group.json         # Configuración del footer
-│   ├── hero-video.liquid         # Hero principal con video
-│   ├── race-dates.liquid         # Sección de fechas de carreras
-│   ├── sponsors.liquid           # Sección de patrocinadores
-│   ├── race-registration.liquid  # Sección de inscripciones
-│   ├── product.liquid            # Página de producto
+│   ├── 404.liquid                        # Página de error 404
+│   ├── header.liquid                     # Header del sitio (con link Ranking)
+│   ├── header-group.json                 # Configuración del header
+│   ├── footer.liquid                     # Footer del sitio
+│   ├── footer-group.json                 # Configuración del footer
+│   ├── hero-video.liquid                 # Hero principal con video
+│   ├── race-dates.liquid                 # Sección de fechas de carreras
+│   ├── sponsors.liquid                   # Sección de patrocinadores
+│   ├── race-registration.liquid          # Sección de inscripciones (variantes)
+│   ├── race-registration-guanajuato.liquid # Página registro Guanajuato
+│   ├── product.liquid                    # Página de producto (con auto-select)
+│   ├── cart-custom.liquid                # Carrito personalizado
+│   ├── registration-form.liquid          # Formulario multi-inscripción
+│   ├── ranking.liquid                    # Página de ranking con filtros
 │   └── [otras secciones]
 │
 ├── snippets/
@@ -71,10 +75,13 @@ dhmexraces-custom/
 │   └── meta-tags.liquid         # Meta tags SEO
 │
 └── templates/
-    ├── index.json               # Template homepage
-    ├── 404.json                 # Template 404
-    ├── product.json             # Template producto default
-    ├── product.guanajuato.json  # Template producto Guanajuato
+    ├── index.json                      # Template homepage
+    ├── 404.json                        # Template 404
+    ├── product.json                    # Template producto default
+    ├── product.guanajuato.json         # Template producto Guanajuato
+    ├── cart.json                       # Template carrito custom
+    ├── page.registration-form.json     # Template formulario inscripción
+    ├── page.ranking.json               # Template página ranking
     └── [otros templates]
 ```
 
@@ -244,12 +251,22 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
 
 ## 📝 Notas de Desarrollo
 
-### Correcciones Aplicadas (V.1 FUNCIONAL)
+### V.1 FUNCIONAL (15 Nov 2025)
 1. ✅ Eliminada coma extra en `sections/header-group.json`
 2. ✅ Agregados atributos width/height en imágenes
 3. ✅ Agregado `defer` al script de animaciones AOS
 4. ✅ Configurado `settings_data.json` con datos básicos
 5. ✅ Subido logo oficial (dhmexraces-logo.png)
+
+### V.2 CHECKOUT & RANKING (15 Nov 2025)
+1. ✅ Sistema completo de checkout e inscripciones
+2. ✅ Carrito personalizado con summary
+3. ✅ Formulario multi-inscripción dinámico
+4. ✅ Página de Ranking con filtros por categoría
+5. ✅ Auto-selección de categorías desde registro
+6. ✅ Herramienta Excel to Ranking converter
+7. ✅ Link de Ranking en header
+8. ✅ 5 sedes configuradas en ranking
 
 ### Warnings Menores
 - Remote assets (AOS CDN) - No crítico
@@ -257,16 +274,118 @@ La tienda está en modo desarrollo (password protected) hasta que se seleccione 
 
 ---
 
-## 🔄 Próximos Pasos (V.2)
+## 🆕 Nuevas Funcionalidades (V.2)
+
+### 1. Sistema de Checkout Completo
+
+**Flujo de inscripción:**
+1. Usuario selecciona categoría en producto
+2. Agrega al carrito (puede agregar múltiples inscripciones)
+3. Ve resumen en `/cart` con cantidades y totales
+4. Click en "Continuar al Registro"
+5. Formulario dinámico (uno por cada inscripción)
+6. Validación de campos y datos
+7. Redirect a Shopify checkout
+
+**Archivos involucrados:**
+- `sections/cart-custom.liquid` - Carrito personalizado
+- `sections/registration-form.liquid` - Formulario multi-inscripción
+- `templates/cart.json` - Template del carrito
+- `templates/page.registration-form.json` - Template del formulario
+
+**Datos capturados por inscripción:**
+- Nombre Completo
+- Fecha de Nacimiento
+- Equipo (opcional)
+- Email
+- Teléfono
+- Categoría (auto-llenada)
+
+### 2. Página de Ranking
+
+**Características:**
+- Diseño tipo F1 profesional
+- Filtros por categoría (automáticos)
+- Reorganización dinámica de posiciones
+- Estilos especiales para podio (oro, plata, bronce)
+- Estado: Próximamente / Completada
+- 5 sedes configuradas
+
+**Cómo agregar resultados:**
+
+1. **Opción A: Manual en Shopify**
+   - Ve a Theme Customizer → Página Ranking
+   - Selecciona el bloque de la carrera
+   - Cambia estado a "Completada"
+   - Pega datos en formato: `posición|nombre|categoría|tiempo|puntos||...`
+
+2. **Opción B: Excel (Recomendado)**
+   - Abre `excel-to-ranking-converter.html` en navegador
+   - Prepara Excel con columnas: Posición | Nombre | Categoría | Tiempo | Puntos
+   - Arrastra archivo a la herramienta
+   - Copia el resultado generado
+   - Pega en Shopify Theme Customizer
+
+**Formato de datos:**
+```
+1|Juan Pérez|Elite|2:15:30|100||2|María González|Elite Femenil|2:20:45|80||3|Carlos López|Elite|2:25:15|60
+```
+
+**Filtros por categoría:**
+- Detecta automáticamente categorías únicas
+- Genera botones de filtro si hay >1 categoría
+- Reorganiza posiciones al filtrar
+- Mantiene estilos de podio (1°, 2°, 3°)
+
+### 3. Auto-Selección de Categorías
+
+**Funcionamiento:**
+- Usuario hace click en categoría desde página de registro
+- Sistema guarda categoría en `sessionStorage`
+- Al llegar a página de producto, auto-selecciona la categoría
+- Scroll automático a la categoría seleccionada
+
+**Archivos:**
+- `sections/race-registration.liquid` - Guarda categoría
+- `sections/race-registration-guanajuato.liquid` - Página dedicada Guanajuato
+- `sections/product.liquid` - Auto-selecciona categoría
+
+### 4. Herramienta Excel to Ranking
+
+**Ubicación:** `excel-to-ranking-converter.html` (raíz del proyecto)
+
+**Funcionalidades:**
+- Convierte archivos .xlsx / .xls
+- Detecta y elimina filas de encabezados automáticamente
+- Convierte tiempos de Excel (decimal) a formato HH:MM:SS
+- Valida que posiciones sean números
+- Genera formato compatible con Shopify
+- Drag & drop
+- Copia al portapapeles con un click
+
+**Formato Excel requerido:**
+| Posición | Nombre | Categoría | Tiempo | Puntos |
+|----------|---------|-----------|---------|---------|
+| 1 | Juan | Elite | 2:15:30 | 100 |
+
+**Salida generada:**
+```
+1|Juan|Elite|2:15:30|100||2|María|Amateur|2:20:45|80
+```
+
+---
+
+## 🔄 Próximos Pasos (V.3)
 
 - [ ] Crear productos para las 4 sedes restantes
 - [ ] Agregar video al hero
 - [ ] Implementar sistema de notificaciones
-- [ ] Integrar pasarela de pagos
 - [ ] Agregar galería de fotos/videos
 - [ ] Implementar blog/noticias
 - [ ] SEO optimization
 - [ ] Performance optimization
+- [ ] Integración con sistema de puntos
+- [ ] Dashboard de administración de inscripciones
 
 ---
 

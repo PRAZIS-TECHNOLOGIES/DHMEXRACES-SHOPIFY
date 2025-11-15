@@ -14,95 +14,58 @@
     {% endif %}
 
     <div class="registration__grid">
-      {% if section.settings.collection != blank %}
-        {% assign collection = collections[section.settings.collection] %}
-        {% for product in collection.products limit: section.settings.products_limit %}
-          <div class="registration-card" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 100 }}">
-            {% if product.featured_image %}
+      {% if section.settings.product != blank %}
+        {% assign selected_product = all_products[section.settings.product] %}
+        {% for variant in selected_product.variants %}
+          <div class="registration-card" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 100 }}" onclick="goToVariant('{{ variant.title }}', '{{ selected_product.url }}')">
+            {% if selected_product.featured_image %}
               <div class="registration-card__image">
-                {{ product.featured_image | image_url: width: 500 | image_tag: class: 'registration-card__img', loading: 'lazy', alt: product.title }}
-                {% if product.compare_at_price > product.price %}
-                  <div class="registration-card__sale">
-                    {% assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
-                    -{{ discount }}%
-                  </div>
-                {% endif %}
+                {{ selected_product.featured_image | image_url: width: 500 | image_tag: class: 'registration-card__img', loading: 'lazy', alt: variant.title }}
               </div>
             {% endif %}
 
             <div class="registration-card__content">
               <div class="registration-card__header">
-                <h3 class="registration-card__name">{{ product.title }}</h3>
-
-                {% if product.metafields.custom.category != blank %}
-                  <span class="registration-card__category">{{ product.metafields.custom.category }}</span>
-                {% endif %}
+                <h3 class="registration-card__name">{{ variant.title }}</h3>
+                <span class="registration-card__category">{{ selected_product.title }}</span>
               </div>
 
-              {% if product.description != blank %}
-                <p class="registration-card__description">{{ product.description | strip_html | truncate: 120 }}</p>
-              {% endif %}
-
               <div class="registration-card__features">
-                {% if product.metafields.custom.features != blank %}
-                  {% assign features = product.metafields.custom.features | split: ',' %}
-                  {% for feature in features limit: 4 %}
-                    <div class="registration-card__feature">
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      </svg>
-                      <span>{{ feature | strip }}</span>
-                    </div>
-                  {% endfor %}
-                {% else %}
-                  <div class="registration-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Número de corredor</span>
-                  </div>
-                  <div class="registration-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Kit de bienvenida</span>
-                  </div>
-                  <div class="registration-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Seguro de carrera</span>
-                  </div>
-                  <div class="registration-card__feature">
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    <span>Hidratación</span>
-                  </div>
-                {% endif %}
+                <div class="registration-card__feature">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Mecánica Neutral Shimano</span>
+                </div>
+                <div class="registration-card__feature">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Puntos campeonato</span>
+                </div>
+                <div class="registration-card__feature">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                  <span>Premios en efectivo</span>
+                </div>
               </div>
 
               <div class="registration-card__footer">
                 <div class="registration-card__pricing">
-                  {% if product.compare_at_price > product.price %}
-                    <span class="registration-card__price--original">{{ product.compare_at_price | money }}</span>
+                  {% if variant.compare_at_price > variant.price %}
+                    <span class="registration-card__price--original">{{ variant.compare_at_price | money }}</span>
                   {% endif %}
-                  <span class="registration-card__price">{{ product.price | money }}</span>
+                  <span class="registration-card__price">{{ variant.price | money }}</span>
                 </div>
 
-                {% if product.available %}
-                  <a href="{{ product.url }}" class="registration-card__button">
-                    <span>Inscribirse</span>
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M4.16675 10H15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                      <path d="M10 4.16663L15.8333 9.99996L10 15.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                  </a>
-                {% else %}
-                  <button class="registration-card__button registration-card__button--disabled" disabled>
-                    Agotado
-                  </button>
-                {% endif %}
+                <div class="registration-card__button">
+                  <span>Inscribirse</span>
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M4.16675 10H15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M10 4.16663L15.8333 9.99996L10 15.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
@@ -142,6 +105,15 @@
     {% endif %}
   </div>
 </section>
+
+<script>
+  function goToVariant(variantTitle, productUrl) {
+    // Store selected variant in sessionStorage
+    sessionStorage.setItem('selectedCategory', variantTitle);
+    // Redirect to product page
+    window.location.href = productUrl;
+  }
+</script>
 
 {% stylesheet %}
   .registration {
@@ -212,6 +184,7 @@
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 3px solid #F5F5F5;
     position: relative;
+    cursor: pointer;
   }
 
   .registration-card::before {
@@ -489,19 +462,10 @@
       "default": "Elige tu categoría y asegura tu lugar"
     },
     {
-      "type": "collection",
-      "id": "collection",
-      "label": "Collection",
-      "info": "Select collection with registration products"
-    },
-    {
-      "type": "range",
-      "id": "products_limit",
-      "label": "Products Limit",
-      "min": 1,
-      "max": 12,
-      "step": 1,
-      "default": 6
+      "type": "product",
+      "id": "product",
+      "label": "Product",
+      "info": "Select the product with multiple variants (categories)"
     },
     {
       "type": "text",
