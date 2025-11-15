@@ -1,0 +1,525 @@
+{% comment %}
+  Race Registration Section for DHMEXRACES
+  Displays registration categories as products
+{% endcomment %}
+
+<section class="registration">
+  <div class="registration__container">
+    {% if section.settings.title != blank %}
+      <h2 class="registration__title" data-aos="fade-up">{{ section.settings.title }}</h2>
+    {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+      <p class="registration__subtitle" data-aos="fade-up" data-aos-delay="100">{{ section.settings.subtitle }}</p>
+    {% endif %}
+
+    <div class="registration__grid">
+      {% if section.settings.collection != blank %}
+        {% assign collection = collections[section.settings.collection] %}
+        {% for product in collection.products limit: section.settings.products_limit %}
+          <div class="registration-card" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 100 }}">
+            {% if product.featured_image %}
+              <div class="registration-card__image">
+                {{ product.featured_image | image_url: width: 500 | image_tag: class: 'registration-card__img', loading: 'lazy', alt: product.title }}
+                {% if product.compare_at_price > product.price %}
+                  <div class="registration-card__sale">
+                    {% assign discount = product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price %}
+                    -{{ discount }}%
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <div class="registration-card__content">
+              <div class="registration-card__header">
+                <h3 class="registration-card__name">{{ product.title }}</h3>
+
+                {% if product.metafields.custom.category != blank %}
+                  <span class="registration-card__category">{{ product.metafields.custom.category }}</span>
+                {% endif %}
+              </div>
+
+              {% if product.description != blank %}
+                <p class="registration-card__description">{{ product.description | strip_html | truncate: 120 }}</p>
+              {% endif %}
+
+              <div class="registration-card__features">
+                {% if product.metafields.custom.features != blank %}
+                  {% assign features = product.metafields.custom.features | split: ',' %}
+                  {% for feature in features limit: 4 %}
+                    <div class="registration-card__feature">
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                      <span>{{ feature | strip }}</span>
+                    </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="registration-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Número de corredor</span>
+                  </div>
+                  <div class="registration-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Kit de bienvenida</span>
+                  </div>
+                  <div class="registration-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Seguro de carrera</span>
+                  </div>
+                  <div class="registration-card__feature">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.3337 4L6.00033 11.3333L2.66699 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Hidratación</span>
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="registration-card__footer">
+                <div class="registration-card__pricing">
+                  {% if product.compare_at_price > product.price %}
+                    <span class="registration-card__price--original">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                  <span class="registration-card__price">{{ product.price | money }}</span>
+                </div>
+
+                {% if product.available %}
+                  <a href="{{ product.url }}" class="registration-card__button">
+                    <span>Inscribirse</span>
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4.16675 10H15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M10 4.16663L15.8333 9.99996L10 15.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </a>
+                {% else %}
+                  <button class="registration-card__button registration-card__button--disabled" disabled>
+                    Agotado
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        {% comment %} Placeholder cards if no collection is selected {% endcomment %}
+        {% for i in (1..3) %}
+          <div class="registration-card" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 100 }}">
+            <div class="registration-card__content">
+              <div class="registration-card__header">
+                <h3 class="registration-card__name">
+                  {% if forloop.index == 1 %}Elite{% elsif forloop.index == 2 %}Amateur{% else %}Junior{% endif %}
+                </h3>
+                <span class="registration-card__category">Categoría {{ forloop.index }}</span>
+              </div>
+              <p class="registration-card__description">Selecciona una colección en la configuración del tema.</p>
+              <div class="registration-card__footer">
+                <div class="registration-card__pricing">
+                  <span class="registration-card__price">$0.00</span>
+                </div>
+                <button class="registration-card__button registration-card__button--disabled" disabled>
+                  Configurar
+                </button>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+
+    {% if section.settings.button_label != blank %}
+      <div class="registration__cta" data-aos="fade-up">
+        <a href="{{ section.settings.button_link }}" class="registration__cta-button">
+          {{ section.settings.button_label }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .registration {
+    min-height: 100vh;
+    padding: 120px 20px;
+    background: #FFFFFF;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .registration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(255, 77, 0, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(255, 184, 0, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .registration__container {
+    max-width: 1600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .registration__title {
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #000000 0%, #FF4D00 50%, #000000 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.3));
+  }
+
+  .registration__subtitle {
+    text-align: center;
+    font-size: clamp(1.125rem, 2vw, 1.5rem);
+    color: #555;
+    margin-bottom: 5rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 400;
+  }
+
+  .registration__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  .registration-card {
+    background: #FFFFFF;
+    border-radius: 30px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 3px solid #F5F5F5;
+    position: relative;
+  }
+
+  .registration-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.02) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+  }
+
+  .registration-card:hover::before {
+    opacity: 1;
+  }
+
+  .registration-card:hover {
+    transform: translateY(-20px) scale(1.02);
+    box-shadow: 0 30px 80px rgba(255, 77, 0, 0.2),
+                0 0 60px rgba(255, 77, 0, 0.1);
+    border-color: #FF4D00;
+  }
+
+  .registration-card__image {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #F5F5F5, #EEEEEE);
+  }
+
+  .registration-card__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: brightness(0.95) contrast(1.05);
+  }
+
+  .registration-card:hover .registration-card__img {
+    transform: scale(1.1) rotate(-2deg);
+    filter: brightness(1) contrast(1.1);
+  }
+
+  .registration-card__sale {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #FF0000, #CC0000);
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 100px;
+    font-weight: 800;
+    font-size: 1rem;
+    box-shadow: 0 8px 24px rgba(255, 0, 0, 0.4);
+    z-index: 2;
+  }
+
+  .registration-card__content {
+    padding: 2.5rem;
+  }
+
+  .registration-card__header {
+    margin-bottom: 1.5rem;
+  }
+
+  .registration-card__category {
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #FF4D00, #FFB800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.75rem;
+  }
+
+  .registration-card__name {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #000000;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  .registration-card__description {
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .registration-card__features {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+  }
+
+  .registration-card__feature {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  .registration-card__feature svg {
+    flex-shrink: 0;
+    color: #00cc66;
+  }
+
+  .registration-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .registration-card__pricing {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .registration-card__price--original {
+    font-size: 1.125rem;
+    color: #999;
+    text-decoration: line-through;
+    font-weight: 600;
+  }
+
+  .registration-card__price {
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF4D00, #FF8800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 8px rgba(255, 77, 0, 0.3));
+  }
+
+  .registration-card__button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: linear-gradient(135deg, #FF4D00 0%, #FF8800 50%, #FFB800 100%);
+    color: #000;
+    text-decoration: none;
+    border-radius: 100px;
+    font-weight: 800;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.3);
+    overflow: hidden;
+  }
+
+  .registration-card__button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: left 0.5s;
+  }
+
+  .registration-card__button:hover::before {
+    left: 100%;
+  }
+
+  .registration-card__button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.5);
+  }
+
+  .registration-card__button svg {
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .registration-card__button:hover svg {
+    transform: translateX(8px);
+  }
+
+  .registration-card__button--disabled {
+    background: linear-gradient(135deg, #CCC, #999);
+    cursor: not-allowed;
+    color: #666;
+  }
+
+  .registration-card__button--disabled:hover {
+    transform: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
+
+  .registration-card__button--disabled::before {
+    display: none;
+  }
+
+  .registration__cta {
+    text-align: center;
+    margin-top: 3rem;
+  }
+
+  .registration__cta-button {
+    display: inline-block;
+    padding: 1.25rem 3rem;
+    background: #0a0a0a;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1.125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+  }
+
+  .registration__cta-button:hover {
+    background: #ff6b00;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    .registration {
+      padding: 60px 15px;
+    }
+
+    .registration__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .registration-card__footer {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .registration-card__button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Race Registration",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Inscripciones"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Elige tu categoría y asegura tu lugar"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection",
+      "info": "Select collection with registration products"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products Limit",
+      "min": 1,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "CTA Button Label",
+      "default": "Ver todas las categorías"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "CTA Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Race Registration",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

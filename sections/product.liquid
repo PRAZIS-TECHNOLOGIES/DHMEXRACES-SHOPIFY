@@ -1,0 +1,793 @@
+{% comment %}
+  Product page for DHMEXRACES race registrations
+{% endcomment %}
+
+<section class="product-race">
+  <div class="product-race__glow"></div>
+  <div class="product-race__container">
+
+    {%- comment -%} Product Gallery {%- endcomment -%}
+    <div class="product-race__gallery">
+      {% if product.images.size > 0 %}
+        <div class="product-race__main-image">
+          <img
+            src="{{ product.featured_image | image_url: width: 1000 }}"
+            alt="{{ product.title }}"
+            id="mainProductImage"
+            class="product-race__image"
+            width="1000"
+            height="600">
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="product-race__thumbnails">
+            {% for image in product.images %}
+              <button
+                type="button"
+                class="product-race__thumbnail {% if forloop.first %}active{% endif %}"
+                data-image="{{ image | image_url: width: 1000 }}"
+                onclick="changeMainImage(this)">
+                <img src="{{ image | image_url: width: 150 }}" alt="{{ product.title }}" width="150" height="100">
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="product-race__placeholder">
+          <span>{{ product.title }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Product Info & Form {%- endcomment -%}
+    <div class="product-race__info">
+
+      {%- comment -%} Race Badge {%- endcomment -%}
+      {% if product.metafields.custom.race_round != blank %}
+        <div class="product-race__badge">
+          {{ product.metafields.custom.race_round }}
+        </div>
+      {% endif %}
+
+      {%- comment -%} Title {%- endcomment -%}
+      <h1 class="product-race__title">{{ product.title }}</h1>
+
+      {%- comment -%} Race Details {%- endcomment -%}
+      <div class="product-race__details">
+        {% if product.metafields.custom.race_date != blank %}
+          <div class="product-race__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M6 2V5M14 2V5M3 8H17M5 4H15C16.1046 4 17 4.89543 17 6V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span>{{ product.metafields.custom.race_date }}</span>
+          </div>
+        {% endif %}
+
+        {% if product.metafields.custom.race_location != blank %}
+          <div class="product-race__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M10 2C7.23858 2 5 4.23858 5 7C5 11.5 10 18 10 18C10 18 15 11.5 15 7C15 4.23858 12.7614 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+              <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <span>{{ product.metafields.custom.race_location }}</span>
+          </div>
+        {% endif %}
+      </div>
+
+      {%- comment -%} Description {%- endcomment -%}
+      <div class="product-race__description">
+        {{ product.description }}
+      </div>
+
+      {%- comment -%} Price {%- endcomment -%}
+      <div class="product-race__price-container">
+        <div class="product-race__price" id="productPrice">
+          {{ product.selected_or_first_available_variant.price | money }}
+        </div>
+        <span class="product-race__price-label">MXN por inscripción</span>
+      </div>
+
+      {%- comment -%} Add to Cart Form {%- endcomment -%}
+      {% form 'product', product, class: 'product-race__form' %}
+        {% assign current_variant = product.selected_or_first_available_variant %}
+
+        {%- comment -%} Category Selector {%- endcomment -%}
+        {% if product.variants.size > 1 %}
+          <div class="product-race__field">
+            <label for="categorySelect" class="product-race__label">
+              Categoría
+            </label>
+            <select
+              name="id"
+              id="categorySelect"
+              class="product-race__select"
+              onchange="updatePrice(this)">
+              {% for variant in product.variants %}
+                <option
+                  value="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  {% if variant == current_variant %}selected{% endif %}
+                  {% unless variant.available %}disabled{% endunless %}>
+                  {{ variant.title }}{% unless variant.available %} - AGOTADO{% endunless %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        {% else %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {% endif %}
+
+        {%- comment -%} Quantity {%- endcomment -%}
+        <div class="product-race__field">
+          <label for="quantity" class="product-race__label">
+            Cantidad de inscripciones
+          </label>
+          <div class="product-race__quantity">
+            <button type="button" class="product-race__qty-btn" onclick="decreaseQty()">-</button>
+            <input
+              type="number"
+              name="quantity"
+              id="quantity"
+              min="1"
+              value="1"
+              class="product-race__qty-input">
+            <button type="button" class="product-race__qty-btn" onclick="increaseQty()">+</button>
+          </div>
+        </div>
+
+        {%- comment -%} Submit Button {%- endcomment -%}
+        <button
+          type="submit"
+          class="product-race__submit"
+          {% unless current_variant.available %}disabled{% endunless %}>
+          {% if current_variant.available %}
+            Inscribirse Ahora
+          {% else %}
+            Agotado
+          {% endif %}
+        </button>
+
+        {%- comment -%} Additional Info {%- endcomment -%}
+        <div class="product-race__footer">
+          <p>Mecánica Neutral Shimano</p>
+          <p>Puntos para campeonato nacional</p>
+          <p>Premios en efectivo</p>
+        </div>
+      {% endform %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function changeMainImage(button) {
+    const newImage = button.getAttribute('data-image');
+    document.getElementById('mainProductImage').src = newImage;
+
+    // Update active thumbnail
+    document.querySelectorAll('.product-race__thumbnail').forEach(thumb => {
+      thumb.classList.remove('active');
+    });
+    button.classList.add('active');
+  }
+
+  function updatePrice(select) {
+    const selectedOption = select.options[select.selectedIndex];
+    const price = selectedOption.getAttribute('data-price');
+    document.getElementById('productPrice').textContent = price;
+  }
+
+  function increaseQty() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+  }
+
+  function decreaseQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+      input.value = parseInt(input.value) - 1;
+    }
+  }
+</script>
+
+{% stylesheet %}
+  .product-race {
+    min-height: 100vh;
+    padding: 120px 20px 80px;
+    background: #000000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-race__glow {
+    position: absolute;
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(255, 77, 0, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    top: -200px;
+    right: -200px;
+    animation: float 20s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(-100px, 100px) scale(1.1); }
+    66% { transform: translate(100px, -100px) scale(0.9); }
+  }
+
+  .product-race__container {
+    max-width: 1600px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 5rem;
+    align-items: start;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Gallery */
+  .product-race__gallery {
+    position: sticky;
+    top: 120px;
+  }
+
+  .product-race__main-image {
+    border-radius: 40px;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    margin-bottom: 2rem;
+    aspect-ratio: 4/3;
+    position: relative;
+    box-shadow:
+      0 30px 90px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(255, 77, 0, 0.3),
+      inset 0 0 60px rgba(255, 77, 0, 0.05);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .product-race__main-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.2) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .product-race__main-image:hover {
+    transform: scale(1.02);
+    box-shadow:
+      0 40px 120px rgba(255, 77, 0, 0.3),
+      0 0 0 1px rgba(255, 77, 0, 0.6),
+      inset 0 0 80px rgba(255, 77, 0, 0.1);
+  }
+
+  .product-race__main-image:hover::before {
+    opacity: 1;
+  }
+
+  .product-race__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 0;
+  }
+
+  .product-race__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .product-race__thumbnail {
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    padding: 0;
+    aspect-ratio: 1;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .product-race__thumbnail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.3), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+  }
+
+  .product-race__thumbnail:hover {
+    border-color: rgba(255, 77, 0, 0.5);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow:
+      0 20px 50px rgba(255, 77, 0, 0.3),
+      0 0 0 1px rgba(255, 77, 0, 0.5);
+  }
+
+  .product-race__thumbnail:hover::before {
+    opacity: 1;
+  }
+
+  .product-race__thumbnail.active {
+    border-color: #FF4D00;
+    transform: translateY(-5px) scale(1.1);
+    box-shadow:
+      0 25px 60px rgba(255, 77, 0, 0.5),
+      0 0 0 2px #FF4D00,
+      inset 0 0 20px rgba(255, 77, 0, 0.2);
+  }
+
+  .product-race__thumbnail.active::before {
+    opacity: 1;
+  }
+
+  .product-race__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    z-index: 0;
+  }
+
+  .product-race__placeholder {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.1) 0%, rgba(0, 0, 0, 0.8) 100%);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255, 77, 0, 0.2);
+  }
+
+  .product-race__placeholder span {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #FF4D00;
+    text-transform: uppercase;
+  }
+
+  /* Info Section */
+  .product-race__info {
+    color: #FFFFFF;
+  }
+
+  .product-race__badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #FF4D00, #FFB800);
+    color: #000000;
+    font-weight: 900;
+    font-size: 0.875rem;
+    padding: 0.75rem 2rem;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 2rem;
+    box-shadow:
+      0 10px 40px rgba(255, 77, 0, 0.4),
+      inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-race__badge::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    animation: shimmerBadge 3s infinite;
+  }
+
+  @keyframes shimmerBadge {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  .product-race__title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 900;
+    margin-bottom: 2rem;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.3));
+    position: relative;
+  }
+
+  .product-race__details {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .product-race__detail {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #CCCCCC;
+    font-size: 1.125rem;
+  }
+
+  .product-race__detail svg {
+    color: #FF4D00;
+    flex-shrink: 0;
+  }
+
+  .product-race__description {
+    color: #CCCCCC;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    font-size: 1.125rem;
+  }
+
+  .product-race__price-container {
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.15), rgba(255, 136, 0, 0.05));
+    border: 3px solid transparent;
+    border-radius: 30px;
+    padding: 2.5rem 3rem;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow:
+      0 20px 60px rgba(255, 77, 0, 0.2),
+      inset 0 0 60px rgba(255, 77, 0, 0.1);
+  }
+
+  .product-race__price-container::before {
+    content: '';
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border-radius: 30px;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.6), rgba(255, 184, 0, 0.4));
+    z-index: -1;
+  }
+
+  .product-race__price {
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #FF4D00 0%, #FFB800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 0.75rem;
+    filter: drop-shadow(0 0 20px rgba(255, 77, 0, 0.5));
+  }
+
+  .product-race__price-label {
+    color: #CCCCCC;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    font-weight: 600;
+  }
+
+  /* Form */
+  .product-race__form {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 77, 0, 0.02));
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 40px;
+    padding: 3rem;
+    backdrop-filter: blur(20px);
+    box-shadow:
+      0 30px 90px rgba(0, 0, 0, 0.6),
+      inset 0 0 40px rgba(255, 77, 0, 0.05);
+    position: relative;
+  }
+
+  .product-race__form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 77, 0, 0.5), transparent);
+  }
+
+  .product-race__field {
+    margin-bottom: 2rem;
+  }
+
+  .product-race__label {
+    display: block;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #FF4D00;
+    margin-bottom: 0.75rem;
+  }
+
+  .product-race__select {
+    width: 100%;
+    padding: 1.25rem 1.75rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .product-race__select:hover {
+    border-color: rgba(255, 77, 0, 0.5);
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.2);
+  }
+
+  .product-race__select:focus {
+    border-color: #FF4D00;
+    outline: none;
+    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.3), 0 0 0 4px rgba(255, 77, 0, 0.1);
+  }
+
+  .product-race__quantity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .product-race__qty-btn {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.3), rgba(255, 77, 0, 0.15));
+    border: 3px solid rgba(255, 77, 0, 0.6);
+    border-radius: 18px;
+    color: #FF4D00;
+    font-size: 1.75rem;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-race__qty-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.5), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .product-race__qty-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.5), rgba(255, 77, 0, 0.3));
+    border-color: #FF4D00;
+    transform: translateY(-3px) scale(1.05);
+    box-shadow:
+      0 15px 40px rgba(255, 77, 0, 0.4),
+      0 0 0 1px #FF4D00;
+  }
+
+  .product-race__qty-btn:hover::before {
+    opacity: 1;
+  }
+
+  .product-race__qty-btn:active {
+    transform: translateY(-1px) scale(0.98);
+  }
+
+  .product-race__qty-input {
+    flex: 1;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.4));
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    color: #FFFFFF;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+
+  .product-race__qty-input:focus {
+    border-color: #FF4D00;
+    outline: none;
+    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.3), 0 0 0 4px rgba(255, 77, 0, 0.1);
+  }
+
+  .product-race__submit {
+    width: 100%;
+    padding: 2rem 3rem;
+    background: linear-gradient(135deg, #FF4D00 0%, #FF8800 50%, #FFB800 100%);
+    border: none;
+    border-radius: 100px;
+    color: #000000;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow:
+      0 20px 60px rgba(255, 77, 0, 0.5),
+      0 0 0 1px rgba(255, 77, 0, 0.3),
+      inset 0 -3px 15px rgba(0, 0, 0, 0.3),
+      inset 0 2px 10px rgba(255, 255, 255, 0.3);
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-race__submit::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .product-race__submit:hover:not(:disabled)::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  .product-race__submit:hover:not(:disabled) {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow:
+      0 30px 80px rgba(255, 77, 0, 0.7),
+      0 0 0 2px #FFB800,
+      inset 0 -3px 15px rgba(0, 0, 0, 0.3),
+      inset 0 2px 10px rgba(255, 255, 255, 0.4);
+  }
+
+  .product-race__submit:active:not(:disabled) {
+    transform: translateY(-2px) scale(0.98);
+  }
+
+  .product-race__submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    filter: grayscale(1);
+  }
+
+  .product-race__footer {
+    background: linear-gradient(135deg, rgba(255, 77, 0, 0.05), transparent);
+    border: 2px solid rgba(255, 77, 0, 0.2);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    color: #CCCCCC;
+    font-size: 0.95rem;
+    line-height: 2;
+    font-weight: 500;
+  }
+
+  .product-race__footer p {
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .product-race__footer p:last-child {
+    margin-bottom: 0;
+  }
+
+  .product-race__footer p::before {
+    content: '✓';
+    color: #FF4D00;
+    font-weight: 900;
+    font-size: 1.25rem;
+  }
+
+  /* Mobile */
+  @media (max-width: 968px) {
+    .product-race {
+      padding: 100px 15px 60px;
+    }
+
+    .product-race__glow {
+      width: 500px;
+      height: 500px;
+      top: -100px;
+      right: -100px;
+    }
+
+    .product-race__container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+
+    .product-race__gallery {
+      position: relative;
+      top: 0;
+    }
+
+    .product-race__main-image {
+      border-radius: 30px;
+    }
+
+    .product-race__thumbnails {
+      grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+      gap: 1rem;
+    }
+
+    .product-race__title {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .product-race__price-container {
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .product-race__price {
+      font-size: 3rem;
+    }
+
+    .product-race__form {
+      padding: 2rem;
+      border-radius: 30px;
+    }
+
+    .product-race__submit {
+      font-size: 1.25rem;
+      padding: 1.5rem 2.5rem;
+    }
+
+    .product-race__qty-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product Race",
+  "settings": [],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

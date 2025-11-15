@@ -1,0 +1,222 @@
+{% comment %}
+  Sponsors Section for DHMEXRACES
+{% endcomment %}
+
+<section class="sponsors" id="sponsors">
+  <div class="sponsors__container">
+    {% if section.settings.title != blank %}
+      <h2 class="sponsors__title" data-aos="fade-up">{{ section.settings.title }}</h2>
+    {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+      <p class="sponsors__subtitle" data-aos="fade-up" data-aos-delay="100">{{ section.settings.subtitle }}</p>
+    {% endif %}
+
+    <div class="sponsors__grid">
+      {% for block in section.blocks %}
+        <div class="sponsor-card" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+          {% if block.settings.image != blank %}
+            <div class="sponsor-card__image">
+              {{ block.settings.image | image_url: width: 400 | image_tag: class: 'sponsor-card__img', loading: 'lazy', alt: block.settings.name }}
+            </div>
+          {% else %}
+            <div class="sponsor-card__placeholder">
+              <span class="sponsor-card__name">{{ block.settings.name }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .sponsors {
+    padding: 100px 20px;
+    background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sponsors::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(255, 77, 0, 0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .sponsors__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sponsors__title {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 50%, #FFB800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.5));
+  }
+
+  .sponsors__subtitle {
+    text-align: center;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: #CCCCCC;
+    margin-bottom: 4rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 300;
+  }
+
+  .sponsors__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .sponsor-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .sponsor-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    background: rgba(255, 77, 0, 0.08);
+    border-color: rgba(255, 77, 0, 0.3);
+    box-shadow: 0 20px 60px rgba(255, 77, 0, 0.2);
+  }
+
+  .sponsor-card__image {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sponsor-card__img {
+    max-width: 100%;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: all 0.4s ease;
+  }
+
+  .sponsor-card:hover .sponsor-card__img {
+    filter: brightness(1) invert(0);
+  }
+
+  .sponsor-card__placeholder {
+    width: 100%;
+    text-align: center;
+  }
+
+  .sponsor-card__name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .sponsor-card:hover .sponsor-card__name {
+    background: linear-gradient(135deg, #FF4D00, #FFB800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  @media (max-width: 768px) {
+    .sponsors {
+      padding: 60px 15px;
+    }
+
+    .sponsors__grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .sponsor-card {
+      padding: 1.5rem;
+      min-height: 120px;
+    }
+
+    .sponsor-card__img {
+      max-height: 60px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Sponsors",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Sponsors Oficiales"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "El line-up de sponsors más grande en la historia del DH mexicano"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "sponsor",
+      "name": "Sponsor",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Sponsor Name",
+          "default": "Sponsor"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsors",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

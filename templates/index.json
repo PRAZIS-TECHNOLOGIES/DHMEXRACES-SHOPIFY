@@ -1,0 +1,228 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero-video",
+      "settings": {
+        "video_url": "",
+        "subtitle": "POWERED BY SHIMANO",
+        "title": "COPA SCOTT DHMEXRACES 2026",
+        "description": "$500,000 MXN en premios • Mecánica Neutral Shimano • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
+        "button_label": "Inscríbete - 12 DIC",
+        "button_link": "#inscripciones",
+        "button_label_2": "Ver Sedes",
+        "button_link_2": "#fechas"
+      }
+    },
+    "race_dates": {
+      "type": "race-dates",
+      "blocks": {
+        "race_1": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 1",
+            "race_name": "GUANAJUATO",
+            "date": "21-22 Febrero 2026",
+            "location": "Guanajuato, México",
+            "elevation": "+$100,000 en premios",
+            "description": "Apertura épica de la temporada COPA SCOTT. Mecánica neutral Shimano disponible.",
+            "button_label": "Inscripción 12 de Diciembre",
+            "button_link": "/products/inscripcion-guanajuato-2026"
+          }
+        },
+        "race_2": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 2",
+            "race_name": "PUEBLA",
+            "date": "21-22 Marzo 2026",
+            "location": "Puebla, México",
+            "elevation": "+$100,000 en premios",
+            "description": "Segunda válida del campeonato nacional con soporte técnico completo.",
+            "button_label": "Próximamente",
+            "button_link": "/collections/inscripciones"
+          }
+        },
+        "race_3": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 3",
+            "race_name": "GUADALAJARA",
+            "date": "30-31 Mayo 2026",
+            "location": "Guadalajara, Jalisco",
+            "elevation": "+$100,000 en premios",
+            "description": "Mitad de temporada en una de las pistas más técnicas del circuito.",
+            "button_label": "Próximamente",
+            "button_link": "/collections/inscripciones"
+          }
+        },
+        "race_4": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 4",
+            "race_name": "IXTAPAN DE LA SAL",
+            "date": "18-19 Julio 2026",
+            "location": "Ixtapan de la Sal, Estado de México",
+            "elevation": "+$100,000 en premios",
+            "description": "Cuarta válida con los mejores riders compitiendo por puntos cruciales.",
+            "button_label": "Próximamente",
+            "button_link": "/collections/inscripciones"
+          }
+        },
+        "race_5": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 5 - FINAL",
+            "race_name": "TAXCO",
+            "date": "24-25 Octubre 2026",
+            "location": "Taxco, Guerrero",
+            "elevation": "+$100,000 en premios",
+            "description": "¡LA GRAN FINAL! Definición de campeones nacionales. $500,000 MXN en premios totales.",
+            "button_label": "Próximamente",
+            "button_link": "/collections/inscripciones"
+          }
+        }
+      },
+      "block_order": [
+        "race_1",
+        "race_2",
+        "race_3",
+        "race_4",
+        "race_5"
+      ],
+      "settings": {
+        "title": "5 SEDES 2026",
+        "subtitle": "5 Sedes que definen campeones • $500,000 MXN en premios totales"
+      }
+    },
+    "sponsors": {
+      "type": "sponsors",
+      "blocks": {
+        "sponsor_1": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SCOTT"
+          }
+        },
+        "sponsor_2": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SHIMANO"
+          }
+        },
+        "sponsor_3": {
+          "type": "sponsor",
+          "settings": {
+            "name": "RED BULL"
+          }
+        },
+        "sponsor_4": {
+          "type": "sponsor",
+          "settings": {
+            "name": "MOTUL"
+          }
+        },
+        "sponsor_5": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SRAM"
+          }
+        },
+        "sponsor_6": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SCHWALBE"
+          }
+        },
+        "sponsor_7": {
+          "type": "sponsor",
+          "settings": {
+            "name": "FOX FACTORY"
+          }
+        },
+        "sponsor_8": {
+          "type": "sponsor",
+          "settings": {
+            "name": "VITTORIA"
+          }
+        },
+        "sponsor_9": {
+          "type": "sponsor",
+          "settings": {
+            "name": "LAZER"
+          }
+        },
+        "sponsor_10": {
+          "type": "sponsor",
+          "settings": {
+            "name": "GIRO"
+          }
+        },
+        "sponsor_11": {
+          "type": "sponsor",
+          "settings": {
+            "name": "ALPINESTARS"
+          }
+        },
+        "sponsor_12": {
+          "type": "sponsor",
+          "settings": {
+            "name": "RACE FACE"
+          }
+        },
+        "sponsor_13": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SYNCROS"
+          }
+        },
+        "sponsor_14": {
+          "type": "sponsor",
+          "settings": {
+            "name": "ZEFAL"
+          }
+        }
+      },
+      "block_order": [
+        "sponsor_1",
+        "sponsor_2",
+        "sponsor_3",
+        "sponsor_4",
+        "sponsor_5",
+        "sponsor_6",
+        "sponsor_7",
+        "sponsor_8",
+        "sponsor_9",
+        "sponsor_10",
+        "sponsor_11",
+        "sponsor_12",
+        "sponsor_13",
+        "sponsor_14"
+      ],
+      "settings": {
+        "title": "SPONSORS OFICIALES",
+        "subtitle": "El line-up de sponsors más grande en la historia del DH mexicano"
+      }
+    },
+    "registration": {
+      "type": "race-registration",
+      "settings": {
+        "title": "INSCRIPCIONES ABREN 12 DICIEMBRE",
+        "subtitle": "13 Categorías Disponibles • Nueva Plataforma Digital • Gestiona inscripciones, puntos y resultados en tiempo real",
+        "products_limit": 6,
+        "button_label": "Notificarme Cuando Abran",
+        "button_link": "/collections/inscripciones"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "race_dates",
+    "sponsors",
+    "registration"
+  ]
+}

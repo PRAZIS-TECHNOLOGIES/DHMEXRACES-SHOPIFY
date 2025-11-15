@@ -1,0 +1,224 @@
+<header class="site-header">
+  <div class="header__container">
+    <a href="{{ routes.root_url }}" class="header__logo">
+      {% if section.settings.logo != blank %}
+        <img src="{{ section.settings.logo | image_url: width: 300 }}"
+             alt="DHMEXRACES"
+             class="header__logo-img"
+             loading="eager"
+             width="{{ section.settings.logo_width }}"
+             height="120">
+      {% else %}
+        <span class="header__logo-text">DHMEXRACES</span>
+      {% endif %}
+    </a>
+
+    <nav class="header__menu">
+      {% for link in section.settings.menu.links %}
+        <a href="{{ link.url }}" class="header__menu-link">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
+
+    <div class="header__icons">
+      {% if shop.customer_accounts_enabled %}
+        <a href="{{ routes.account_url }}" class="header__icon">
+          {{ 'icon-account.svg' | inline_asset_content }}
+        </a>
+      {% endif %}
+
+      <a href="{{ routes.cart_url }}" class="header__icon header__cart">
+        {% if cart.item_count > 0 %}
+          <span class="cart__count">{{ cart.item_count }}</span>
+        {% endif %}
+        {{ 'icon-cart.svg' | inline_asset_content }}
+      </a>
+    </div>
+  </div>
+</header>
+
+{% stylesheet %}
+  .site-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 77, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .header__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .header__logo {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: transform 0.3s ease;
+  }
+
+  .header__logo:hover {
+    transform: scale(1.05);
+  }
+
+  .header__logo-img {
+    height: auto;
+    width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+  }
+
+  .header__logo-text {
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.05em;
+  }
+
+  .header__menu {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .header__menu-link {
+    color: #FFFFFF;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .header__menu-link::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #FF4D00, #FFB800);
+    transition: width 0.3s ease;
+  }
+
+  .header__menu-link:hover {
+    color: #FF4D00;
+  }
+
+  .header__menu-link:hover::after {
+    width: 100%;
+  }
+
+  .header__icons {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .header__icon {
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .header__icon svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+  }
+
+  .header__icon:hover {
+    color: #FF4D00;
+    transform: translateY(-2px);
+  }
+
+  .cart__count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #FF4D00, #FFB800);
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 800;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @media (max-width: 768px) {
+    .header__container {
+      padding: 1rem;
+    }
+
+    .header__menu {
+      display: none;
+    }
+
+    .header__logo-img {
+      max-height: 70px;
+    }
+
+    .header__logo-text {
+      font-size: 1.2rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Recommended: PNG or SVG with transparent background"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 100,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Logo Width",
+      "default": 400
+    },
+    {
+      "type": "header",
+      "content": "Navigation"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    }
+  ]
+}
+{% endschema %}
