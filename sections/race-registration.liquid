@@ -214,17 +214,13 @@
     height: {{ section.settings.container_height | default: '300' }}px;
     overflow: hidden;
     background: #F5F5F5;
-    display: flex;
-    align-items: {{ section.settings.image_vertical_align | default: 'center' }};
-    justify-content: {{ section.settings.image_horizontal_align | default: 'center' }};
   }
 
   .registration-card__img {
-    width: {{ section.settings.image_width | default: 60 }}%;
-    height: {{ section.settings.image_height | default: 60 }}%;
-    max-width: none;
-    max-height: none;
-    object-fit: none;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: {{ section.settings.image_position_x | default: '50' }}% {{ section.settings.image_position_y | default: '50' }}%;
     transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: brightness(0.95) contrast(1.05);
   }
@@ -483,65 +479,25 @@
     },
     {
       "type": "range",
-      "id": "image_width",
-      "min": 2,
-      "max": 200,
-      "step": 2,
+      "id": "image_position_x",
+      "min": 0,
+      "max": 100,
+      "step": 5,
       "unit": "%",
-      "label": "Ancho de imagen",
-      "default": 60,
-      "info": "Ajusta el ancho de la imagen (2% - 200%)"
+      "label": "Posición Horizontal",
+      "default": 50,
+      "info": "Mueve la imagen a izquierda (0%) o derecha (100%)"
     },
     {
       "type": "range",
-      "id": "image_height",
-      "min": 2,
-      "max": 200,
-      "step": 2,
+      "id": "image_position_y",
+      "min": 0,
+      "max": 100,
+      "step": 5,
       "unit": "%",
-      "label": "Alto de imagen",
-      "default": 60,
-      "info": "Ajusta el alto de la imagen (2% - 200%)"
-    },
-    {
-      "type": "select",
-      "id": "image_vertical_align",
-      "label": "Alineación Vertical",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "Arriba"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        },
-        {
-          "value": "flex-end",
-          "label": "Abajo"
-        }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "select",
-      "id": "image_horizontal_align",
-      "label": "Alineación Horizontal",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "Izquierda"
-        },
-        {
-          "value": "center",
-          "label": "Centro"
-        },
-        {
-          "value": "flex-end",
-          "label": "Derecha"
-        }
-      ],
-      "default": "center"
+      "label": "Posición Vertical",
+      "default": 50,
+      "info": "Mueve la imagen arriba (0%) o abajo (100%)"
     },
     {
       "type": "text",
