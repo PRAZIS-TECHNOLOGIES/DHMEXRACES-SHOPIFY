@@ -94,20 +94,23 @@
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(228, 44, 44, 0.2);
     border-radius: 12px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .ranking-overall__table {
     width: 100%;
+    min-width: 800px; /* Ensures table doesn't get too cramped */
   }
 
   .ranking-overall__table-header {
     display: grid;
     grid-template-columns: 60px 1fr 150px 150px 100px 120px;
-    gap: 1rem;
+    gap: 0.75rem;
     padding: 1.25rem 1.5rem;
     background: rgba(228, 44, 44, 0.1);
     border-bottom: 2px solid var(--color-border-accent);
+    overflow-x: auto;
   }
 
   .ranking-overall__table-cell {
@@ -116,6 +119,12 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    text-align: center;
+  }
+
+  .ranking-overall__table-cell--sede {
+    color: var(--color-secondary);
+    font-size: 0.75rem;
   }
 
   .ranking-overall__table-body {
@@ -125,11 +134,12 @@
   .ranking-overall__row {
     display: grid;
     grid-template-columns: 60px 1fr 150px 150px 100px 120px;
-    gap: 1rem;
+    gap: 0.75rem;
     padding: 1.25rem 1.5rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
     align-items: center;
+    overflow-x: auto;
   }
 
   .ranking-overall__row:hover {
@@ -207,6 +217,20 @@
 
   .ranking-overall__difference--leader {
     color: var(--color-success);
+  }
+
+  .ranking-overall__sede-points {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    text-align: center;
+  }
+
+  .ranking-overall__sede-points--empty {
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.3);
+    text-align: center;
   }
 
   .ranking-overall__no-data {
@@ -318,7 +342,7 @@
       const overallStandings = calculateOverallStandings(racesBySede);
 
       // Render the overall table
-      renderOverallTable(overallStandings);
+      renderOverallTable(overallStandings, racesBySede);
 
     } catch (error) {
       console.error('Error fetching ranking data:', error);
@@ -331,7 +355,7 @@
     const riders = {};
 
     // Process each sede separately
-    racesBySede.forEach(sede => {
+    racesBySede.forEach((sede, sedeIndex) => {
       // Group results by rider within this sede
       const sedeRiders = {};
 
@@ -358,9 +382,13 @@
             name: sedeResult.name,
             category: sedeResult.category,
             team: sedeResult.team,
-            totalPoints: 0
+            totalPoints: 0,
+            pointsBySede: {} // Object to store points per sede
           };
         }
+
+        // Store points for this specific sede
+        riders[riderKey].pointsBySede[sedeIndex] = sedeResult.points;
 
         // Add the BEST points from this sede
         riders[riderKey].totalPoints += sedeResult.points;
@@ -383,7 +411,7 @@
     return standings;
   }
 
-  function renderOverallTable(standings) {
+  function renderOverallTable(standings, racesBySede) {
     const tableBody = document.getElementById('overallTableBody');
     const filtersContainer = document.getElementById('overallFilters');
 
@@ -391,6 +419,9 @@
       tableBody.innerHTML = '<div class="ranking-overall__no-data">No hay datos de ranking disponibles aún.</div>';
       return;
     }
+
+    // Update table header with dynamic sede columns
+    updateTableHeader(racesBySede);
 
     // Get unique categories
     const categories = [...new Set(standings.map(r => r.category))].sort();
@@ -405,7 +436,7 @@
         button.addEventListener('click', function() {
           document.querySelectorAll('.category-filter-btn').forEach(btn => btn.classList.remove('active'));
           this.classList.add('active');
-          filterByCategory(category, standings);
+          filterByCategory(category, standings, racesBySede);
         });
         filtersContainer.appendChild(button);
       });
@@ -413,18 +444,57 @@
 
     // Render initial table (first category or all if only one)
     if (categories.length > 1) {
-      filterByCategory(categories[0], standings);
+      filterByCategory(categories[0], standings, racesBySede);
     } else {
-      renderRows(standings);
+      renderRows(standings, racesBySede);
     }
   }
 
-  function filterByCategory(selectedCategory, allStandings) {
-    const filtered = allStandings.filter(r => r.category === selectedCategory);
-    renderRows(filtered);
+  function updateTableHeader(racesBySede) {
+    const header = document.querySelector('.ranking-overall__table-header');
+
+    // Build dynamic grid template
+    let gridColumns = '60px 1fr 150px 150px'; // Pos, Name, Category, Team
+
+    // Add column for each sede
+    racesBySede.forEach(() => {
+      gridColumns += ' 80px'; // Sede points column
+    });
+
+    gridColumns += ' 100px 120px'; // Total, Difference
+
+    // Update header grid
+    header.style.gridTemplateColumns = gridColumns;
+
+    // Build header HTML
+    let headerHTML = `
+      <div class="ranking-overall__table-cell">Pos</div>
+      <div class="ranking-overall__table-cell">Nombre</div>
+      <div class="ranking-overall__table-cell">Categoría</div>
+      <div class="ranking-overall__table-cell">Equipo</div>
+    `;
+
+    // Add sede headers
+    racesBySede.forEach((sede, index) => {
+      // Shorten the race name for header
+      const shortName = sede.raceName.replace('INSCRIPCION SEDE', 'S').replace('GUANAJUATO 2026', '').trim() || `S${index + 1}`;
+      headerHTML += `<div class="ranking-overall__table-cell ranking-overall__table-cell--sede">${shortName}</div>`;
+    });
+
+    headerHTML += `
+      <div class="ranking-overall__table-cell">Total</div>
+      <div class="ranking-overall__table-cell">Dif</div>
+    `;
+
+    header.innerHTML = headerHTML;
   }
 
-  function renderRows(standings) {
+  function filterByCategory(selectedCategory, allStandings, racesBySede) {
+    const filtered = allStandings.filter(r => r.category === selectedCategory);
+    renderRows(filtered, racesBySede);
+  }
+
+  function renderRows(standings, racesBySede) {
     const tableBody = document.getElementById('overallTableBody');
     tableBody.innerHTML = '';
 
@@ -435,22 +505,38 @@
 
     const leaderPoints = standings[0].totalPoints;
 
+    // Get grid template from header
+    const header = document.querySelector('.ranking-overall__table-header');
+    const gridColumns = header.style.gridTemplateColumns;
+
     standings.forEach((rider, index) => {
       const position = index + 1;
-      const difference = position === 1 ? 'LÍDER' : `-${leaderPoints - rider.totalPoints}`;
+      const difference = position === 1 ? 'LÍD' : `-${leaderPoints - rider.totalPoints}`;
 
       const row = document.createElement('div');
       row.className = `ranking-overall__row ranking-overall__row--position-${position}`;
+      row.style.gridTemplateColumns = gridColumns;
 
-      row.innerHTML = `
+      let rowHTML = `
         <div class="ranking-overall__position">${position}</div>
         <div class="ranking-overall__name">${rider.name}</div>
         <div class="ranking-overall__category">${rider.category}</div>
         <div class="ranking-overall__team">${rider.team}</div>
+      `;
+
+      // Add points for each sede
+      racesBySede.forEach((sede, sedeIndex) => {
+        const points = rider.pointsBySede[sedeIndex] || 0;
+        const pointsClass = points > 0 ? 'ranking-overall__sede-points' : 'ranking-overall__sede-points--empty';
+        rowHTML += `<div class="${pointsClass}">${points > 0 ? points : '-'}</div>`;
+      });
+
+      rowHTML += `
         <div class="ranking-overall__points">${rider.totalPoints}</div>
         <div class="ranking-overall__difference ${position === 1 ? 'ranking-overall__difference--leader' : ''}">${difference}</div>
       `;
 
+      row.innerHTML = rowHTML;
       tableBody.appendChild(row);
     });
   }
