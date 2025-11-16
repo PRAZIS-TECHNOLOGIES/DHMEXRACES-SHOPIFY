@@ -1,19 +1,24 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "ranking": {
       "type": "ranking",
-      "settings": {
-        "title": "Ranking de Carreras",
-        "subtitle": "Resultados oficiales de todas las fechas del campeonato DHMEXRACES 2026"
-      },
       "blocks": {
         "race_1_gto": {
           "type": "race",
           "settings": {
             "race_name": "SEDE 1 - Guanajuato",
             "race_date": "21-22 Febrero 2026",
-            "status": "upcoming",
-            "results_data": ""
+            "status": "completed",
+            "results_data": "1|gibran|elite|trek|2:15:30|100||2|gibran g|elite|trek|3:15:30|101||3|gibran gi|elite|trek|4:15:30|102||4|gibran go|elite|trek|5:15:30|103||1|maria|femenil|scott|1:10:10|100||2|maria 1|femenil|trek|2:10:10|101||3|maria 2|femenil|scott|3:10:10|102||4|maria 3|femenil|trek|4:10:10|103||5|maria 4|femenil|scott|5:10:10|104||1|rober 1|ebike|trek|5:10:10|100||2|rober2|ebike|scott|6:10:10|101||3|rober3|ebike|trek|7:10:10|102||4|rober4|ebike|scott|8:10:10|103||5|rober5|ebike|trek|9:10:10|104||6|rober6|ebike|scott|10:10:10|105||1|gibs1|junior|trek|10:10:10|100||2|gibs2|junior|scott|11:10:10|101||3|gibs3|junior|trek|12:10:10|102||4|gibs4|junior|scott|13:10:10|103||5|gibs5|junior|trek|14:10:10|104||6|gibs6|junior|scott|15:10:10|105"
           }
         },
         "race_2_puebla": {
@@ -21,8 +26,8 @@
           "settings": {
             "race_name": "SEDE 2 - Puebla",
             "race_date": "21-22 Marzo 2026",
-            "status": "upcoming",
-            "results_data": ""
+            "status": "completed",
+            "results_data": "1|gibran|elite|trek|2:15:30|100||2|gibran g|elite|trek|3:15:30|101||3|gibran gi|elite|trek|4:15:30|102||4|gibran go|elite|trek|5:15:30|103||1|maria|femenil|scott|1:10:10|100||2|maria 1|femenil|trek|2:10:10|101||3|maria 2|femenil|scott|3:10:10|102||4|maria 3|femenil|trek|4:10:10|103||5|maria 4|femenil|scott|5:10:10|104||1|rober 1|ebike|trek|5:10:10|100||2|rober2|ebike|scott|6:10:10|101||3|rober3|ebike|trek|7:10:10|102||4|rober4|ebike|scott|8:10:10|103||5|rober5|ebike|trek|9:10:10|104||6|rober6|ebike|scott|10:10:10|105||1|gibs1|junior|trek|10:10:10|100||2|gibs2|junior|scott|11:10:10|101||3|gibs3|junior|trek|12:10:10|102||4|gibs4|junior|scott|13:10:10|103||5|gibs5|junior|trek|14:10:10|104||6|gibs6|junior|scott|15:10:10|105"
           }
         },
         "race_3_gdl": {
@@ -30,8 +35,8 @@
           "settings": {
             "race_name": "SEDE 3 - Guadalajara",
             "race_date": "30-31 Mayo 2026",
-            "status": "upcoming",
-            "results_data": ""
+            "status": "completed",
+            "results_data": "1|gibran|elite|trek|2:15:30|100||2|gibran g|elite|trek|3:15:30|101||3|gibran gi|elite|trek|4:15:30|102||4|gibran go|elite|trek|5:15:30|103||1|maria|femenil|scott|1:10:10|100||2|maria 1|femenil|trek|2:10:10|101||3|maria 2|femenil|scott|3:10:10|102||4|maria 3|femenil|trek|4:10:10|103||5|maria 4|femenil|scott|5:10:10|104||1|rober 1|ebike|trek|5:10:10|100||2|rober2|ebike|scott|6:10:10|101||3|rober3|ebike|trek|7:10:10|102||4|rober4|ebike|scott|8:10:10|103||5|rober5|ebike|trek|9:10:10|104||6|rober6|ebike|scott|10:10:10|105||1|gibs1|junior|trek|10:10:10|100||2|gibs2|junior|scott|11:10:10|101||3|gibs3|junior|trek|12:10:10|102||4|gibs4|junior|scott|13:10:10|103||5|gibs5|junior|trek|14:10:10|104||6|gibs6|junior|scott|15:10:10|105"
           }
         },
         "race_4_ixtapan": {
@@ -39,8 +44,8 @@
           "settings": {
             "race_name": "SEDE 4 - Ixtapan de la Sal",
             "race_date": "18-19 Julio 2026",
-            "status": "upcoming",
-            "results_data": ""
+            "status": "completed",
+            "results_data": "1|gibran|elite|trek|2:15:30|100||2|gibran g|elite|trek|3:15:30|101||3|gibran gi|elite|trek|4:15:30|102||4|gibran go|elite|trek|5:15:30|103||1|maria|femenil|scott|1:10:10|100||2|maria 1|femenil|trek|2:10:10|101||3|maria 2|femenil|scott|3:10:10|102||4|maria 3|femenil|trek|4:10:10|103||5|maria 4|femenil|scott|5:10:10|104||1|rober 1|ebike|trek|5:10:10|100||2|rober2|ebike|scott|6:10:10|101||3|rober3|ebike|trek|7:10:10|102||4|rober4|ebike|scott|8:10:10|103||5|rober5|ebike|trek|9:10:10|104||6|rober6|ebike|scott|10:10:10|105||1|gibs1|junior|trek|10:10:10|100||2|gibs2|junior|scott|11:10:10|101||3|gibs3|junior|trek|12:10:10|102||4|gibs4|junior|scott|13:10:10|103||5|gibs5|junior|trek|14:10:10|104||6|gibs6|junior|scott|15:10:10|106"
           }
         },
         "race_5_taxco": {
@@ -48,8 +53,8 @@
           "settings": {
             "race_name": "SEDE 5 - Taxco",
             "race_date": "24-25 Octubre 2026 - GRAN FINAL",
-            "status": "upcoming",
-            "results_data": ""
+            "status": "completed",
+            "results_data": "1|gibran|elite|trek|2:15:30|100||2|gibran g|elite|trek|3:15:30|101||3|gibran gi|elite|trek|4:15:30|102||4|gibran go|elite|trek|5:15:30|103||1|maria|femenil|scott|1:10:10|100||2|maria 1|femenil|trek|2:10:10|101||3|maria 2|femenil|scott|3:10:10|102||4|maria 3|femenil|trek|4:10:10|103||5|maria 4|femenil|scott|5:10:10|104||1|rober 1|ebike|trek|5:10:10|100||2|rober2|ebike|scott|6:10:10|101||3|rober3|ebike|trek|7:10:10|102||4|rober4|ebike|scott|8:10:10|103||5|rober5|ebike|trek|9:10:10|104||6|rober6|ebike|scott|10:10:10|105||1|gibs1|junior|trek|10:10:10|100||2|gibs2|junior|scott|11:10:10|101||3|gibs3|junior|trek|12:10:10|102||4|gibs4|junior|scott|13:10:10|103||5|gibs5|junior|trek|14:10:10|104||6|gibs6|junior|scott|15:10:10|105"
           }
         }
       },
@@ -59,7 +64,11 @@
         "race_3_gdl",
         "race_4_ixtapan",
         "race_5_taxco"
-      ]
+      ],
+      "settings": {
+        "title": "Ranking de Carreras",
+        "subtitle": "Resultados oficiales de todas las fechas del campeonato DHMEXRACES 2026"
+      }
     }
   },
   "order": [

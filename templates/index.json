@@ -1,10 +1,21 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "hero": {
       "type": "hero-video",
       "settings": {
-        "video_url": "",
-        "subtitle": "POWERED BY <span class='shimano-text'>SHIMANO</span>",
+        "video_url": "https://www.youtube.com/watch?v=xzqBTyiHOXU",
+        "overlay_color": "#000000",
+        "overlay_opacity": 50,
+        "subtitle": "POWERED BY SHIMANO",
         "title": "COPA SCOTT DHMEXRACES 2026",
         "description": "$500,000 MXN en premios • Mecánica Neutral Shimano • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
         "button_label": "Inscríbete - 12 DIC",
@@ -213,8 +224,13 @@
       "settings": {
         "title": "INSCRIPCIONES ABREN 12 DICIEMBRE",
         "subtitle": "13 Categorías Disponibles • Nueva Plataforma Digital • Gestiona inscripciones, puntos y resultados en tiempo real",
-        "products_limit": 6,
-        "button_label": "Notificarme Cuando Abran",
+        "product": "inscripcion-guanajuato-2026",
+        "container_height": 200,
+        "image_width": 2,
+        "image_height": 2,
+        "image_vertical_align": "center",
+        "image_horizontal_align": "center",
+        "button_label": "",
         "button_link": "/collections/inscripciones"
       }
     }
