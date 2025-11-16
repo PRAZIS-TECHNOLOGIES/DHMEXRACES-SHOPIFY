@@ -36,6 +36,7 @@
   .ranking-overall__container {
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
   }
 
   .ranking-overall__title {
@@ -241,26 +242,36 @@
 
   @media (max-width: 768px) {
     .ranking-overall {
-      padding: 100px 0.5rem 2rem;
+      padding: 100px 0 2rem;
     }
 
     .ranking-overall__container {
       padding: 0;
+      max-width: 100%;
     }
 
     .ranking-overall__table-wrapper {
-      border-radius: 8px;
-      margin: 0 0.5rem;
+      border-radius: 0;
+      margin: 0;
+      border-left: none;
+      border-right: none;
     }
 
     .ranking-overall__table {
-      min-width: 600px; /* Reduced from 800px for mobile */
+      min-width: max-content; /* Ensures table is as wide as needed */
+      width: max-content;
     }
 
     .ranking-overall__table-header,
     .ranking-overall__row {
       gap: 0.5rem;
-      padding: 0.75rem 0.5rem;
+      padding: 0.75rem 1rem;
+      /* Don't override grid-template-columns - let JS handle it dynamically */
+    }
+
+    .ranking-overall__table-header > *,
+    .ranking-overall__row > * {
+      min-width: fit-content;
     }
 
     .ranking-overall__title {
@@ -271,40 +282,80 @@
     .ranking-overall__subtitle {
       font-size: 0.95rem;
       padding: 0 1rem;
+      margin-bottom: 2rem;
     }
 
     .ranking-overall__filters {
-      padding: 0 0.5rem;
+      padding: 0 1rem;
+      margin-bottom: 1.5rem;
     }
 
     .ranking-overall__position {
-      font-size: 1.125rem;
+      font-size: 1rem;
+      min-width: 45px !important;
+      width: 45px;
     }
 
     .ranking-overall__name {
       font-size: 0.875rem;
+      min-width: 140px !important;
     }
 
-    .ranking-overall__category,
+    .ranking-overall__category {
+      font-size: 0.75rem;
+      min-width: 85px !important;
+    }
+
     .ranking-overall__team {
       font-size: 0.75rem;
+      min-width: 85px !important;
     }
 
-    .ranking-overall__points,
-    .ranking-overall__sede-points {
+    .ranking-overall__points {
       font-size: 0.875rem;
+      min-width: 65px !important;
+      width: 65px;
+    }
+
+    .ranking-overall__sede-points {
+      font-size: 0.85rem;
+      min-width: 55px !important;
+      width: 55px;
     }
 
     .ranking-overall__difference {
       font-size: 0.75rem;
+      min-width: 65px !important;
+      width: 65px;
     }
 
     .ranking-overall__table-cell {
       font-size: 0.75rem;
+      white-space: nowrap;
+      padding: 0.25rem;
+    }
+
+    .ranking-overall__table-cell:nth-child(1) {
+      min-width: 45px !important;
+      width: 45px;
+    }
+
+    .ranking-overall__table-cell:nth-child(2) {
+      min-width: 140px !important;
+    }
+
+    .ranking-overall__table-cell:nth-child(3) {
+      min-width: 85px !important;
+    }
+
+    .ranking-overall__table-cell:nth-child(4) {
+      min-width: 85px !important;
     }
 
     .ranking-overall__table-cell--sede {
       font-size: 0.7rem;
+      min-width: 55px !important;
+      width: 55px;
     }
 
     /* Show scroll hint */
