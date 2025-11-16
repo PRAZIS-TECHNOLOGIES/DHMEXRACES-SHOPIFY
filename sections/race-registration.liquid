@@ -220,10 +220,10 @@
   }
 
   .registration-card__img {
-    width: {{ section.settings.image_width | default: 'auto' }};
-    height: {{ section.settings.image_height | default: 'auto' }};
-    max-width: 100%;
-    max-height: 100%;
+    width: {{ section.settings.image_width | default: 100 }}%;
+    height: {{ section.settings.image_height | default: 100 }}%;
+    max-width: none;
+    max-height: none;
     object-fit: none;
     transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: brightness(0.95) contrast(1.05);
@@ -482,18 +482,26 @@
       "info": "Altura del área donde se muestra la imagen"
     },
     {
-      "type": "text",
+      "type": "range",
       "id": "image_width",
+      "min": 30,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
       "label": "Ancho de imagen",
-      "default": "auto",
-      "info": "Ejemplos: auto, 80%, 250px, 100%"
+      "default": 100,
+      "info": "Ajusta el ancho de la imagen (30% - 150%)"
     },
     {
-      "type": "text",
+      "type": "range",
       "id": "image_height",
+      "min": 30,
+      "max": 150,
+      "step": 5,
+      "unit": "%",
       "label": "Alto de imagen",
-      "default": "auto",
-      "info": "Ejemplos: auto, 80%, 250px, 100%"
+      "default": 100,
+      "info": "Ajusta el alto de la imagen (30% - 150%)"
     },
     {
       "type": "select",
