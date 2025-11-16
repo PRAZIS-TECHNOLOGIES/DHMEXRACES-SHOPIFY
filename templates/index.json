@@ -4,7 +4,7 @@
       "type": "hero-video",
       "settings": {
         "video_url": "",
-        "subtitle": "POWERED BY SHIMANO",
+        "subtitle": "POWERED BY <span class='shimano-text'>SHIMANO</span>",
         "title": "COPA SCOTT DHMEXRACES 2026",
         "description": "$500,000 MXN en premios • Mecánica Neutral Shimano • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
         "button_label": "Inscríbete - 12 DIC",

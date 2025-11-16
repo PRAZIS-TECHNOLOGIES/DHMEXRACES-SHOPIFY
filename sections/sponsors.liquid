@@ -33,7 +33,7 @@
 {% stylesheet %}
   .sponsors {
     padding: 100px 20px;
-    background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
+    background: #000000;
     position: relative;
     overflow: hidden;
   }
@@ -46,7 +46,7 @@
     width: 100%;
     height: 100%;
     background:
-      radial-gradient(circle at 50% 50%, rgba(255, 77, 0, 0.1) 0%, transparent 60%);
+      radial-gradient(circle at 50% 50%, rgba(228, 44, 44, 0.1) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -64,11 +64,8 @@
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 50%, #FFB800 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.5));
+    color: var(--color-text-primary);
+    filter: drop-shadow(0 0 40px rgba(228, 44, 44, 0.5));
   }
 
   .sponsors__subtitle {
@@ -110,9 +107,9 @@
 
   .sponsor-card:hover {
     transform: translateY(-10px) scale(1.05);
-    background: rgba(255, 77, 0, 0.08);
-    border-color: rgba(255, 77, 0, 0.3);
-    box-shadow: 0 20px 60px rgba(255, 77, 0, 0.2);
+    background: rgba(228, 44, 44, 0.08);
+    border-color: var(--color-border-accent);
+    box-shadow: 0 20px 60px rgba(228, 44, 44, 0.2);
   }
 
   .sponsor-card__image {
@@ -149,10 +146,7 @@
   }
 
   .sponsor-card:hover .sponsor-card__name {
-    background: linear-gradient(135deg, #FF4D00, #FFB800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-primary);
   }
 
   @media (max-width: 768px) {

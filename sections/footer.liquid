@@ -43,14 +43,14 @@
       </div>
 
       <!-- Column 3: Sedes -->
-      <div class="footer__column">
+      <div class="footer__column footer__column--sedes">
         <h4 class="footer__heading">Sedes 2026</h4>
-        <ul class="footer__links">
-          <li>SEDE 1 - Guanajuato<span class="footer__date">21-22 Feb</span></li>
-          <li>SEDE 2 - Puebla<span class="footer__date">21-22 Mar</span></li>
-          <li>SEDE 3 - Guadalajara<span class="footer__date">30-31 May</span></li>
-          <li>SEDE 4 - Ixtapan de la Sal<span class="footer__date">18-19 Jul</span></li>
-          <li>SEDE 5 - Taxco<span class="footer__date">24-25 Oct</span></li>
+        <ul class="footer__links footer__links--sedes">
+          <li><span class="sede-name">SEDE 1 - Guanajuato</span><span class="footer__date">21-22 Feb</span></li>
+          <li><span class="sede-name">SEDE 2 - Puebla</span><span class="footer__date">21-22 Mar</span></li>
+          <li><span class="sede-name">SEDE 3 - Guadalajara</span><span class="footer__date">30-31 May</span></li>
+          <li><span class="sede-name">SEDE 4 - Ixtapan de la Sal</span><span class="footer__date">18-19 Jul</span></li>
+          <li><span class="sede-name">SEDE 5 - Taxco</span><span class="footer__date">24-25 Oct</span></li>
         </ul>
       </div>
 
@@ -103,11 +103,25 @@
 </footer>
 
 {% stylesheet %}
+  :root {
+    --color-primary: #E42C2C;
+    --color-secondary: #0066B3;
+    --color-gold: #FFD700;
+    --color-bg-dark: #000000;
+    --color-bg-surface: #1A1A1A;
+    --color-bg-elevated: #2A2A2A;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #A0A0A0;
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-accent: rgba(228, 44, 44, 0.3);
+  }
+
   .footer {
-    background: #000000;
-    border-top: 2px solid rgba(255, 77, 0, 0.3);
+    background: var(--color-bg-dark);
+    border-top: 2px solid var(--color-primary);
     padding: 60px 0 30px;
     margin-top: 80px;
+    position: relative;
   }
 
   .footer__container {
@@ -132,38 +146,64 @@
   }
 
   @media (max-width: 640px) {
+    .footer {
+      padding: 40px 0 20px;
+      margin-top: 60px;
+    }
+
+    .footer__container {
+      padding: 0 16px;
+    }
+
     .footer__top {
       grid-template-columns: 1fr;
-      gap: 30px;
+      gap: 40px;
+    }
+
+    .footer__column--about .footer__heading {
+      font-size: 1.2rem;
+    }
+
+    .footer__description {
+      font-size: 0.875rem;
     }
   }
 
   /* Column */
   .footer__column {
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--color-text-secondary);
   }
 
   .footer__heading {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #FF4D00;
+    color: var(--color-primary);
     margin-bottom: 16px;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
+    position: relative;
+    padding-bottom: 8px;
+  }
+
+  .footer__heading::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--color-primary);
   }
 
   .footer__column--about .footer__heading {
     font-size: 1.5rem;
-    background: linear-gradient(135deg, #FF4D00, #FFB800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text-primary);
   }
 
   .footer__description {
     font-size: 0.9rem;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    color: var(--color-text-secondary);
     margin-bottom: 20px;
   }
 
@@ -181,18 +221,15 @@
   .footer__stat-number {
     font-size: 2rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #FF4D00, #FFB800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-secondary);
     line-height: 1;
   }
 
   .footer__stat-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     margin-top: 4px;
   }
 
@@ -211,20 +248,82 @@
   }
 
   .footer__links a {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-secondary);
     text-decoration: none;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    position: relative;
   }
 
   .footer__links a:hover {
-    color: #FF4D00;
+    color: var(--color-text-primary);
+    padding-left: 4px;
   }
 
   .footer__date {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-text-secondary);
     margin-left: 8px;
+    white-space: nowrap;
+    opacity: 0.6;
+  }
+
+  /* Sedes específicas */
+  .footer__links--sedes li {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .sede-name {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 640px) {
+    .footer__links--sedes li {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .footer__links--sedes li:last-child {
+      border-bottom: none;
+    }
+
+    .sede-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .footer__date {
+      margin-left: 0;
+      font-size: 0.8rem;
+      color: var(--color-gold);
+      opacity: 1;
+    }
+
+    .footer__stats {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+    }
+
+    .footer__stat {
+      min-width: 80px;
+    }
+
+    .footer__sponsors {
+      padding: 20px 0;
+      margin-bottom: 20px;
+    }
+
+    .footer__sponsors-list {
+      font-size: 0.75rem;
+      line-height: 1.8;
+    }
   }
 
   /* Social */
@@ -237,10 +336,10 @@
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: rgba(255, 77, 0, 0.1);
-    border: 1px solid rgba(255, 77, 0, 0.3);
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid var(--color-border-accent);
     border-radius: 8px;
-    color: #FF4D00;
+    color: var(--color-primary);
     text-decoration: none;
     font-weight: 600;
     font-size: 0.9rem;
@@ -248,13 +347,14 @@
   }
 
   .footer__social-link:hover {
-    background: rgba(255, 77, 0, 0.2);
-    border-color: #FF4D00;
+    background: rgba(228, 44, 44, 0.15);
+    border-color: var(--color-primary);
     transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(228, 44, 44, 0.3);
   }
 
   .footer__social-link svg {
-    color: #FF4D00;
+    color: var(--color-primary);
   }
 
   /* Contact */
@@ -263,38 +363,40 @@
   }
 
   .footer__contact-info a {
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--color-text-secondary);
     text-decoration: none;
     font-size: 0.9rem;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
   }
 
   .footer__contact-info a:hover {
-    color: #FFB800;
+    color: var(--color-text-primary);
   }
 
   /* Sponsors */
   .footer__sponsors {
     text-align: center;
     padding: 30px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
     margin-bottom: 30px;
+    background: var(--color-bg-elevated);
   }
 
   .footer__sponsors-label {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.1em;
     margin-bottom: 10px;
+    opacity: 0.7;
   }
 
   .footer__sponsors-list {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--color-text-secondary);
     font-weight: 600;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
   }
 
   /* Bottom Section */
@@ -303,7 +405,7 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--color-border);
     margin-top: 30px;
   }
 
@@ -317,11 +419,12 @@
 
   .footer__copyright p {
     font-size: 0.875rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--color-text-secondary);
     margin: 0;
+    opacity: 0.6;
   }
 
-  /* Powered by PRAZIS - Sutil */
+  /* Powered by PRAZIS - Sutil y Profesional */
   .footer__powered {
     display: flex;
     align-items: center;
@@ -337,8 +440,9 @@
 
   .footer__powered-text {
     font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--color-text-secondary);
     margin: 0;
+    opacity: 0.5;
   }
 
   .footer__powered-link {
@@ -346,21 +450,22 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: rgba(255, 77, 0, 0.05);
-    border: 1px solid rgba(255, 77, 0, 0.2);
+    background: rgba(0, 102, 179, 0.1);
+    border: 1px solid var(--color-secondary);
     border-radius: 6px;
     text-decoration: none;
     transition: all 0.3s ease;
   }
 
   .footer__powered-link:hover {
-    background: rgba(255, 77, 0, 0.1);
-    border-color: rgba(255, 77, 0, 0.4);
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
     transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 102, 179, 0.4);
   }
 
   .footer__powered-link svg {
-    color: #FFB800;
+    color: var(--color-secondary);
     width: 14px;
     height: 14px;
   }
@@ -368,12 +473,16 @@
   .footer__powered-brand {
     font-size: 0.8rem;
     font-weight: 600;
-    color: #FF4D00;
-    letter-spacing: 0.03em;
+    color: var(--color-secondary);
+    letter-spacing: 0.05em;
   }
 
   .footer__powered-link:hover .footer__powered-brand {
-    color: #FFB800;
+    color: var(--color-text-primary);
+  }
+
+  .footer__powered-link:hover svg {
+    color: var(--color-text-primary);
   }
 
   /* Payment Icons (optional) */

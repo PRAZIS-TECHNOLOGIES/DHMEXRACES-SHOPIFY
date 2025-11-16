@@ -132,8 +132,8 @@
     width: 100%;
     height: 100%;
     background:
-      radial-gradient(circle at 80% 20%, rgba(255, 77, 0, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 20% 80%, rgba(255, 184, 0, 0.06) 0%, transparent 50%);
+      radial-gradient(circle at 80% 20%, rgba(228, 44, 44, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 20% 80%, rgba(0, 102, 179, 0.06) 0%, transparent 50%);
     pointer-events: none;
   }
 
@@ -151,11 +151,8 @@
     margin-bottom: 1.5rem;
     text-transform: uppercase;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #000000 0%, #FF4D00 50%, #000000 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 0 40px rgba(255, 77, 0, 0.3));
+    color: #000000;
+    filter: drop-shadow(0 0 40px var(--color-border-accent));
   }
 
   .registration__subtitle {
@@ -194,7 +191,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255, 77, 0, 0.02) 0%, transparent 100%);
+    background: rgba(228, 44, 44, 0.02);
     opacity: 0;
     transition: opacity 0.5s ease;
     pointer-events: none;
@@ -206,9 +203,9 @@
 
   .registration-card:hover {
     transform: translateY(-20px) scale(1.02);
-    box-shadow: 0 30px 80px rgba(255, 77, 0, 0.2),
-                0 0 60px rgba(255, 77, 0, 0.1);
-    border-color: #FF4D00;
+    box-shadow: 0 30px 80px rgba(228, 44, 44, 0.2),
+                0 0 60px rgba(228, 44, 44, 0.1);
+    border-color: var(--color-primary);
   }
 
   .registration-card__image {
@@ -216,7 +213,7 @@
     width: 100%;
     height: 300px;
     overflow: hidden;
-    background: linear-gradient(135deg, #F5F5F5, #EEEEEE);
+    background: #F5F5F5;
   }
 
   .registration-card__img {
@@ -236,13 +233,13 @@
     position: absolute;
     top: 20px;
     right: 20px;
-    background: linear-gradient(135deg, #FF0000, #CC0000);
+    background: var(--color-error);
     color: #fff;
     padding: 0.75rem 1.5rem;
     border-radius: 100px;
     font-weight: 800;
     font-size: 1rem;
-    box-shadow: 0 8px 24px rgba(255, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.4);
     z-index: 2;
   }
 
@@ -258,10 +255,7 @@
     display: inline-block;
     font-size: 1rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #FF4D00, #FFB800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-gold);
     text-transform: uppercase;
     letter-spacing: 0.15em;
     margin-bottom: 0.75rem;
@@ -298,7 +292,7 @@
 
   .registration-card__feature svg {
     flex-shrink: 0;
-    color: #00cc66;
+    color: var(--color-success);
   }
 
   .registration-card__footer {
@@ -326,11 +320,8 @@
   .registration-card__price {
     font-size: 2.5rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #FF4D00, #FF8800);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    filter: drop-shadow(0 2px 8px rgba(255, 77, 0, 0.3));
+    color: var(--color-primary);
+    filter: drop-shadow(0 2px 8px var(--color-border-accent));
   }
 
   .registration-card__button {
@@ -340,8 +331,8 @@
     justify-content: center;
     gap: 0.75rem;
     padding: 1.25rem 2.5rem;
-    background: linear-gradient(135deg, #FF4D00 0%, #FF8800 50%, #FFB800 100%);
-    color: #000;
+    background: var(--color-secondary);
+    color: #fff;
     text-decoration: none;
     border-radius: 100px;
     font-weight: 800;
@@ -352,7 +343,7 @@
     white-space: nowrap;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    box-shadow: 0 10px 30px rgba(255, 77, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 102, 179, 0.3);
     overflow: hidden;
   }
 
@@ -363,7 +354,7 @@
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background: rgba(255,255,255,0.2);
     transition: left 0.5s;
   }
 
@@ -373,7 +364,8 @@
 
   .registration-card__button:hover {
     transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 15px 40px rgba(255, 77, 0, 0.5);
+    background: var(--color-primary);
+    box-shadow: 0 15px 40px rgba(228, 44, 44, 0.5);
   }
 
   .registration-card__button svg {
@@ -385,13 +377,14 @@
   }
 
   .registration-card__button--disabled {
-    background: linear-gradient(135deg, #CCC, #999);
+    background: #999;
     cursor: not-allowed;
     color: #666;
   }
 
   .registration-card__button--disabled:hover {
     transform: none;
+    background: #999;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   }
 
@@ -407,7 +400,7 @@
   .registration__cta-button {
     display: inline-block;
     padding: 1.25rem 3rem;
-    background: #0a0a0a;
+    background: var(--color-secondary);
     color: #fff;
     text-decoration: none;
     border-radius: 50px;
@@ -416,12 +409,13 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     transition: all 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0, 102, 179, 0.3);
   }
 
   .registration__cta-button:hover {
-    background: #ff6b00;
+    background: var(--color-primary);
     transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(255, 107, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(228, 44, 44, 0.3);
   }
 
   @media (max-width: 768px) {
