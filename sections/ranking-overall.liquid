@@ -96,6 +96,7 @@
     border-radius: 12px;
     overflow-x: auto;
     overflow-y: hidden;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
   }
 
   .ranking-overall__table {
@@ -110,7 +111,6 @@
     padding: 1.25rem 1.5rem;
     background: rgba(228, 44, 44, 0.1);
     border-bottom: 2px solid var(--color-border-accent);
-    overflow-x: auto;
   }
 
   .ranking-overall__table-cell {
@@ -139,7 +139,6 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
     align-items: center;
-    overflow-x: auto;
   }
 
   .ranking-overall__row:hover {
@@ -242,39 +241,82 @@
 
   @media (max-width: 768px) {
     .ranking-overall {
-      padding: 100px 1rem 2rem;
+      padding: 100px 0.5rem 2rem;
+    }
+
+    .ranking-overall__container {
+      padding: 0;
+    }
+
+    .ranking-overall__table-wrapper {
+      border-radius: 8px;
+      margin: 0 0.5rem;
+    }
+
+    .ranking-overall__table {
+      min-width: 600px; /* Reduced from 800px for mobile */
     }
 
     .ranking-overall__table-header,
     .ranking-overall__row {
-      grid-template-columns: 50px 1fr 80px;
-      gap: 0.75rem;
-      padding: 1rem;
-    }
-
-    .ranking-overall__table-cell:nth-child(3),
-    .ranking-overall__table-cell:nth-child(4),
-    .ranking-overall__table-cell:nth-child(6),
-    .ranking-overall__category,
-    .ranking-overall__team,
-    .ranking-overall__difference {
-      display: none;
+      gap: 0.5rem;
+      padding: 0.75rem 0.5rem;
     }
 
     .ranking-overall__title {
       font-size: 2rem;
+      padding: 0 1rem;
+    }
+
+    .ranking-overall__subtitle {
+      font-size: 0.95rem;
+      padding: 0 1rem;
+    }
+
+    .ranking-overall__filters {
+      padding: 0 0.5rem;
     }
 
     .ranking-overall__position {
-      font-size: 1.25rem;
+      font-size: 1.125rem;
     }
 
     .ranking-overall__name {
-      font-size: 1rem;
+      font-size: 0.875rem;
     }
 
-    .ranking-overall__points {
-      font-size: 1rem;
+    .ranking-overall__category,
+    .ranking-overall__team {
+      font-size: 0.75rem;
+    }
+
+    .ranking-overall__points,
+    .ranking-overall__sede-points {
+      font-size: 0.875rem;
+    }
+
+    .ranking-overall__difference {
+      font-size: 0.75rem;
+    }
+
+    .ranking-overall__table-cell {
+      font-size: 0.75rem;
+    }
+
+    .ranking-overall__table-cell--sede {
+      font-size: 0.7rem;
+    }
+
+    /* Show scroll hint */
+    .ranking-overall__table-wrapper::after {
+      content: '← Desliza para ver más →';
+      display: block;
+      text-align: center;
+      padding: 0.75rem;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.5);
+      background: rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
   }
 {% endstylesheet %}
