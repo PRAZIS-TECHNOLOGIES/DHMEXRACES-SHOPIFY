@@ -1,0 +1,527 @@
+{% comment %}
+  Login Page for DHMEXRACES
+  Professional design with brand colors
+{% endcomment %}
+
+<section class="login">
+  <div class="login__container">
+    <div class="login__content">
+
+      <!-- Logo/Brand -->
+      <div class="login__brand">
+        <h1 class="login__logo">DHMEXRACES</h1>
+        <p class="login__tagline">COPA SCOTT 2026</p>
+      </div>
+
+      <!-- Login Form -->
+      <div class="login__form-wrapper">
+        <h2 class="login__title">Iniciar Sesión</h2>
+        <p class="login__subtitle">Accede a tu cuenta de corredor</p>
+
+        {% form 'customer_login' %}
+          {% if form.errors %}
+            <div class="login__errors">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="10" cy="14" r="0.5" fill="currentColor"/>
+              </svg>
+              <div class="login__errors-content">
+                <h3 class="login__errors-title">Error al iniciar sesión</h3>
+                {{ form.errors | default_errors }}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="login__field">
+            <label for="CustomerEmail" class="login__label">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4L10 11L17 4M3 4H17V16H3V4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              name="customer[email]"
+              id="CustomerEmail"
+              class="login__input"
+              autocomplete="email"
+              autocapitalize="off"
+              placeholder="corredor@ejemplo.com"
+              required>
+          </div>
+
+          {% if form.password_needed %}
+            <div class="login__field">
+              <label for="CustomerPassword" class="login__label">
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <rect x="4" y="9" width="12" height="9" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 9V6C7 4.34315 8.34315 3 10 3C11.6569 3 13 4.34315 13 6V9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                Contraseña
+              </label>
+              <input
+                type="password"
+                name="customer[password]"
+                id="CustomerPassword"
+                class="login__input"
+                placeholder="••••••••"
+                required>
+            </div>
+          {% endif %}
+
+          <button type="submit" class="login__submit">
+            <span>Iniciar Sesión</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="login__links">
+            <a href="#recover" class="login__link" id="RecoverPassword">¿Olvidaste tu contraseña?</a>
+          </div>
+        {% endform %}
+      </div>
+
+      <!-- Create Account Link -->
+      <div class="login__register">
+        <p class="login__register-text">¿No tienes cuenta?</p>
+        <a href="{{ routes.account_register_url }}" class="login__register-link">
+          Crear Cuenta de Corredor
+          <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+            <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- Guest Checkout -->
+      {% if shop.checkout.guest_login %}
+        <div class="login__guest">
+          <p class="login__guest-text">O continúa como invitado</p>
+          <a href="{{ routes.cart_url }}" class="login__guest-link">Ir al Carrito</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Password Recovery Form (Hidden by default) -->
+    <div class="login__content login__recover" id="RecoverPasswordForm" style="display: none;">
+      <div class="login__brand">
+        <h1 class="login__logo">DHMEXRACES</h1>
+        <p class="login__tagline">COPA SCOTT 2026</p>
+      </div>
+
+      <div class="login__form-wrapper">
+        <h2 class="login__title">Recuperar Contraseña</h2>
+        <p class="login__subtitle">Te enviaremos un correo para restablecer tu contraseña</p>
+
+        {% form 'recover_customer_password' %}
+          {% if form.posted_successfully? %}
+            <div class="login__success">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="M7 10L9 12L13 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p>Te hemos enviado un correo con instrucciones para recuperar tu contraseña.</p>
+            </div>
+          {% endif %}
+
+          {% if form.errors %}
+            <div class="login__errors">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="M10 6V10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                <circle cx="10" cy="14" r="0.5" fill="currentColor"/>
+              </svg>
+              <div class="login__errors-content">
+                {{ form.errors | default_errors }}
+              </div>
+            </div>
+          {% endif %}
+
+          <div class="login__field">
+            <label for="RecoverEmail" class="login__label">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M3 4L10 11L17 4M3 4H17V16H3V4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Correo Electrónico
+            </label>
+            <input
+              type="email"
+              name="email"
+              id="RecoverEmail"
+              class="login__input"
+              autocomplete="email"
+              placeholder="corredor@ejemplo.com"
+              required>
+          </div>
+
+          <button type="submit" class="login__submit">
+            <span>Enviar Instrucciones</span>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M3 4L10 11L17 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3 4H17V16H3V4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <div class="login__links">
+            <a href="#login" class="login__link" id="HideRecoverPasswordLink">Volver a Iniciar Sesión</a>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Toggle between login and recover password forms
+  document.addEventListener('DOMContentLoaded', function() {
+    const recoverLink = document.getElementById('RecoverPassword');
+    const hideRecoverLink = document.getElementById('HideRecoverPasswordLink');
+    const loginForm = document.querySelector('.login__content:not(.login__recover)');
+    const recoverForm = document.getElementById('RecoverPasswordForm');
+
+    if (recoverLink) {
+      recoverLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        loginForm.style.display = 'none';
+        recoverForm.style.display = 'block';
+      });
+    }
+
+    if (hideRecoverLink) {
+      hideRecoverLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        recoverForm.style.display = 'none';
+        loginForm.style.display = 'block';
+      });
+    }
+
+    // Show recover form if hash is present
+    if (window.location.hash === '#recover') {
+      loginForm.style.display = 'none';
+      recoverForm.style.display = 'block';
+    }
+  });
+</script>
+
+<style>
+  :root {
+    --color-primary: #E42C2C;
+    --color-secondary: #0066B3;
+    --color-gold: #FFD700;
+    --color-success: #10B981;
+    --color-error: #EF4444;
+    --color-bg-dark: #000000;
+    --color-bg-surface: #1A1A1A;
+    --color-text-primary: #FFFFFF;
+    --color-text-secondary: #A0A0A0;
+    --color-border: rgba(255, 255, 255, 0.1);
+  }
+
+  .login {
+    min-height: 100vh;
+    background: var(--color-bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 20% 80%, rgba(228, 44, 44, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(0, 102, 179, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .login__container {
+    max-width: 480px;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  .login__content {
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid var(--color-border);
+    border-radius: 24px;
+    padding: 48px;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .login__brand {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .login__logo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--color-text-primary);
+    margin: 0 0 8px 0;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .login__tagline {
+    font-size: 0.875rem;
+    color: var(--color-gold);
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .login__form-wrapper {
+    margin-bottom: 32px;
+  }
+
+  .login__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 8px 0;
+    text-align: center;
+  }
+
+  .login__subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    text-align: center;
+    margin: 0 0 32px 0;
+  }
+
+  .login__field {
+    margin-bottom: 24px;
+  }
+
+  .login__label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .login__label svg {
+    color: var(--color-secondary);
+  }
+
+  .login__input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--color-border);
+    border-radius: 12px;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .login__input:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(0, 102, 179, 0.1);
+  }
+
+  .login__input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .login__submit {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--color-secondary);
+    border: none;
+    border-radius: 12px;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .login__submit:hover {
+    background: var(--color-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(228, 44, 44, 0.3);
+  }
+
+  .login__submit svg {
+    transition: transform 0.3s ease;
+  }
+
+  .login__submit:hover svg {
+    transform: translateX(4px);
+  }
+
+  .login__links {
+    text-align: center;
+  }
+
+  .login__link {
+    color: var(--color-secondary);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: color 0.3s ease;
+  }
+
+  .login__link:hover {
+    color: var(--color-primary);
+  }
+
+  .login__errors {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    color: var(--color-error);
+    margin-bottom: 24px;
+  }
+
+  .login__errors svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .login__errors-content {
+    flex: 1;
+  }
+
+  .login__errors-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+  }
+
+  .login__errors ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+  }
+
+  .login__success {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 12px;
+    color: var(--color-success);
+    margin-bottom: 24px;
+    font-size: 0.875rem;
+  }
+
+  .login__success svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .login__success p {
+    margin: 0;
+  }
+
+  .login__register {
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .login__register-text {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin: 0 0 12px 0;
+  }
+
+  .login__register-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+
+  .login__register-link:hover {
+    color: var(--color-text-primary);
+    gap: 10px;
+  }
+
+  .login__register-link svg {
+    transition: transform 0.3s ease;
+  }
+
+  .login__register-link:hover svg {
+    transform: translateX(4px);
+  }
+
+  .login__guest {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+
+  .login__guest-text {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+    margin: 0 0 12px 0;
+  }
+
+  .login__guest-link {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+
+  .login__guest-link:hover {
+    color: var(--color-secondary);
+  }
+
+  @media (max-width: 640px) {
+    .login {
+      padding: 40px 16px;
+    }
+
+    .login__content {
+      padding: 32px 24px;
+    }
+
+    .login__logo {
+      font-size: 2rem;
+    }
+
+    .login__title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
