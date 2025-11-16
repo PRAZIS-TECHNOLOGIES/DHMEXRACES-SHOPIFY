@@ -211,7 +211,7 @@
   .registration-card__image {
     position: relative;
     width: 100%;
-    height: 300px;
+    height: {{ section.settings.container_height | default: '300' }}px;
     overflow: hidden;
     background: #F5F5F5;
     display: flex;
@@ -220,10 +220,11 @@
   }
 
   .registration-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: {{ section.settings.image_fit | default: 'contain' }};
-    object-position: {{ section.settings.image_position_x | default: '50' }}% {{ section.settings.image_position_y | default: '50' }}%;
+    width: {{ section.settings.image_width | default: 'auto' }};
+    height: {{ section.settings.image_height | default: 'auto' }};
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: none;
     transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: brightness(0.95) contrast(1.05);
   }
@@ -470,44 +471,29 @@
       "content": "Ajustes de Imagen"
     },
     {
-      "type": "select",
-      "id": "image_fit",
-      "label": "Ajuste de imagen",
-      "options": [
-        {
-          "value": "contain",
-          "label": "Contener (mostrar imagen completa)"
-        },
-        {
-          "value": "cover",
-          "label": "Cubrir (llenar espacio)"
-        },
-        {
-          "value": "fill",
-          "label": "Rellenar (estirar)"
-        }
-      ],
-      "default": "contain"
+      "type": "range",
+      "id": "container_height",
+      "min": 200,
+      "max": 600,
+      "step": 10,
+      "unit": "px",
+      "label": "Altura del contenedor",
+      "default": 300,
+      "info": "Altura del área donde se muestra la imagen"
     },
     {
-      "type": "range",
-      "id": "image_position_x",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "label": "Posición Horizontal",
-      "default": 50
+      "type": "text",
+      "id": "image_width",
+      "label": "Ancho de imagen",
+      "default": "auto",
+      "info": "Ejemplos: auto, 80%, 250px, 100%"
     },
     {
-      "type": "range",
-      "id": "image_position_y",
-      "min": 0,
-      "max": 100,
-      "step": 5,
-      "unit": "%",
-      "label": "Posición Vertical",
-      "default": 50
+      "type": "text",
+      "id": "image_height",
+      "label": "Alto de imagen",
+      "default": "auto",
+      "info": "Ejemplos: auto, 80%, 250px, 100%"
     },
     {
       "type": "select",
