@@ -355,6 +355,7 @@
 
       // Get all race cards with completed status
       const raceCards = doc.querySelectorAll('.ranking-card');
+      console.log('Found', raceCards.length, 'race cards');
       const racesBySede = [];
 
       raceCards.forEach((card, raceIndex) => {
@@ -396,8 +397,13 @@
         }
       });
 
+      console.log('Total races found:', racesBySede.length);
+      console.log('Races:', racesBySede);
+
       // Calculate overall standings
       const overallStandings = calculateOverallStandings(racesBySede);
+
+      console.log('Overall standings calculated:', overallStandings.length);
 
       // Render the overall table
       renderOverallTable(overallStandings, racesBySede);
@@ -511,8 +517,12 @@
   function updateTableHeader(racesBySede) {
     const header = document.querySelector('.ranking-overall__table-header');
 
+    console.log('Updating header with', racesBySede.length, 'sedes');
+    console.log('Window width:', window.innerWidth);
+
     // Check if mobile
     const isMobile = window.innerWidth <= 768;
+    console.log('Is mobile:', isMobile);
 
     // Build dynamic grid template with fixed widths for better mobile scrolling
     let gridColumns;
@@ -539,8 +549,16 @@
       gridColumns += ' 100px 100px'; // Total, Difference
     }
 
+    console.log('Grid columns:', gridColumns);
+
     // Update header grid
     header.style.gridTemplateColumns = gridColumns;
+
+    // Force the table wrapper to allow scroll
+    const wrapper = document.querySelector('.ranking-overall__table-wrapper');
+    if (wrapper) {
+      wrapper.style.overflowX = 'auto';
+    }
 
     // Build header HTML
     let headerHTML = `
