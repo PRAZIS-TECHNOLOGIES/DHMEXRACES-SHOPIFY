@@ -339,15 +339,27 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Show loading state
+    const tableBody = document.getElementById('overallTableBody');
+    tableBody.innerHTML = '<div class="ranking-overall__no-data">Cargando datos...</div>';
+
     // Fetch ranking page and extract race data
     fetchRankingData();
   });
 
   async function fetchRankingData() {
     try {
+      console.log('[OVERALL] Starting data fetch from /pages/ranking');
+
       // Fetch the ranking page
       const response = await fetch('/pages/ranking');
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
       const html = await response.text();
+      console.log('[OVERALL] Fetched HTML, length:', html.length);
 
       // Parse HTML
       const parser = new DOMParser();
@@ -355,21 +367,32 @@
 
       // Get all race cards with completed status
       const raceCards = doc.querySelectorAll('.ranking-card');
-      console.log('Found', raceCards.length, 'race cards');
+      console.log('[OVERALL] Found', raceCards.length, 'race cards in the page');
+
+      if (raceCards.length === 0) {
+        console.warn('[OVERALL] No race cards found! Page structure might have changed.');
+        throw new Error('No se encontraron carreras en la página de ranking');
+      }
+
       const racesBySede = [];
 
       raceCards.forEach((card, raceIndex) => {
         // Check if race is completed (has results table)
         const resultsTable = card.querySelector('.ranking-table');
-        if (!resultsTable) return;
+        if (!resultsTable) {
+          console.log('[OVERALL] Sede', raceIndex + 1, 'skipped - no results table');
+          return;
+        }
 
         // Get race name from card header
         const raceName = card.querySelector('.ranking-card__title')?.textContent.trim() || `Sede ${raceIndex + 1}`;
+        console.log('[OVERALL] Processing sede:', raceName);
 
         const sedeResults = [];
 
         // Get all result rows
         const rows = card.querySelectorAll('.ranking-table__row[data-category]');
+        console.log('[OVERALL] Found', rows.length, 'result rows in', raceName);
 
         rows.forEach(row => {
           const position = row.querySelector('.ranking-table__position span')?.textContent.trim();
@@ -394,24 +417,27 @@
             raceName,
             results: sedeResults
           });
+          console.log('[OVERALL] Added sede with', sedeResults.length, 'results');
         }
       });
 
-      console.log('Total races found:', racesBySede.length);
-      console.log('Races:', racesBySede);
+      console.log('[OVERALL] Total valid sedes:', racesBySede.length);
+
+      if (racesBySede.length === 0) {
+        throw new Error('No se encontraron resultados válidos en las carreras');
+      }
 
       // Calculate overall standings
       const overallStandings = calculateOverallStandings(racesBySede);
-
-      console.log('Overall standings calculated:', overallStandings.length);
+      console.log('[OVERALL] Calculated standings for', overallStandings.length, 'riders');
 
       // Render the overall table
       renderOverallTable(overallStandings, racesBySede);
 
     } catch (error) {
-      console.error('Error fetching ranking data:', error);
+      console.error('[OVERALL] Error fetching ranking data:', error);
       document.getElementById('overallTableBody').innerHTML =
-        '<div class="ranking-overall__no-data">Error al cargar los datos. Por favor recarga la página.</div>';
+        `<div class="ranking-overall__no-data">Error: ${error.message}. Por favor recarga la página.</div>`;
     }
   }
 
@@ -516,27 +542,36 @@
 
   function updateTableHeader(racesBySede) {
     const header = document.querySelector('.ranking-overall__table-header');
+    const table = document.querySelector('.ranking-overall__table');
+    const wrapper = document.querySelector('.ranking-overall__table-wrapper');
 
-    console.log('Updating header with', racesBySede.length, 'sedes');
-    console.log('Window width:', window.innerWidth);
+    console.log('[OVERALL] Updating header with', racesBySede.length, 'sedes');
+    console.log('[OVERALL] Window width:', window.innerWidth);
+    console.log('[OVERALL] User agent:', navigator.userAgent.substring(0, 50));
 
-    // Check if mobile
-    const isMobile = window.innerWidth <= 768;
-    console.log('Is mobile:', isMobile);
+    // Check if mobile - be more thorough
+    const isMobile = window.innerWidth <= 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    console.log('[OVERALL] Is mobile:', isMobile);
 
     // Build dynamic grid template with fixed widths for better mobile scrolling
     let gridColumns;
+    let minTableWidth;
 
     if (isMobile) {
       // Mobile: use fixed pixel widths to force horizontal scroll
       gridColumns = '50px 140px 90px 90px'; // Pos, Name, Category, Team
+      minTableWidth = 50 + 140 + 90 + 90; // Sum of base columns
 
       // Add column for each sede
       racesBySede.forEach(() => {
         gridColumns += ' 60px'; // Sede points column (narrower on mobile)
+        minTableWidth += 60;
       });
 
       gridColumns += ' 70px 70px'; // Total, Difference
+      minTableWidth += 140;
+
+      console.log('[OVERALL] Mobile mode - minimum table width:', minTableWidth + 'px');
     } else {
       // Desktop: use flexible widths
       gridColumns = '60px minmax(180px, 2fr) 120px 120px'; // Pos, Name, Category, Team
@@ -547,17 +582,26 @@
       });
 
       gridColumns += ' 100px 100px'; // Total, Difference
+      minTableWidth = 800; // Default minimum for desktop
     }
 
-    console.log('Grid columns:', gridColumns);
+    console.log('[OVERALL] Grid columns:', gridColumns);
 
     // Update header grid
     header.style.gridTemplateColumns = gridColumns;
 
-    // Force the table wrapper to allow scroll
-    const wrapper = document.querySelector('.ranking-overall__table-wrapper');
+    // Force proper sizing and scrolling
     if (wrapper) {
       wrapper.style.overflowX = 'auto';
+      wrapper.style.overflowY = 'hidden';
+      wrapper.style.webkitOverflowScrolling = 'touch';
+      console.log('[OVERALL] Wrapper overflow set to auto');
+    }
+
+    if (table) {
+      table.style.minWidth = minTableWidth + 'px';
+      table.style.width = isMobile ? 'max-content' : '100%';
+      console.log('[OVERALL] Table min-width set to', minTableWidth + 'px');
     }
 
     // Build header HTML
@@ -573,6 +617,7 @@
       // Shorten the race name for header
       const shortName = sede.raceName.replace('INSCRIPCION SEDE', 'S').replace('GUANAJUATO 2026', '').trim() || `S${index + 1}`;
       headerHTML += `<div class="ranking-overall__table-cell ranking-overall__table-cell--sede">${shortName}</div>`;
+      console.log('[OVERALL] Added header for sede:', shortName);
     });
 
     headerHTML += `
@@ -581,6 +626,7 @@
     `;
 
     header.innerHTML = headerHTML;
+    console.log('[OVERALL] Header HTML updated with', racesBySede.length + 6, 'columns total');
   }
 
   function filterByCategory(selectedCategory, allStandings, racesBySede) {
@@ -592,6 +638,8 @@
     const tableBody = document.getElementById('overallTableBody');
     tableBody.innerHTML = '';
 
+    console.log('[OVERALL] Rendering', standings.length, 'riders with', racesBySede.length, 'sedes');
+
     if (standings.length === 0) {
       tableBody.innerHTML = '<div class="ranking-overall__no-data">No hay corredores en esta categoría.</div>';
       return;
@@ -602,6 +650,8 @@
     // Get grid template from header
     const header = document.querySelector('.ranking-overall__table-header');
     const gridColumns = header.style.gridTemplateColumns;
+
+    console.log('[OVERALL] Using grid columns:', gridColumns);
 
     standings.forEach((rider, index) => {
       const position = index + 1;
@@ -633,6 +683,8 @@
       row.innerHTML = rowHTML;
       tableBody.appendChild(row);
     });
+
+    console.log('[OVERALL] Finished rendering', standings.length, 'rows');
   }
 </script>
 
