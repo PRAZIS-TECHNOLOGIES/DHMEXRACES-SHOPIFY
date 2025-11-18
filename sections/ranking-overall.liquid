@@ -266,12 +266,7 @@
     .ranking-overall__row {
       gap: 0.5rem;
       padding: 0.75rem 1rem;
-      /* Don't override grid-template-columns - let JS handle it dynamically */
-    }
-
-    .ranking-overall__table-header > *,
-    .ranking-overall__row > * {
-      min-width: fit-content;
+      /* Grid template columns handled by JavaScript */
     }
 
     .ranking-overall__title {
@@ -292,41 +287,30 @@
 
     .ranking-overall__position {
       font-size: 1rem;
-      min-width: 45px !important;
-      width: 45px;
     }
 
     .ranking-overall__name {
       font-size: 0.875rem;
-      min-width: 140px !important;
     }
 
     .ranking-overall__category {
       font-size: 0.75rem;
-      min-width: 85px !important;
     }
 
     .ranking-overall__team {
       font-size: 0.75rem;
-      min-width: 85px !important;
     }
 
     .ranking-overall__points {
       font-size: 0.875rem;
-      min-width: 65px !important;
-      width: 65px;
     }
 
     .ranking-overall__sede-points {
       font-size: 0.85rem;
-      min-width: 55px !important;
-      width: 55px;
     }
 
     .ranking-overall__difference {
       font-size: 0.75rem;
-      min-width: 65px !important;
-      width: 65px;
     }
 
     .ranking-overall__table-cell {
@@ -335,27 +319,8 @@
       padding: 0.25rem;
     }
 
-    .ranking-overall__table-cell:nth-child(1) {
-      min-width: 45px !important;
-      width: 45px;
-    }
-
-    .ranking-overall__table-cell:nth-child(2) {
-      min-width: 140px !important;
-    }
-
-    .ranking-overall__table-cell:nth-child(3) {
-      min-width: 85px !important;
-    }
-
-    .ranking-overall__table-cell:nth-child(4) {
-      min-width: 85px !important;
-    }
-
     .ranking-overall__table-cell--sede {
       font-size: 0.7rem;
-      min-width: 55px !important;
-      width: 55px;
     }
 
     /* Show scroll hint */
@@ -546,15 +511,33 @@
   function updateTableHeader(racesBySede) {
     const header = document.querySelector('.ranking-overall__table-header');
 
-    // Build dynamic grid template
-    let gridColumns = '60px 1fr 150px 150px'; // Pos, Name, Category, Team
+    // Check if mobile
+    const isMobile = window.innerWidth <= 768;
 
-    // Add column for each sede
-    racesBySede.forEach(() => {
-      gridColumns += ' 80px'; // Sede points column
-    });
+    // Build dynamic grid template with fixed widths for better mobile scrolling
+    let gridColumns;
 
-    gridColumns += ' 100px 120px'; // Total, Difference
+    if (isMobile) {
+      // Mobile: use fixed pixel widths to force horizontal scroll
+      gridColumns = '50px 140px 90px 90px'; // Pos, Name, Category, Team
+
+      // Add column for each sede
+      racesBySede.forEach(() => {
+        gridColumns += ' 60px'; // Sede points column (narrower on mobile)
+      });
+
+      gridColumns += ' 70px 70px'; // Total, Difference
+    } else {
+      // Desktop: use flexible widths
+      gridColumns = '60px minmax(180px, 2fr) 120px 120px'; // Pos, Name, Category, Team
+
+      // Add column for each sede
+      racesBySede.forEach(() => {
+        gridColumns += ' 80px'; // Sede points column
+      });
+
+      gridColumns += ' 100px 100px'; // Total, Difference
+    }
 
     // Update header grid
     header.style.gridTemplateColumns = gridColumns;
