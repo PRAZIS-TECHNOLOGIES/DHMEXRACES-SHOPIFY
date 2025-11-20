@@ -1,16 +1,29 @@
 {% comment %}
   Race Registration for Guanajuato - SEDE 1
   Category selector with buttons that redirect to product
+  Color theme: Red (#E42C2C)
 {% endcomment %}
 
 <section class="registration-gto">
   <div class="registration-gto__container">
     <div class="registration-gto__header" data-aos="fade-up">
       <span class="registration-gto__badge">SEDE 1</span>
-      <h2 class="registration-gto__title">Inscripciones Guanajuato 2026</h2>
-      <p class="registration-gto__subtitle">21-22 Febrero 2026 • Guanajuato, México</p>
+      <h2 class="registration-gto__title">{{ section.settings.title | default: 'Inscripciones Guanajuato 2026' }}</h2>
+      <p class="registration-gto__subtitle">{{ section.settings.subtitle | default: '21-22 Febrero 2026 • Guanajuato, México' }}</p>
     </div>
 
+    {% if section.settings.status == 'coming_soon' %}
+      <div class="registration-gto__coming-soon" data-aos="fade-up" data-aos-delay="100">
+        <div class="registration-gto__coming-soon-icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="35" stroke="currentColor" stroke-width="3"/>
+            <path d="M40 20V40L52 52" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="registration-gto__coming-soon-title">PRÓXIMAMENTE</h3>
+        <p class="registration-gto__coming-soon-text">{{ section.settings.coming_soon_message | default: 'Las inscripciones estarán disponibles pronto' }}</p>
+      </div>
+    {% else %}
     <div class="registration-gto__info" data-aos="fade-up" data-aos-delay="100">
       <div class="registration-gto__price-card">
         <div class="registration-gto__price-label">Precio por inscripción</div>
@@ -118,6 +131,7 @@
         </button>
       </div>
     </div>
+    {% endif %}
   </div>
 </section>
 
@@ -174,6 +188,37 @@
     font-size: 1.25rem;
     color: rgba(255, 255, 255, 0.7);
     font-weight: 400;
+  }
+
+  /* Coming Soon State */
+  .registration-gto__coming-soon {
+    padding: 80px 32px;
+    text-align: center;
+    background: rgba(228, 44, 44, 0.05);
+    border: 1px solid rgba(228, 44, 44, 0.2);
+    border-radius: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .registration-gto__coming-soon-icon {
+    color: var(--color-primary);
+    margin-bottom: 24px;
+  }
+
+  .registration-gto__coming-soon-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--color-primary);
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .registration-gto__coming-soon-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .registration-gto__info {
@@ -321,13 +366,56 @@
       gap: 12px;
       text-align: center;
     }
+
+    .registration-gto__coming-soon {
+      padding: 60px 24px;
+    }
+
+    .registration-gto__coming-soon-title {
+      font-size: 1.5rem;
+    }
   }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "Registro Guanajuato",
-  "settings": [],
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Inscripciones Guanajuato 2026"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "21-22 Febrero 2026 • Guanajuato, México"
+    },
+    {
+      "type": "select",
+      "id": "status",
+      "label": "Estado",
+      "options": [
+        {
+          "value": "active",
+          "label": "Activo"
+        },
+        {
+          "value": "coming_soon",
+          "label": "Próximamente"
+        }
+      ],
+      "default": "active"
+    },
+    {
+      "type": "text",
+      "id": "coming_soon_message",
+      "label": "Mensaje Próximamente",
+      "default": "Las inscripciones estarán disponibles pronto"
+    }
+  ],
   "presets": [
     {
       "name": "Registro Guanajuato",

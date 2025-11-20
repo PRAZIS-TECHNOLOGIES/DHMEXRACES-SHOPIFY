@@ -93,7 +93,34 @@
         </div>
       </div>
 
-      {%- comment -%} Add to Cart Form {%- endcomment -%}
+      {%- comment -%} Registration Status Check {%- endcomment -%}
+      {% assign registration_status = product.metafields.custom.registration_status | default: 'open' %}
+
+      {% if registration_status == 'coming_soon' %}
+        {%- comment -%} PRÓXIMAMENTE State {%- endcomment -%}
+        <div class="product__status-message product__status-message--coming-soon">
+          <div class="product__status-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="product__status-title">Próximamente</h3>
+          <p class="product__status-text">Las inscripciones estarán disponibles pronto</p>
+        </div>
+      {% elsif registration_status == 'closed' %}
+        {%- comment -%} AGOTADO/CLOSED State {%- endcomment -%}
+        <div class="product__status-message product__status-message--closed">
+          <div class="product__status-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18.364 5.636a9 9 0 11-12.728 12.728 9 9 0 0112.728-12.728zM6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="product__status-title">Inscripciones Cerradas</h3>
+          <p class="product__status-text">Las inscripciones para esta sede han finalizado</p>
+        </div>
+      {% else %}
+      {%- comment -%} Add to Cart Form - Only shown when OPEN {%- endcomment -%}
       {% form 'product', product, class: 'product__form' %}
         {% assign current_variant = product.selected_or_first_available_variant %}
 
@@ -186,6 +213,7 @@
           </div>
         </div>
       {% endform %}
+      {% endif %}
     </div>
 
   </div>
@@ -605,6 +633,79 @@
   .product__submit:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  /* Status Messages - PRÓXIMAMENTE / CERRADO */
+  .product__status-message {
+    padding: 48px 32px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product__status-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .product__status-message--coming-soon {
+    background: linear-gradient(135deg, rgba(0, 102, 179, 0.08) 0%, rgba(0, 102, 179, 0.02) 100%);
+    border: 1px solid rgba(0, 102, 179, 0.15);
+  }
+
+  .product__status-message--coming-soon .product__status-icon {
+    color: #0066B3;
+    opacity: 0.8;
+  }
+
+  .product__status-message--coming-soon .product__status-title {
+    color: #0066B3;
+  }
+
+  .product__status-message--closed {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .product__status-message--closed .product__status-icon {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .product__status-message--closed .product__status-title {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .product__status-icon {
+    margin-bottom: 16px;
+  }
+
+  .product__status-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .product__status-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .product__status-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.5;
   }
 
   .product__benefits {
