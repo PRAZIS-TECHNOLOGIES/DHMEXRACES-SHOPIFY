@@ -1,9 +1,9 @@
 {% comment %}
-  Ranking Section for DHMEXRACES
-  Displays race results by event/date
+  Ranking Section for DHMEXRACES - Campeonato 2025
+  Historical results from the inaugural championship
 {% endcomment %}
 
-<section class="ranking">
+<section class="ranking ranking-2025">
   <div class="ranking__container">
     {% if section.settings.title != blank %}
       <h1 class="ranking__title" data-aos="fade-up">{{ section.settings.title }}</h1>
@@ -13,13 +13,19 @@
       <p class="ranking__subtitle" data-aos="fade-up" data-aos-delay="100">{{ section.settings.subtitle }}</p>
     {% endif %}
 
+    <!-- Historical Banner -->
+    <div class="ranking-2025__historical-banner" data-aos="fade-up" data-aos-delay="120">
+      <h3 class="ranking-2025__historical-title">Primera Temporada DHMEXRACES</h3>
+      <p class="ranking-2025__historical-text">{{ section.settings.historical_message }}</p>
+    </div>
+
     <!-- Overall Button -->
     <div class="ranking__overall-btn-wrapper" data-aos="fade-up" data-aos-delay="150">
-      <a href="/pages/ranking-overall" class="ranking__overall-btn">
+      <a href="/pages/ranking-overall-2025" class="ranking__overall-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M3 3h18v18H3V3zm16 16V5H5v14h14zM7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h7v2H7v-2z" fill="currentColor"/>
         </svg>
-        <span>VER OVERALL</span>
+        <span>VER OVERALL 2025</span>
       </a>
     </div>
 
@@ -44,19 +50,19 @@
                   <path d="M40 20V40L52 52" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
                 </svg>
               </div>
-              <h3 class="ranking-card__upcoming-text">PRÓXIMAMENTE</h3>
-              <p class="ranking-card__upcoming-desc">Los resultados se publicarán después de la carrera</p>
+              <h3 class="ranking-card__upcoming-text">PROXIMAMENTE</h3>
+              <p class="ranking-card__upcoming-desc">Los resultados se publicaran despues de la carrera</p>
             </div>
           {% else %}
             <div class="ranking-card__results">
               <!-- Category Filters -->
-              <div class="category-filters" data-block-id="block-{{ forloop.index }}"></div>
+              <div class="category-filters" data-block-id="block-2025-{{ forloop.index }}"></div>
 
-              <div class="ranking-table" data-table-id="table-{{ forloop.index }}">
+              <div class="ranking-table" data-table-id="table-2025-{{ forloop.index }}">
                 <div class="ranking-table__header">
                   <div class="ranking-table__col ranking-table__col--pos">POS</div>
                   <div class="ranking-table__col ranking-table__col--rider">CORREDOR</div>
-                  <div class="ranking-table__col ranking-table__col--category">CATEGORÍA</div>
+                  <div class="ranking-table__col ranking-table__col--category">CATEGORIA</div>
                   <div class="ranking-table__col ranking-table__col--team">EQUIPO</div>
                   <div class="ranking-table__col ranking-table__col--time">TIEMPO</div>
                   <div class="ranking-table__col ranking-table__col--points">PUNTOS</div>
@@ -136,15 +142,17 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     // Procesar cada tabla de ranking
-    const tables = document.querySelectorAll('[data-table-id]');
+    const tables = document.querySelectorAll('[data-table-id^="table-2025-"]');
 
-    tables.forEach((table, index) => {
+    tables.forEach((table) => {
+      const tableId = table.getAttribute('data-table-id');
+      const blockIndex = tableId.replace('table-2025-', '');
       const rows = table.querySelectorAll('.ranking-table__row[data-category]');
-      const filterContainer = document.querySelector(`[data-block-id="block-${index + 1}"]`);
+      const filterContainer = document.querySelector(`[data-block-id="block-2025-${blockIndex}"]`);
 
       if (!rows.length || !filterContainer) return;
 
-      // Obtener categorías únicas
+      // Obtener categorias unicas
       const categories = new Set();
       rows.forEach(row => {
         const category = row.getAttribute('data-category');
@@ -153,9 +161,9 @@
         }
       });
 
-      // Si hay más de una categoría, crear botones de filtro
+      // Si hay mas de una categoria, crear botones de filtro
       if (categories.size > 1) {
-        // Botones para cada categoría
+        // Botones para cada categoria
         let isFirst = true;
         categories.forEach(category => {
           const button = document.createElement('button');
@@ -178,13 +186,13 @@
             if (rowCategory === selectedCategory) {
               row.style.display = 'grid';
 
-              // Actualizar número de posición
+              // Actualizar numero de posicion
               const positionElement = row.querySelector('.ranking-table__position span');
               if (positionElement) {
                 positionElement.textContent = visiblePosition;
               }
 
-              // Actualizar clase de posición para mantener estilos de podio
+              // Actualizar clase de posicion para mantener estilos de podio
               row.className = row.className.replace(/ranking-table__row--position-\d+/,
                 `ranking-table__row--position-${visiblePosition}`);
 
@@ -208,7 +216,7 @@
           });
         });
 
-        // Filtrar por la primera categoría al cargar
+        // Filtrar por la primera categoria al cargar
         const firstCategory = filterButtons[0].getAttribute('data-category');
         filterByCategory(firstCategory);
       }
@@ -262,6 +270,32 @@
     max-width: 700px;
     margin-left: auto;
     margin-right: auto;
+  }
+
+  /* Historical Banner - 2025 */
+  .ranking-2025__historical-banner {
+    text-align: center;
+    margin-bottom: 32px;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+  }
+
+  .ranking-2025__historical-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-gold);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .ranking-2025__historical-text {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    margin: 0;
   }
 
   .ranking__overall-btn-wrapper {
@@ -569,6 +603,19 @@
       padding: 100px 16px 60px;
     }
 
+    .ranking-2025__historical-banner {
+      padding: 0 16px;
+      margin-bottom: 24px;
+    }
+
+    .ranking-2025__historical-title {
+      font-size: 0.95rem;
+    }
+
+    .ranking-2025__historical-text {
+      font-size: 0.85rem;
+    }
+
     .ranking-card__header {
       padding: 24px 20px;
     }
@@ -615,19 +662,25 @@
 
 {% schema %}
 {
-  "name": "Ranking",
+  "name": "Ranking 2025",
   "settings": [
     {
       "type": "text",
       "id": "title",
       "label": "Titulo",
-      "default": "Ranking 2026"
+      "default": "Campeonato 2025"
     },
     {
       "type": "textarea",
       "id": "subtitle",
       "label": "Subtitulo",
-      "default": "Resultados oficiales de todas las fechas del campeonato 2026"
+      "default": "Resultados oficiales de la temporada inaugural"
+    },
+    {
+      "type": "textarea",
+      "id": "historical_message",
+      "label": "Mensaje Historico",
+      "default": "Los pioneros que marcaron el inicio de una nueva era en el downhill mexicano. Resultados oficiales de la primera temporada DHMEXRACES."
     }
   ],
   "blocks": [
@@ -645,7 +698,7 @@
           "type": "text",
           "id": "race_date",
           "label": "Fecha",
-          "default": "12 de Diciembre, 2026"
+          "default": "12 de Diciembre, 2025"
         },
         {
           "type": "select",
@@ -654,27 +707,27 @@
           "options": [
             {
               "value": "upcoming",
-              "label": "Próximamente"
+              "label": "Proximamente"
             },
             {
               "value": "completed",
               "label": "Completada"
             }
           ],
-          "default": "upcoming"
+          "default": "completed"
         },
         {
           "type": "textarea",
           "id": "results_data",
           "label": "Resultados",
-          "info": "Formato: posición|nombre|categoría|tiempo|puntos separados por ||. Ejemplo: 1|Juan Pérez|Elite|2:15:30|100||2|María González|Amateur|2:20:45|80"
+          "info": "Formato: posicion|nombre|categoria|equipo|tiempo|puntos separados por ||. Ejemplo: 1|Juan Perez|Elite|Team X|2:15:30|100||2|Maria Gonzalez|Amateur|Team Y|2:20:45|80"
         }
       ]
     }
   ],
   "presets": [
     {
-      "name": "Ranking",
+      "name": "Ranking 2025",
       "category": "DHMEXRACES"
     }
   ]

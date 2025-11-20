@@ -13,13 +13,20 @@
       {% endif %}
     </a>
 
-    <nav class="header__menu">
+    <nav class="header__menu" id="headerMenu">
       <a href="/" class="header__menu-link">Home</a>
       <a href="/products/inscripcion-guanajuato-2026" class="header__menu-link">Inscripciones</a>
-      <a href="/pages/ranking" class="header__menu-link">Ranking</a>
+      <a href="/pages/ranking" class="header__menu-link">Ranking 2026</a>
+      <a href="/pages/ranking-2025" class="header__menu-link">Campeonato 2025</a>
     </nav>
 
     <div class="header__icons">
+      <button class="header__hamburger" id="hamburgerBtn" aria-label="Toggle menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
       {% if shop.customer_accounts_enabled %}
         <a href="{{ routes.account_url }}" class="header__icon">
           {{ 'icon-account.svg' | inline_asset_content }}
@@ -36,7 +43,45 @@
   </div>
 </header>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('headerMenu');
+
+    if (hamburger && menu) {
+      hamburger.addEventListener('click', function() {
+        hamburger.classList.toggle('active');
+        menu.classList.toggle('active');
+        document.body.classList.toggle('menu-open');
+      });
+
+      // Close menu when clicking a link
+      const menuLinks = menu.querySelectorAll('.header__menu-link');
+      menuLinks.forEach(link => {
+        link.addEventListener('click', function() {
+          hamburger.classList.remove('active');
+          menu.classList.remove('active');
+          document.body.classList.remove('menu-open');
+        });
+      });
+    }
+  });
+</script>
+
 {% stylesheet %}
+  :root {
+    --color-primary: #E42C2C;        /* Rojo DHMEX */
+    --color-secondary: #0066B3;      /* Azul Shimano */
+    --color-gold: #FFD700;           /* Amarillo dorado */
+    --color-bg-dark: #000000;        /* Negro SCOTT */
+    --color-bg-surface: #1A1A1A;     /* Gris muy oscuro */
+    --color-bg-elevated: #2A2A2A;    /* Gris oscuro */
+    --color-text-primary: #FFFFFF;   /* Blanco puro */
+    --color-text-secondary: #A0A0A0; /* Gris claro */
+    --color-border: rgba(255, 255, 255, 0.1);
+    --color-border-accent: rgba(228, 44, 44, 0.3);
+  }
+
   .site-header {
     position: fixed;
     top: 0;
@@ -44,8 +89,9 @@
     width: 100%;
     z-index: 1000;
     background: rgba(0, 0, 0, 0.95);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 77, 0, 0.2);
+    backdrop-filter: blur(20px);
+    border-bottom: 2px solid var(--color-primary);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
     transition: all 0.3s ease;
   }
 
@@ -82,48 +128,59 @@
     font-size: 1.5rem;
     font-weight: 900;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #FFFFFF 0%, #FF4D00 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: var(--color-text-primary);
     letter-spacing: 0.05em;
   }
 
   .header__menu {
     display: flex;
     align-items: center;
-    gap: 2rem;
+    gap: 2.5rem;
     justify-self: center;
   }
 
   .header__menu-link {
-    color: #FFFFFF;
+    color: var(--color-text-secondary);
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.08em;
     transition: all 0.3s ease;
     position: relative;
+    padding: 0.5rem 0;
   }
 
   .header__menu-link::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, #FF4D00, #FFB800);
+    background: var(--color-primary);
     transition: width 0.3s ease;
   }
 
   .header__menu-link:hover {
-    color: #FF4D00;
+    color: var(--color-text-primary);
   }
 
   .header__menu-link:hover::after {
     width: 100%;
+  }
+
+  /* Gold link style for 2025 */
+  .header__menu-link--gold {
+    color: var(--color-gold) !important;
+  }
+
+  .header__menu-link--gold:hover {
+    color: #fff !important;
+  }
+
+  .header__menu-link--gold::after {
+    background: var(--color-gold);
   }
 
   .header__icons {
@@ -134,9 +191,9 @@
   }
 
   .header__icon {
-    color: #FFFFFF;
+    color: var(--color-text-secondary);
     text-decoration: none;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
   }
 
@@ -147,7 +204,7 @@
   }
 
   .header__icon:hover {
-    color: #FF4D00;
+    color: var(--color-primary);
     transform: translateY(-2px);
   }
 
@@ -155,9 +212,9 @@
     position: absolute;
     top: -8px;
     right: -8px;
-    background: linear-gradient(135deg, #FF4D00, #FFB800);
-    color: #000;
-    font-size: 0.75rem;
+    background: var(--color-primary);
+    color: var(--color-text-primary);
+    font-size: 0.7rem;
     font-weight: 800;
     width: 20px;
     height: 20px;
@@ -165,29 +222,128 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 2px 8px rgba(228, 44, 44, 0.5);
   }
 
+  /* Hamburger Menu */
+  .header__hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 22px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1001;
+  }
+
+  .header__hamburger span {
+    width: 100%;
+    height: 3px;
+    background: var(--color-text-secondary);
+    border-radius: 2px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .header__hamburger:hover span {
+    background: var(--color-text-primary);
+  }
+
+  .header__hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(7px, 7px);
+    background: var(--color-primary);
+  }
+
+  .header__hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .header__hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+    background: var(--color-primary);
+  }
+
+  /* Mobile Styles */
   @media (max-width: 768px) {
     .header__container {
       padding: 1rem;
       grid-template-columns: 1fr auto;
     }
 
+    .header__hamburger {
+      display: flex;
+      margin-right: 1rem;
+    }
+
     .header__menu {
+      position: fixed;
+      top: 70px;
+      left: 0;
+      right: 0;
+      background: var(--color-bg-dark);
+      backdrop-filter: blur(30px);
+      flex-direction: column;
+      padding: 2.5rem 2rem;
+      gap: 0;
+      transform: translateY(-100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.4s ease;
+      border-bottom: 2px solid var(--color-primary);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+    }
+
+    .header__menu.active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .header__menu-link {
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid var(--color-border);
+      font-size: 1.1rem;
+      text-align: center;
+      color: var(--color-text-secondary);
+    }
+
+    .header__menu-link:hover {
+      background: var(--color-bg-elevated);
+      color: var(--color-text-primary);
+    }
+
+    .header__menu-link:last-child {
+      border-bottom: none;
+    }
+
+    .header__menu-link::after {
       display: none;
     }
 
     .header__logo-img {
-      max-height: 70px;
+      max-height: 60px;
     }
 
     .header__logo-text {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     .header__icons {
       justify-self: end;
+      gap: 0.5rem;
     }
+
+    .header__icon svg {
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  /* Prevent body scroll when menu is open */
+  body.menu-open {
+    overflow: hidden;
   }
 {% endstylesheet %}
 

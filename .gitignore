@@ -31,3 +31,6 @@ npm-debug.log*
 # Backups
 *.bak
 *.backup
+nul
+sections/nul
+snippets/nul

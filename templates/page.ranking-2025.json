@@ -1,0 +1,49 @@
+{
+  "sections": {
+    "ranking-2025": {
+      "type": "ranking-2025",
+      "blocks": {
+        "race_1_gto_2025": {
+          "type": "race",
+          "settings": {
+            "race_name": "SEDE 1 - Guanajuato",
+            "race_date": "15-16 Marzo 2025",
+            "status": "completed",
+            "results_data": ""
+          }
+        },
+        "race_2_puebla_2025": {
+          "type": "race",
+          "settings": {
+            "race_name": "SEDE 2 - Puebla",
+            "race_date": "26-27 Abril 2025",
+            "status": "completed",
+            "results_data": ""
+          }
+        },
+        "race_3_gdl_2025": {
+          "type": "race",
+          "settings": {
+            "race_name": "SEDE 3 - Guadalajara",
+            "race_date": "14-15 Junio 2025",
+            "status": "completed",
+            "results_data": ""
+          }
+        }
+      },
+      "block_order": [
+        "race_1_gto_2025",
+        "race_2_puebla_2025",
+        "race_3_gdl_2025"
+      ],
+      "settings": {
+        "title": "Campeonato 2025",
+        "subtitle": "Resultados oficiales de la temporada inaugural",
+        "historical_message": "Los pioneros que marcaron el inicio de una nueva era en el downhill mexicano. Resultados oficiales de la primera temporada DHMEXRACES."
+      }
+    }
+  },
+  "order": [
+    "ranking-2025"
+  ]
+}
