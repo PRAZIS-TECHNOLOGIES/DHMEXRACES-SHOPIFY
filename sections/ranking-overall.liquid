@@ -411,13 +411,16 @@
 
   async function fetchRankingData() {
     try {
-      console.log('[OVERALL] Starting data fetch from /pages/ranking');
+      console.log('[OVERALL] Starting data fetch from /pages/ranking-2026');
 
-      // Fetch the ranking page
-      const response = await fetch('/pages/ranking');
+      // Fetch the ranking page for 2026
+      const response = await fetch('/pages/ranking-2026');
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // Si no existe la página o hay error, mostrar próximamente
+        console.log('[OVERALL] Page not found or error, showing coming soon');
+        showComingSoon();
+        return;
       }
 
       const html = await response.text();
@@ -432,8 +435,9 @@
       console.log('[OVERALL] Found', raceCards.length, 'race cards in the page');
 
       if (raceCards.length === 0) {
-        console.warn('[OVERALL] No race cards found! Page structure might have changed.');
-        throw new Error('No se encontraron carreras en la página de ranking');
+        console.log('[OVERALL] No race cards found, showing coming soon');
+        showComingSoon();
+        return;
       }
 
       const racesBySede = [];
@@ -511,9 +515,23 @@
 
     } catch (error) {
       console.error('[OVERALL] Error fetching ranking data:', error);
-      document.getElementById('overallTableBody').innerHTML =
-        `<div class="ranking-overall__no-data">Error: ${error.message}. Por favor recarga la página.</div>`;
+      showComingSoon();
     }
+  }
+
+  function showComingSoon() {
+    document.getElementById('overallTableBody').innerHTML = `
+      <div class="ranking-overall__coming-soon">
+        <div class="ranking-overall__coming-soon-icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="35" stroke="currentColor" stroke-width="3"/>
+            <path d="M40 20V40L52 52" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="ranking-overall__coming-soon-title">PRÓXIMAMENTE</h3>
+        <p class="ranking-overall__coming-soon-text">El ranking overall 2026 estará disponible cuando inicien las carreras de la temporada</p>
+      </div>
+    `;
   }
 
   function calculateOverallStandings(racesBySede) {

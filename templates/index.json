@@ -33,9 +33,9 @@
         "logo_width": 0,
         "title": "El Campeonato Nacional de Downhill",
         "subtitle": "Temporada 2026",
-        "description": "<p>DHMEXRACES es el campeonato de Downhill más importante de México. Tres sedes, los mejores riders y la adrenalina al máximo.</p>",
-        "button_text": "Ver Historia",
-        "button_link": "",
+        "description": "<p>DHMEXRACES es el campeonato de Downhill más importante de México. Cinco sedes, los mejores riders y la adrenalina al máximo.</p>",
+        "button_text": "INSTAGRAM",
+        "button_link": "https://www.instagram.com/dhmex_races/",
         "background_color": "#000000",
         "title_color": "#ffffff",
         "subtitle_color": "#e42c2c",
@@ -70,7 +70,7 @@
             "elevation": "+$100,000 en premios",
             "description": "Segunda válida del campeonato nacional con soporte técnico completo.",
             "button_label": "Próximamente",
-            "button_link": "/collections/inscripciones"
+            "button_link": "shopify://products/inscripcion-sede-1-puebla"
           }
         },
         "race_3": {
@@ -84,7 +84,7 @@
             "elevation": "+$100,000 en premios",
             "description": "Mitad de temporada en una de las pistas más técnicas del circuito.",
             "button_label": "Próximamente",
-            "button_link": "/collections/inscripciones"
+            "button_link": "shopify://products/inscripcion-sede-2-guadalajara"
           }
         },
         "race_4": {
@@ -98,7 +98,7 @@
             "elevation": "+$100,000 en premios",
             "description": "Cuarta válida con los mejores riders compitiendo por puntos cruciales.",
             "button_label": "Próximamente",
-            "button_link": "/collections/inscripciones"
+            "button_link": "shopify://products/inscripcion-sede-4-ixtapan-de-la-sal"
           }
         },
         "race_5": {
@@ -112,7 +112,7 @@
             "elevation": "+$130,000 en premios",
             "description": "¡LA GRAN FINAL! Definición de campeones nacionales. $500,000 MXN en premios totales.",
             "button_label": "Próximamente",
-            "button_link": "/collections/inscripciones"
+            "button_link": "shopify://products/inscripcion-sede-5-taxco-final-urbano"
           }
         }
       },
