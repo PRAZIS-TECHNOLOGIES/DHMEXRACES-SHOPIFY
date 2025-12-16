@@ -1,0 +1,1913 @@
+{% comment %}
+  Product page for DHMEXRACES race registrations - Professional Design
+{% endcomment %}
+
+<section class="product">
+  <div class="product__container">
+
+    {%- comment -%} Product Gallery {%- endcomment -%}
+    <div class="product__gallery">
+      {% if product.images.size > 0 %}
+        <div class="product__main-image">
+          <img
+            src="{{ product.featured_image | image_url: width: 1200 }}"
+            alt="{{ product.title }}"
+            id="mainProductImage"
+            class="product__image"
+            width="1200"
+            height="800">
+        </div>
+
+        {% if product.images.size > 1 %}
+          <div class="product__thumbnails">
+            {% for image in product.images %}
+              <button
+                type="button"
+                class="product__thumbnail {% if forloop.first %}active{% endif %}"
+                data-image="{{ image | image_url: width: 1200 }}"
+                onclick="changeMainImage(this)">
+                <img src="{{ image | image_url: width: 200 }}" alt="{{ product.title }}" width="200" height="150">
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="product__placeholder">
+          <span>{{ product.title }}</span>
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Product Info & Form {%- endcomment -%}
+    <div class="product__info">
+
+      {%- comment -%} Race Badge {%- endcomment -%}
+      {% if product.metafields.custom.race_round != blank %}
+        <div class="product__badge">
+          {{ product.metafields.custom.race_round }}
+        </div>
+      {% endif %}
+
+      {%- comment -%} Title {%- endcomment -%}
+      <h1 class="product__title">{{ product.title }}</h1>
+
+      {%- comment -%} Race Details {%- endcomment -%}
+      {% if product.metafields.custom.race_date != blank or product.metafields.custom.race_location != blank %}
+        <div class="product__details">
+          {% if product.metafields.custom.race_date != blank %}
+            <div class="product__detail">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M6 2V5M14 2V5M3 8H17M5 4H15C16.1046 4 17 4.89543 17 6V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <span>{{ product.metafields.custom.race_date }}</span>
+            </div>
+          {% endif %}
+
+          {% if product.metafields.custom.race_location != blank %}
+            <div class="product__detail">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2C7.23858 2 5 4.23858 5 7C5 11.5 10 18 10 18C10 18 15 11.5 15 7C15 4.23858 12.7614 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>{{ product.metafields.custom.race_location }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {%- comment -%} Description {%- endcomment -%}
+      {% if product.description != blank %}
+        <div class="product__description">
+          {{ product.description }}
+        </div>
+      {% endif %}
+
+      <script id="sedeConfig" type="application/json">
+        {
+          "productTitle": {{ product.title | json }},
+          "apiUrl": "https://dhmexraces-webhooks.vercel.app/api/inventory",
+          "eventDate": "{{ product.metafields.custom.event_date | date: '%Y-%m-%dT%H:%M:%S' }}",
+          "eventDateLabel": {{ product.metafields.custom.event_date_label | default: "" | json }},
+          "closeDate": "{{ product.metafields.custom.close_date | date: '%Y-%m-%dT%H:%M:%S' }}"
+        }
+      </script>
+
+      {%- comment -%} FOMO Inventory Badges - Playeras y Medallas (ARRIBA) {%- endcomment -%}
+      <div class="product__fomo-container" id="fomoContainer" style="display: none;">
+        <div class="product__fomo-badge product__fomo-badge--playeras" id="fomoPlayeras">
+          <div class="product__fomo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M20 7L12 3L4 7M20 7V17L12 21M20 7L12 11M12 21L4 17V7M12 21V11M4 7L12 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="product__fomo-content">
+            <span class="product__fomo-label">Playera Oficial</span>
+            <span class="product__fomo-value" id="fomoPlayerasValue">Cargando...</span>
+          </div>
+        </div>
+        <div class="product__fomo-badge product__fomo-badge--medallas" id="fomoMedallas">
+          <div class="product__fomo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+              <path d="M9 13L7 22L12 19L17 22L15 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="product__fomo-content">
+            <span class="product__fomo-label">Medalla Conmemorativa</span>
+            <span class="product__fomo-value" id="fomoMedallasValue">Cargando...</span>
+          </div>
+        </div>
+      </div>
+
+      {%- comment -%} FOMO - Contador de Inscritos (aparece desde 61+) {%- endcomment -%}
+      <div class="product__fomo-inscritos" id="fomoInscritos" style="display: none;">
+        <div class="product__fomo-inscritos-count" id="fomoInscritosCount">
+          <span class="product__fomo-fire">🔥</span>
+          <span id="fomoInscritosNumber">0</span> riders ya inscritos en esta sede
+        </div>
+        <div class="product__fomo-progress" id="fomoProgress" style="display: none;">
+          <div class="product__fomo-progress-bar">
+            <div class="product__fomo-progress-fill" id="fomoProgressFill"></div>
+          </div>
+          <span class="product__fomo-progress-text" id="fomoProgressText">0% del cupo</span>
+        </div>
+      </div>
+
+      {%- comment -%} Price Card with Dynamic Pricing from Product Metafields {%- endcomment -%}
+      {% assign pricing_enabled = product.metafields.custom.pricing_enabled %}
+      {% if pricing_enabled %}
+        {%- comment -%} Dynamic Pricing Enabled via Product Metafield {%- endcomment -%}
+        <div class="product__price-card product__price-card--dynamic" id="dynamicPriceCard">
+          <div class="product__price-phase">
+            <span class="product__phase-badge" id="phaseBadge">Cargando...</span>
+            <div class="product__price-label">Precio por inscripción</div>
+          </div>
+          <div class="product__price-wrapper">
+            <div class="product__price" id="productPrice">
+              {{ product.selected_or_first_available_variant.price | money }}
+            </div>
+            <span class="product__price-currency">MXN</span>
+          </div>
+        </div>
+
+        {%- comment -%} Price Increase Countdown {%- endcomment -%}
+        <div class="product__price-countdown" id="priceCountdown" style="display: none;">
+          <div class="product__countdown-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="product__countdown-text">
+            <span>El precio aumenta a </span>
+            <strong id="nextPrice">$0</strong>
+            <span> en </span>
+            <strong id="countdownDays">0</strong>
+            <span> días</span>
+          </div>
+        </div>
+
+        {%- comment -%} Price Timeline from Product Metafields {%- endcomment -%}
+        <div class="product__price-timeline" id="priceTimeline">
+          {% if product.metafields.custom.phase1_price != blank %}
+            <div class="product__timeline-phase" data-phase="1">
+              <div class="product__timeline-dot"></div>
+              <div class="product__timeline-info">
+                <span class="product__timeline-label">{{ product.metafields.custom.phase1_label | default: 'Early Bird' }}</span>
+                <span class="product__timeline-price">${{ product.metafields.custom.phase1_price }}</span>
+              </div>
+            </div>
+          {% endif %}
+          {% if product.metafields.custom.phase2_price != blank %}
+            <div class="product__timeline-phase" data-phase="2">
+              <div class="product__timeline-dot"></div>
+              <div class="product__timeline-info">
+                <span class="product__timeline-label">{{ product.metafields.custom.phase2_label | default: 'Normal' }}</span>
+                <span class="product__timeline-price">${{ product.metafields.custom.phase2_price }}</span>
+              </div>
+            </div>
+          {% endif %}
+          {% if product.metafields.custom.phase3_price != blank %}
+            <div class="product__timeline-phase" data-phase="3">
+              <div class="product__timeline-dot"></div>
+              <div class="product__timeline-info">
+                <span class="product__timeline-label">{{ product.metafields.custom.phase3_label | default: 'Último Momento' }}</span>
+                <span class="product__timeline-price">${{ product.metafields.custom.phase3_price }}</span>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+
+        {%- comment -%} Pass Product Metafield config to JavaScript {%- endcomment -%}
+        <script id="pricingConfig" type="application/json">
+          {
+            "enabled": true,
+            "phases": [
+              {
+                "start": "{{ product.metafields.custom.phase1_start }}",
+                "end": "{{ product.metafields.custom.phase1_end }}",
+                "price": {{ product.metafields.custom.phase1_price | default: 0 }},
+                "label": "{{ product.metafields.custom.phase1_label | default: 'Early Bird' }}"
+              },
+              {
+                "start": "{{ product.metafields.custom.phase2_start }}",
+                "end": "{{ product.metafields.custom.phase2_end }}",
+                "price": {{ product.metafields.custom.phase2_price | default: 0 }},
+                "label": "{{ product.metafields.custom.phase2_label | default: 'Normal' }}"
+              },
+              {
+                "start": "{{ product.metafields.custom.phase3_start }}",
+                "end": "{{ product.metafields.custom.phase3_end }}",
+                "price": {{ product.metafields.custom.phase3_price | default: 0 }},
+                "label": "{{ product.metafields.custom.phase3_label | default: 'Último Momento' }}"
+              }
+            ]
+          }
+        </script>
+      {% else %}
+        {%- comment -%} Standard Price Card {%- endcomment -%}
+        <div class="product__price-card">
+          <div class="product__price-label">Precio por inscripción</div>
+          <div style="display: flex; align-items: baseline;">
+            <div class="product__price" id="productPrice">
+              {{ product.selected_or_first_available_variant.price | money }}
+            </div>
+            <span class="product__price-currency">MXN</span>
+          </div>
+        </div>
+      {% endif %}
+
+      {%- comment -%} Countdown al Evento - Sutil y Pro {%- endcomment -%}
+      <div class="product__event-countdown" id="eventCountdown" style="display: none;">
+        <div class="product__event-countdown-inner">
+          <span class="product__event-countdown-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <span class="product__event-countdown-text">
+            Faltan <strong id="eventDays">--</strong>d <strong id="eventHours">--</strong>h <strong id="eventMinutes">--</strong>m <strong id="eventSeconds">--</strong>s
+          </span>
+          <span class="product__event-countdown-label" id="eventDateLabel"></span>
+        </div>
+      </div>
+
+      {%- comment -%} Alerta de Cierre de Inscripciones {%- endcomment -%}
+      <div class="product__registration-closed" id="registrationClosed" style="display: none;">
+        <div class="product__registration-closed-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+            <path d="M15 9L9 15M9 9L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="product__registration-closed-text">
+          <strong>Inscripciones Cerradas</strong>
+          <span>Las inscripciones para esta sede han finalizado</span>
+        </div>
+      </div>
+
+      {%- comment -%} Registration Status Check {%- endcomment -%}
+      {% assign registration_status = product.metafields.custom.registration_status | default: 'open' %}
+
+      {% if registration_status == 'coming_soon' %}
+        {%- comment -%} PRÓXIMAMENTE State {%- endcomment -%}
+        <div class="product__status-message product__status-message--coming-soon">
+          <div class="product__status-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="product__status-title">Próximamente</h3>
+          <p class="product__status-text">Las inscripciones estarán disponibles pronto</p>
+        </div>
+      {% elsif registration_status == 'closed' %}
+        {%- comment -%} AGOTADO/CLOSED State {%- endcomment -%}
+        <div class="product__status-message product__status-message--closed">
+          <div class="product__status-icon">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M18.364 5.636a9 9 0 11-12.728 12.728 9 9 0 0112.728-12.728zM6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="product__status-title">Inscripciones Cerradas</h3>
+          <p class="product__status-text">Las inscripciones para esta sede han finalizado</p>
+        </div>
+      {% else %}
+      {%- comment -%} Add to Cart Form - Only shown when OPEN {%- endcomment -%}
+      {% form 'product', product, class: 'product__form' %}
+        {% assign current_variant = product.selected_or_first_available_variant %}
+
+        {%- comment -%} Category Selector - Button Style {%- endcomment -%}
+        {% if product.variants.size > 1 %}
+          <div class="product__field">
+            <label class="product__label">
+              Categoría
+            </label>
+            <input type="hidden" name="id" id="selectedVariantId" value="{{ current_variant.id }}">
+            <div class="product__categories">
+              {% for variant in product.variants %}
+                <button
+                  type="button"
+                  class="product__category {% if variant == current_variant %}active{% endif %} {% unless variant.available %}disabled{% endunless %}"
+                  data-variant-id="{{ variant.id }}"
+                  data-price="{{ variant.price | money }}"
+                  {% unless variant.available %}disabled{% endunless %}
+                  onclick="selectCategory(this)">
+                  {{ variant.title }}
+                  {% unless variant.available %}
+                    <span class="product__category-sold">Agotado</span>
+                  {% endunless %}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+        {% else %}
+          <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {% endif %}
+
+        {%- comment -%} Quantity {%- endcomment -%}
+        <div class="product__field">
+          <label for="quantity" class="product__label">
+            Cantidad
+          </label>
+          <div class="product__quantity">
+            <button type="button" class="product__qty-btn" onclick="decreaseQty()" aria-label="Disminuir cantidad">
+              <svg width="16" height="2" viewBox="0 0 16 2" fill="none">
+                <path d="M0 1H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+            <input
+              type="number"
+              name="quantity"
+              id="quantity"
+              min="1"
+              value="1"
+              class="product__qty-input"
+              readonly>
+            <button type="button" class="product__qty-btn" onclick="increaseQty()" aria-label="Aumentar cantidad">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 0V16M0 8H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {%- comment -%} Submit Button {%- endcomment -%}
+        <button
+          type="submit"
+          class="product__submit"
+          {% unless current_variant.available %}disabled{% endunless %}>
+          {% if current_variant.available %}
+            Inscribirse Ahora
+          {% else %}
+            Agotado
+          {% endif %}
+        </button>
+
+        {%- comment -%} Benefits {%- endcomment -%}
+        <div class="product__benefits">
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Mecánica Neutral Shimano</span>
+          </div>
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Puntos campeonato nacional</span>
+          </div>
+          <div class="product__benefit">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Premios en efectivo</span>
+          </div>
+        </div>
+      {% endform %}
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function changeMainImage(button) {
+    const newImage = button.getAttribute('data-image');
+    document.getElementById('mainProductImage').src = newImage;
+
+    document.querySelectorAll('.product__thumbnail').forEach(thumb => {
+      thumb.classList.remove('active');
+    });
+    button.classList.add('active');
+  }
+
+  function selectCategory(button) {
+    if (button.disabled) return;
+
+    // Update active state
+    document.querySelectorAll('.product__category').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    button.classList.add('active');
+
+    // Update hidden input with variant ID
+    const variantId = button.getAttribute('data-variant-id');
+    document.getElementById('selectedVariantId').value = variantId;
+
+    // Update price
+    const price = button.getAttribute('data-price');
+    document.getElementById('productPrice').textContent = price;
+  }
+
+  function increaseQty() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+  }
+
+  function decreaseQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) {
+      input.value = parseInt(input.value) - 1;
+    }
+  }
+
+  // Auto-select category if coming from registration page
+  document.addEventListener('DOMContentLoaded', function() {
+    const selectedCategory = sessionStorage.getItem('selectedCategory');
+    if (selectedCategory) {
+      // Find button with matching category name
+      const buttons = document.querySelectorAll('.product__category');
+      buttons.forEach(button => {
+        const buttonText = button.textContent.trim().replace(/\s+/g, ' ');
+        const categoryText = selectedCategory.trim().replace(/\s+/g, ' ');
+
+        if (buttonText.includes(categoryText) || categoryText.includes(buttonText)) {
+          // Click the button to select it
+          button.click();
+          // Scroll to the form
+          setTimeout(() => {
+            button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 100);
+        }
+      });
+      // Clear the sessionStorage
+      sessionStorage.removeItem('selectedCategory');
+    }
+
+    // Initialize dynamic pricing
+    initDynamicPricing();
+
+    // Initialize FOMO inventory badges
+    initFomoInventory();
+
+    // Initialize event countdown
+    initEventCountdown();
+  });
+
+  // Dynamic Pricing Logic
+  function initDynamicPricing() {
+    const configEl = document.getElementById('pricingConfig');
+    if (!configEl) return;
+
+    try {
+      const config = JSON.parse(configEl.textContent);
+      if (!config.enabled) return;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      // Filter valid phases (with dates and prices)
+      const validPhases = config.phases.filter(p => p.start && p.end && p.price > 0);
+      if (validPhases.length === 0) return;
+
+      // Find current phase
+      let currentPhase = null;
+      let currentPhaseIndex = -1;
+
+      for (let i = 0; i < validPhases.length; i++) {
+        const phase = validPhases[i];
+        // Soporta tanto Date como Date and Time de Shopify
+        const startDate = new Date(phase.start);
+        const endDate = new Date(phase.end);
+
+        if (today >= startDate && today <= endDate) {
+          currentPhase = phase;
+          currentPhaseIndex = i;
+          break;
+        }
+      }
+
+      // Update UI
+      const priceEl = document.getElementById('productPrice');
+      const badgeEl = document.getElementById('phaseBadge');
+      const countdownEl = document.getElementById('priceCountdown');
+      const nextPriceEl = document.getElementById('nextPrice');
+      const countdownDaysEl = document.getElementById('countdownDays');
+
+      if (currentPhase) {
+        // Update price display
+        priceEl.textContent = '$' + currentPhase.price.toLocaleString('es-MX');
+        badgeEl.textContent = currentPhase.label;
+
+        // Update timeline - mark current and past phases
+        document.querySelectorAll('.product__timeline-phase').forEach((el, idx) => {
+          if (idx < currentPhaseIndex) {
+            el.classList.add('past');
+          } else if (idx === currentPhaseIndex) {
+            el.classList.add('current');
+          }
+        });
+
+        // Show countdown if there's a next phase
+        if (currentPhaseIndex < validPhases.length - 1) {
+          const nextPhase = validPhases[currentPhaseIndex + 1];
+          const endDate = new Date(currentPhase.end);
+          const daysLeft = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+
+          if (daysLeft > 0 && daysLeft <= 30) {
+            nextPriceEl.textContent = '$' + nextPhase.price.toLocaleString('es-MX');
+            countdownDaysEl.textContent = daysLeft;
+            countdownEl.style.display = 'flex';
+          }
+        }
+      } else {
+        // Check if we're before the first phase
+        const firstPhase = validPhases[0];
+        const firstStartDate = new Date(firstPhase.start);
+
+        if (today < firstStartDate) {
+          badgeEl.textContent = 'Próximamente';
+          priceEl.textContent = '$' + firstPhase.price.toLocaleString('es-MX');
+        } else {
+          // After all phases - show last phase price
+          const lastPhase = validPhases[validPhases.length - 1];
+          badgeEl.textContent = lastPhase.label;
+          priceEl.textContent = '$' + lastPhase.price.toLocaleString('es-MX');
+
+          // Mark all phases as past
+          document.querySelectorAll('.product__timeline-phase').forEach(el => {
+            el.classList.add('past');
+          });
+        }
+      }
+
+    } catch (e) {
+      console.error('Error initializing dynamic pricing:', e);
+    }
+  }
+
+  // Event Countdown Logic - Usando metacampos de Shopify
+  function initEventCountdown() {
+    const configEl = document.getElementById('sedeConfig');
+    if (!configEl) return;
+
+    try {
+      const config = JSON.parse(configEl.textContent);
+
+      // Verificar si hay fecha de evento configurada en metacampos
+      if (!config.eventDate || config.eventDate === '' || config.eventDate === 'null') {
+        console.log('Countdown: No hay fecha de evento configurada');
+        return;
+      }
+
+      // Parsear fecha ISO
+      const eventDate = new Date(config.eventDate);
+
+      // Verificar que la fecha sea válida
+      if (isNaN(eventDate.getTime())) {
+        console.log('Countdown: Fecha inválida:', config.eventDate);
+        return;
+      }
+
+      const eventLabel = config.eventDateLabel || '';
+      const now = new Date();
+
+      // Verificar fecha de cierre (si está configurada)
+      if (config.closeDate && config.closeDate !== '' && config.closeDate !== 'null') {
+        const closeDate = new Date(config.closeDate);
+
+        if (!isNaN(closeDate.getTime()) && now > closeDate) {
+          document.getElementById('registrationClosed').style.display = 'flex';
+          document.getElementById('eventCountdown').style.display = 'none';
+
+          // Deshabilitar botón de compra
+          const submitBtn = document.querySelector('.product__submit');
+          if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Inscripciones Cerradas';
+          }
+
+          // Desactivar formulario de inscripción
+          const form = document.querySelector('.product__form');
+          if (form) {
+            form.style.opacity = '0.5';
+            form.style.pointerEvents = 'none';
+          }
+          return;
+        }
+      }
+
+      // Mostrar countdown
+      document.getElementById('eventCountdown').style.display = 'flex';
+      const labelEl = document.getElementById('eventDateLabel');
+      if (eventLabel && labelEl) {
+        labelEl.textContent = '· ' + eventLabel;
+      }
+
+      function updateCountdown() {
+        const now = new Date();
+        const diff = eventDate - now;
+
+        if (diff <= 0) {
+          // Evento en curso
+          document.getElementById('eventCountdown').innerHTML = `
+            <div class="product__event-countdown-inner">
+              <span class="product__event-countdown-live">🏁 Evento en curso</span>
+            </div>
+          `;
+          return;
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('eventDays').textContent = days;
+        document.getElementById('eventHours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('eventMinutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('eventSeconds').textContent = seconds.toString().padStart(2, '0');
+
+        // Urgencia si quedan menos de 7 días
+        if (days < 7) {
+          document.getElementById('eventCountdown').classList.add('product__event-countdown--urgente');
+        }
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+
+    } catch (e) {
+      console.error('Error en countdown:', e);
+    }
+  }
+
+  // FOMO Inventory Logic - Fetch real-time data from Vercel API
+  async function initFomoInventory() {
+    const configEl = document.getElementById('sedeConfig');
+    if (!configEl) return;
+
+    try {
+      const config = JSON.parse(configEl.textContent);
+      const productTitle = config.productTitle.toLowerCase();
+
+      // Detect sede from product title
+      let sede = null;
+      if (productTitle.includes('guanajuato')) sede = 'guanajuato';
+      else if (productTitle.includes('puebla')) sede = 'puebla';
+      else if (productTitle.includes('guadalajara')) sede = 'guadalajara';
+      else if (productTitle.includes('ixtapan')) sede = 'ixtapan';
+      else if (productTitle.includes('taxco')) sede = 'taxco';
+
+      if (!sede) {
+        console.log('FOMO: No sede detected in product title');
+        return;
+      }
+
+      // Fetch inventory data
+      const response = await fetch(`${config.apiUrl}?sede=${sede}`);
+      if (!response.ok) throw new Error('API error');
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+
+      // Update UI
+      const container = document.getElementById('fomoContainer');
+      const playerasEl = document.getElementById('fomoPlayeras');
+      const medallasEl = document.getElementById('fomoMedallas');
+      const playerasValueEl = document.getElementById('fomoPlayerasValue');
+      const medallasValueEl = document.getElementById('fomoMedallasValue');
+
+      // Playeras (primeros 50)
+      if (data.playeras.agotadas) {
+        playerasValueEl.textContent = 'Agotadas (0 de 50)';
+        playerasEl.classList.add('product__fomo-badge--agotado');
+      } else if (data.playeras.disponibles <= 10) {
+        playerasValueEl.textContent = `¡Quedan ${data.playeras.disponibles} de ${data.playeras.total}!`;
+        playerasEl.classList.add('product__fomo-badge--urgente');
+      } else {
+        playerasValueEl.textContent = `${data.playeras.disponibles} de ${data.playeras.total} disponibles`;
+      }
+
+      // Medallas (primeros 100)
+      if (data.medallas.agotadas) {
+        medallasValueEl.textContent = 'Agotadas (0 de 100)';
+        medallasEl.classList.add('product__fomo-badge--agotado');
+      } else if (data.medallas.disponibles <= 20) {
+        medallasValueEl.textContent = `¡Quedan ${data.medallas.disponibles} de ${data.medallas.total}!`;
+        medallasEl.classList.add('product__fomo-badge--urgente');
+      } else {
+        medallasValueEl.textContent = `${data.medallas.disponibles} de ${data.medallas.total} disponibles`;
+      }
+
+      // Show container
+      container.style.display = 'flex';
+
+      // FOMO Inscritos Counter Logic
+      const inscritos = data.inscritos || 0;
+      const fomoInscritos = document.getElementById('fomoInscritos');
+      const fomoInscritosNumber = document.getElementById('fomoInscritosNumber');
+      const fomoProgress = document.getElementById('fomoProgress');
+      const fomoProgressFill = document.getElementById('fomoProgressFill');
+      const fomoProgressText = document.getElementById('fomoProgressText');
+
+      const MAX_CUPO = 150;
+      const SHOW_COUNT_THRESHOLD = 61;
+      const SHOW_PROGRESS_THRESHOLD = 100;
+
+      if (inscritos >= SHOW_COUNT_THRESHOLD) {
+        // Show inscritos count (61+)
+        fomoInscritosNumber.textContent = inscritos;
+        fomoInscritos.style.display = 'block';
+
+        // Show progress bar (100+)
+        if (inscritos >= SHOW_PROGRESS_THRESHOLD) {
+          const percentage = Math.min(Math.round((inscritos / MAX_CUPO) * 100), 100);
+          fomoProgressFill.style.width = `${percentage}%`;
+          fomoProgressText.textContent = `${percentage}% del cupo`;
+          fomoProgress.style.display = 'flex';
+
+          // Add urgency class if almost full
+          if (percentage >= 80) {
+            fomoProgress.classList.add('product__fomo-progress--urgente');
+          }
+        }
+      }
+
+    } catch (e) {
+      console.error('Error loading FOMO inventory:', e);
+      // Hide container on error
+      const container = document.getElementById('fomoContainer');
+      if (container) container.style.display = 'none';
+    }
+  }
+</script>
+
+{% stylesheet %}
+  /* Product Section */
+  .product {
+    min-height: 100vh;
+    padding: 140px 24px 80px;
+    background: #000000;
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .product *,
+  .product *::before,
+  .product *::after {
+    box-sizing: border-box;
+  }
+
+  .product__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 80px;
+    align-items: start;
+    width: 100%;
+  }
+
+  /* Gallery */
+  .product__gallery {
+    position: sticky;
+    top: 140px;
+    align-self: start;
+    max-height: calc(100vh - 160px);
+    overflow: visible;
+  }
+
+  .product__main-image {
+    border-radius: 24px;
+    overflow: hidden;
+    background: #111;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product__main-image:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.4);
+  }
+
+  .product__image {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .product__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .product__thumbnail {
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    aspect-ratio: 3/2;
+  }
+
+  .product__thumbnail:hover {
+    border-color: rgba(228, 44, 44, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .product__thumbnail.active {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px var(--color-primary);
+  }
+
+  .product__thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .product__placeholder {
+    aspect-ratio: 3/2;
+    background: #111;
+    border-radius: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .product__placeholder span {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    text-transform: uppercase;
+  }
+
+  /* Info Section */
+  .product__info {
+    color: #FFFFFF;
+  }
+
+  .product__badge {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #000000;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+
+  .product__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+  }
+
+  .product__details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .product__detail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+  }
+
+  .product__detail svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  .product__description {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.7;
+    margin-bottom: 32px;
+    font-size: 1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow: hidden;
+  }
+
+  .product__description p,
+  .product__description ul,
+  .product__description ol,
+  .product__description li {
+    margin-bottom: 12px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .product__description img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Price Card */
+  .product__price-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(228, 44, 44, 0.2);
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .product__price-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .product__price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .product__price-currency {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  /* Dynamic Pricing Styles */
+  .product__price-card--dynamic {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .product__price-phase {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .product__phase-badge {
+    background: var(--color-primary);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .product__price-wrapper {
+    display: flex;
+    align-items: baseline;
+  }
+
+  .product__price-countdown {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+  }
+
+  .product__countdown-icon {
+    color: #FFC107;
+    flex-shrink: 0;
+  }
+
+  .product__countdown-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .product__countdown-text strong {
+    color: #FFC107;
+  }
+
+  /* Price Timeline */
+  .product__price-timeline {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 28px;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+  }
+
+  .product__price-timeline::before {
+    content: '';
+    position: absolute;
+    top: 24px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .product__timeline-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .product__timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .product__timeline-phase.current .product__timeline-dot {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 12px rgba(228, 44, 44, 0.5);
+  }
+
+  .product__timeline-phase.past .product__timeline-dot {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .product__timeline-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .product__timeline-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .product__timeline-phase.current .product__timeline-label {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+
+  .product__timeline-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .product__timeline-phase.current .product__timeline-price {
+    color: var(--color-primary);
+  }
+
+  .product__timeline-phase.past .product__timeline-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* Form */
+  .product__form {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .product__field {
+    margin-bottom: 24px;
+  }
+
+  .product__label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 12px;
+  }
+
+  .product__categories {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .product__category {
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: #FFFFFF;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+  }
+
+  .product__category:hover:not(.disabled) {
+    border-color: rgba(228, 44, 44, 0.5);
+    background: rgba(255, 77, 0, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .product__category.active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: #000000;
+    box-shadow: 0 4px 12px var(--color-border-accent);
+  }
+
+  .product__category.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+
+  .product__category-sold {
+    display: block;
+    font-size: 0.7rem;
+    margin-top: 4px;
+    opacity: 0.7;
+  }
+
+  .product__quantity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .product__qty-btn {
+    width: 48px;
+    height: 48px;
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid var(--color-border-accent);
+    border-radius: 12px;
+    color: var(--color-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product__qty-btn:hover {
+    background: rgba(228, 44, 44, 0.2);
+    border-color: var(--color-primary);
+    transform: scale(1.05);
+  }
+
+  .product__qty-btn:active {
+    transform: scale(0.95);
+  }
+
+  .product__qty-input {
+    flex: 1;
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #FFFFFF;
+    font-size: 1.125rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .product__qty-input:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(228, 44, 44, 0.1);
+  }
+
+  .product__submit {
+    width: 100%;
+    padding: 18px 32px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 12px;
+    color: #000000;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 24px;
+  }
+
+  .product__submit:hover:not(:disabled) {
+    background: #E85050;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px var(--color-border-accent);
+  }
+
+  .product__submit:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  .product__submit:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Status Messages - PRÓXIMAMENTE / CERRADO */
+  .product__status-message {
+    padding: 48px 32px;
+    text-align: center;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product__status-message::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0.03;
+    pointer-events: none;
+  }
+
+  .product__status-message--coming-soon {
+    background: linear-gradient(135deg, rgba(0, 102, 179, 0.08) 0%, rgba(0, 102, 179, 0.02) 100%);
+    border: 1px solid rgba(0, 102, 179, 0.15);
+  }
+
+  .product__status-message--coming-soon .product__status-icon {
+    color: #0066B3;
+    opacity: 0.8;
+  }
+
+  .product__status-message--coming-soon .product__status-title {
+    color: #0066B3;
+  }
+
+  .product__status-message--closed {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .product__status-message--closed .product__status-icon {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .product__status-message--closed .product__status-title {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .product__status-icon {
+    margin-bottom: 16px;
+  }
+
+  .product__status-icon svg {
+    width: 48px;
+    height: 48px;
+  }
+
+  .product__status-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .product__status-text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.5);
+    max-width: 300px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  .product__benefits {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .product__benefit {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+  }
+
+  .product__benefit svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+  }
+
+  /* Registration Closed Alert */
+  .product__registration-closed {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: linear-gradient(135deg, rgba(255, 60, 60, 0.15) 0%, rgba(255, 60, 60, 0.05) 100%);
+    border: 2px solid rgba(255, 60, 60, 0.4);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .product__registration-closed-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 60, 60, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #FF3C3C;
+  }
+
+  .product__registration-closed-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .product__registration-closed-text strong {
+    font-size: 1.1rem;
+    color: #FF3C3C;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .product__registration-closed-text span {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Event Countdown - Sutil y Pro */
+  .product__event-countdown {
+    display: flex;
+    align-items: center;
+    background: rgba(0, 102, 179, 0.08);
+    border: 1px solid rgba(0, 102, 179, 0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+  }
+
+  .product__event-countdown-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .product__event-countdown-icon {
+    color: #0066B3;
+    display: flex;
+    align-items: center;
+  }
+
+  .product__event-countdown-text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 500;
+  }
+
+  .product__event-countdown-text strong {
+    color: #FFFFFF;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .product__event-countdown-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .product__event-countdown-live {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  /* Countdown Urgente - menos de 7 días */
+  .product__event-countdown--urgente {
+    background: rgba(228, 44, 44, 0.1);
+    border-color: rgba(228, 44, 44, 0.3);
+  }
+
+  .product__event-countdown--urgente .product__event-countdown-icon {
+    color: #E42C2C;
+  }
+
+  .product__event-countdown--urgente .product__event-countdown-text strong {
+    color: #E42C2C;
+  }
+
+  /* Mobile countdown */
+  @media (max-width: 640px) {
+    .product__event-countdown {
+      padding: 8px 12px;
+    }
+
+    .product__event-countdown-text {
+      font-size: 0.8rem;
+    }
+
+    .product__event-countdown-label {
+      font-size: 0.7rem;
+    }
+  }
+
+  /* FOMO Inscritos Counter */
+  .product__fomo-inscritos {
+    background: linear-gradient(135deg, rgba(228, 44, 44, 0.15) 0%, rgba(228, 44, 44, 0.05) 100%);
+    border: 1px solid rgba(228, 44, 44, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+  }
+
+  .product__fomo-inscritos-count {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .product__fomo-fire {
+    font-size: 1.2rem;
+    animation: fireWiggle 1s ease-in-out infinite;
+  }
+
+  @keyframes fireWiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+  }
+
+  #fomoInscritosNumber {
+    color: #E42C2C;
+    font-weight: 800;
+    font-size: 1.2rem;
+  }
+
+  .product__fomo-progress {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .product__fomo-progress-bar {
+    flex: 1;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .product__fomo-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E42C2C 0%, #FF6B6B 100%);
+    border-radius: 4px;
+    transition: width 1s ease-out;
+    position: relative;
+  }
+
+  .product__fomo-progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    animation: progressShine 2s ease-in-out infinite;
+  }
+
+  @keyframes progressShine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  .product__fomo-progress-text {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+  }
+
+  .product__fomo-progress--urgente .product__fomo-progress-fill {
+    background: linear-gradient(90deg, #E42C2C 0%, #FF4444 100%);
+    animation: urgentPulse 1.5s ease-in-out infinite;
+  }
+
+  .product__fomo-progress--urgente .product__fomo-progress-text {
+    color: #E42C2C;
+  }
+
+  @keyframes urgentPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* FOMO Inventory Badges */
+  .product__fomo-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .product__fomo-badge {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    flex: 1;
+    min-width: 200px;
+    transition: all 0.3s ease;
+  }
+
+  .product__fomo-badge:hover {
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-2px);
+  }
+
+  .product__fomo-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .product__fomo-badge--playeras .product__fomo-icon {
+    background: rgba(0, 102, 179, 0.15);
+    color: #0066B3;
+  }
+
+  .product__fomo-badge--medallas .product__fomo-icon {
+    background: rgba(255, 215, 0, 0.15);
+    color: #FFD700;
+  }
+
+  .product__fomo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .product__fomo-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .product__fomo-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #FFFFFF;
+  }
+
+  /* Urgente - Quedan pocos */
+  .product__fomo-badge--urgente {
+    background: rgba(228, 44, 44, 0.1);
+    border-color: rgba(228, 44, 44, 0.3);
+    animation: fomoPulse 2s ease-in-out infinite;
+  }
+
+  .product__fomo-badge--urgente .product__fomo-value {
+    color: #E42C2C;
+  }
+
+  .product__fomo-badge--urgente .product__fomo-icon {
+    background: rgba(228, 44, 44, 0.2);
+    color: #E42C2C;
+  }
+
+  @keyframes fomoPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(228, 44, 44, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(228, 44, 44, 0); }
+  }
+
+  /* Agotado */
+  .product__fomo-badge--agotado {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.05);
+    opacity: 0.6;
+  }
+
+  .product__fomo-badge--agotado .product__fomo-value {
+    color: rgba(255, 255, 255, 0.5);
+    text-decoration: line-through;
+  }
+
+  .product__fomo-badge--agotado .product__fomo-icon {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Mobile */
+  @media (max-width: 968px) {
+    .product {
+      padding: 100px 0 60px 0;
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100vw;
+    }
+
+    .product__container {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      max-width: 100%;
+      width: 100%;
+      padding: 0 20px;
+    }
+
+    .product__gallery {
+      position: relative;
+      top: 0;
+      max-height: none;
+    }
+
+    .product__gallery,
+    .product__info,
+    .product__main-image,
+    .product__thumbnails,
+    .product__price-card,
+    .product__form,
+    .product__categories,
+    .product__quantity {
+      width: 100%;
+      max-width: 100%;
+    }
+
+    .product__title {
+      font-size: 2rem;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .product__price-card {
+      padding: 16px;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 8px;
+    }
+
+    .product__price-phase {
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .product__phase-badge {
+      text-align: center;
+      width: auto;
+    }
+
+    .product__price {
+      font-size: 1.5rem;
+    }
+
+    .product__price-label {
+      font-size: 0.75rem;
+      text-align: center;
+    }
+
+    .product__price-wrapper {
+      justify-content: center;
+      width: 100%;
+    }
+
+    .product__form {
+      padding: 20px;
+    }
+
+    .product__thumbnails {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .product__categories {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 6px;
+    }
+
+    .product__category {
+      padding: 10px 8px;
+      font-size: 0.75rem;
+      word-wrap: break-word;
+      line-height: 1.2;
+    }
+
+    .product__quantity {
+      gap: 12px;
+    }
+
+    .product__qty-btn {
+      width: 44px;
+      height: 44px;
+      flex-shrink: 0;
+    }
+
+    .product__qty-input {
+      padding: 12px;
+      font-size: 1rem;
+      min-width: 0;
+    }
+
+    .product__submit {
+      width: 100%;
+      padding: 16px;
+      font-size: 1rem;
+    }
+
+    .product__benefit {
+      font-size: 0.85rem;
+    }
+
+    .product__fomo-container {
+      flex-direction: column;
+    }
+
+    .product__fomo-badge {
+      min-width: 100%;
+    }
+
+    .product__price-timeline {
+      gap: 8px;
+    }
+
+    .product__timeline-label {
+      font-size: 0.6rem;
+    }
+
+    .product__timeline-price {
+      font-size: 0.8rem;
+    }
+
+    .product__countdown-text {
+      font-size: 0.8rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .product {
+      padding: 100px 0 60px 0;
+      max-width: 100vw;
+      width: 100vw;
+    }
+
+    .product__container {
+      gap: 30px;
+      padding: 0 16px;
+    }
+
+    .product__title {
+      font-size: 1.75rem;
+    }
+
+    .product__form {
+      padding: 16px;
+    }
+
+    .product__price-card {
+      padding: 12px;
+    }
+
+    .product__thumbnails {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .product__main-image {
+      border-radius: 16px;
+    }
+
+    .product__thumbnail {
+      border-radius: 8px;
+    }
+
+    .product__detail {
+      font-size: 0.85rem;
+    }
+
+    .product__description {
+      font-size: 0.9rem;
+    }
+
+    .product__quantity {
+      gap: 8px;
+    }
+
+    .product__qty-btn {
+      width: 40px;
+      height: 40px;
+    }
+
+    .product__qty-input {
+      padding: 10px;
+      font-size: 0.95rem;
+    }
+
+    .product__categories {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px;
+    }
+
+    .product__category {
+      padding: 8px 6px;
+      font-size: 0.7rem;
+      border-radius: 8px;
+      line-height: 1.15;
+    }
+
+    .product__category-sold {
+      font-size: 0.6rem;
+      margin-top: 2px;
+    }
+
+    .product__benefit {
+      font-size: 0.8rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

@@ -1,0 +1,313 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "hero": {
+      "type": "hero-video",
+      "settings": {
+        "video_url": "https://www.youtube.com/watch?v=xzqBTyiHOXU",
+        "overlay_color": "#000000",
+        "overlay_opacity": 50,
+        "subtitle": "POWERED BY SHIMANO",
+        "title": "COPA SCOTT DHMEXRACES 2026",
+        "description": "$530,000 MXN en premios • Mecánica Neutral Shimano • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
+        "button_label": "Inscríbete - 12 DIC",
+        "button_link": "shopify://products/inscripcion-guanajuato-2026",
+        "button_label_2": "Ver Sedes",
+        "button_link_2": "#fechas"
+      }
+    },
+    "brand_showcase_MM89gn": {
+      "type": "brand-showcase",
+      "name": "Brand Showcase",
+      "settings": {
+        "logo": "shopify://shop_images/dhmexscottshimanologo.png",
+        "logo_alt": "DHMEXRACES",
+        "logo_width": 0,
+        "title": "El Campeonato Nacional de Downhill",
+        "subtitle": "Temporada 2026",
+        "description": "<p>DHMEXRACES es el campeonato de Downhill más importante de México. Cinco sedes, los mejores riders y la adrenalina al máximo.</p>",
+        "button_text": "INSTAGRAM",
+        "button_link": "https://www.instagram.com/dhmex_races/",
+        "background_color": "#000000",
+        "title_color": "#ffffff",
+        "subtitle_color": "#e42c2c",
+        "text_color": "#cccccc"
+      }
+    },
+    "race_dates": {
+      "type": "race-dates",
+      "blocks": {
+        "race_1": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 1",
+            "race_name": "GUANAJUATO",
+            "date": "21-22 Febrero 2026",
+            "location": "Guanajuato, México",
+            "elevation": "+$100,000 en premios",
+            "description": "Apertura épica de la temporada COPA SCOTT. Mecánica neutral Shimano disponible.",
+            "button_label": "Inscripción 12 de Diciembre",
+            "button_link": "/products/inscripcion-guanajuato-2026"
+          }
+        },
+        "race_2": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 2",
+            "race_name": "PUEBLA",
+            "date": "21-22 Marzo 2026",
+            "location": "Puebla, México",
+            "elevation": "+$100,000 en premios",
+            "description": "Segunda válida del campeonato nacional con soporte técnico completo.",
+            "button_label": "Próximamente",
+            "button_link": "shopify://products/inscripcion-sede-1-puebla"
+          }
+        },
+        "race_3": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 3",
+            "race_name": "GUADALAJARA",
+            "date": "30-31 Mayo 2026",
+            "location": "Guadalajara, Jalisco",
+            "elevation": "+$100,000 en premios",
+            "description": "Mitad de temporada en una de las pistas más técnicas del circuito.",
+            "button_label": "Próximamente",
+            "button_link": "shopify://products/inscripcion-sede-2-guadalajara"
+          }
+        },
+        "race_4": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 4",
+            "race_name": "IXTAPAN DE LA SAL",
+            "date": "18-19 Julio 2026",
+            "location": "Ixtapan de la Sal, Estado de México",
+            "elevation": "+$100,000 en premios",
+            "description": "Cuarta válida con los mejores riders compitiendo por puntos cruciales.",
+            "button_label": "Próximamente",
+            "button_link": "shopify://products/inscripcion-sede-4-ixtapan-de-la-sal"
+          }
+        },
+        "race_5": {
+          "type": "race",
+          "settings": {
+            "status": "upcoming",
+            "round": "SEDE 5 - FINAL",
+            "race_name": "TAXCO",
+            "date": "24-25 Octubre 2026",
+            "location": "Taxco, Guerrero",
+            "elevation": "+$130,000 en premios",
+            "description": "¡LA GRAN FINAL! Definición de campeones nacionales. $500,000 MXN en premios totales.",
+            "button_label": "Próximamente",
+            "button_link": "shopify://products/inscripcion-sede-5-taxco-final-urbano"
+          }
+        }
+      },
+      "block_order": [
+        "race_1",
+        "race_2",
+        "race_3",
+        "race_4",
+        "race_5"
+      ],
+      "settings": {
+        "title": "5 SEDES 2026",
+        "subtitle": "5 Sedes que definen campeones • $530,000 MXN en premios totales"
+      }
+    },
+    "sponsors": {
+      "type": "sponsors",
+      "blocks": {
+        "sponsor_GcYnWj": {
+          "type": "sponsor",
+          "settings": {
+            "name": "Sram",
+            "image": "shopify://shop_images/SRAMLOGO.png",
+            "url": "",
+            "sponsor_tier": "silver"
+          }
+        },
+        "sponsor_1": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SCOTT",
+            "image": "shopify://shop_images/SCOTTLOGO.png",
+            "url": "https://www.instagram.com/scottsportsmexico/",
+            "sponsor_tier": "gold"
+          }
+        },
+        "sponsor_2": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SHIMANO",
+            "image": "shopify://shop_images/SHIMANOLOGO.png",
+            "url": "https://www.instagram.com/shimanomx/",
+            "sponsor_tier": "gold"
+          }
+        },
+        "sponsor_4": {
+          "type": "sponsor",
+          "settings": {
+            "name": "MOTUL",
+            "image": "shopify://shop_images/MOTULLOGO1.png",
+            "url": "https://www.instagram.com/motulmotomex/",
+            "sponsor_tier": "silver"
+          }
+        },
+        "sponsor_3": {
+          "type": "sponsor",
+          "settings": {
+            "name": "RED BULL",
+            "image": "shopify://shop_images/REDBULLLOGO1.png",
+            "url": "https://www.instagram.com/redbullmexico/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_6": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SCHWALBE",
+            "image": "shopify://shop_images/SCHWALBELOGO.webp",
+            "url": "https://www.instagram.com/schwalbemx",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_7": {
+          "type": "sponsor",
+          "settings": {
+            "name": "FOX FACTORY",
+            "image": "shopify://shop_images/FOXLOGO.png",
+            "url": "https://www.instagram.com/ridefoxmex/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_10": {
+          "type": "sponsor",
+          "settings": {
+            "name": "GIRO",
+            "image": "shopify://shop_images/GIROLOGO.png",
+            "url": "https://www.instagram.com/giro_mexico/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_HXTExc": {
+          "type": "sponsor",
+          "settings": {
+            "name": "mulaprieta",
+            "image": "shopify://shop_images/Copia_de_Copia_de_Diseno_sin_titulo.png",
+            "url": "https://www.instagram.com/cerveceriamulaprieta/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_8": {
+          "type": "sponsor",
+          "settings": {
+            "name": "VITTORIA",
+            "image": "shopify://shop_images/VITTORIALOGO.webp",
+            "url": "https://www.instagram.com/vittoriamexico/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_9": {
+          "type": "sponsor",
+          "settings": {
+            "name": "LAZER",
+            "image": "shopify://shop_images/LAZERLOGO.png",
+            "url": "https://www.instagram.com/lazerlatinamerica/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_11": {
+          "type": "sponsor",
+          "settings": {
+            "name": "ALPINESTARS",
+            "image": "shopify://shop_images/ALPINELOGO.png",
+            "url": "https://www.instagram.com/traxionsuspension",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_12": {
+          "type": "sponsor",
+          "settings": {
+            "name": "RACE FACE",
+            "image": "shopify://shop_images/RFLOGO.png",
+            "url": "https://www.instagram.com/racefacemexico/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_13": {
+          "type": "sponsor",
+          "settings": {
+            "name": "SYNCROS",
+            "image": "shopify://shop_images/SYNCROSSLOGO.png",
+            "url": "https://www.instagram.com/syncrosmexico/",
+            "sponsor_tier": "bronze"
+          }
+        },
+        "sponsor_14": {
+          "type": "sponsor",
+          "settings": {
+            "name": "ZEFAL",
+            "image": "shopify://shop_images/ZEFALLOGO.avif",
+            "url": "https://www.instagram.com/zefalbike/",
+            "sponsor_tier": "bronze"
+          }
+        }
+      },
+      "block_order": [
+        "sponsor_GcYnWj",
+        "sponsor_1",
+        "sponsor_2",
+        "sponsor_4",
+        "sponsor_3",
+        "sponsor_6",
+        "sponsor_7",
+        "sponsor_10",
+        "sponsor_HXTExc",
+        "sponsor_8",
+        "sponsor_9",
+        "sponsor_11",
+        "sponsor_12",
+        "sponsor_13",
+        "sponsor_14"
+      ],
+      "settings": {
+        "title": "SPONSORS OFICIALES",
+        "subtitle": "El line-up de sponsors más grande en la historia del DH mexicano"
+      }
+    },
+    "registration": {
+      "type": "race-registration",
+      "settings": {
+        "title": "INSCRIPCIONES ABREN 12 DICIEMBRE",
+        "subtitle": "13 Categorías Disponibles • Nueva Plataforma Digital • Gestiona inscripciones, puntos y resultados en tiempo real",
+        "product": "inscripcion-guanajuato-2026",
+        "container_height": 200,
+        "image_position_x": 50,
+        "image_position_y": 50,
+        "button_label": "",
+        "button_link": "/collections/inscripciones"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "brand_showcase_MM89gn",
+    "race_dates",
+    "sponsors",
+    "registration"
+  ]
+}

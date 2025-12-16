@@ -1,0 +1,435 @@
+{% comment %}
+  Race Registration for Guadalajara - SEDE 3
+  Category selector with buttons that redirect to product
+  Color theme: Green (#00A651)
+{% endcomment %}
+
+<section class="registration-gdl">
+  <div class="registration-gdl__container">
+    <div class="registration-gdl__header" data-aos="fade-up">
+      <span class="registration-gdl__badge">SEDE 3</span>
+      <h2 class="registration-gdl__title">{{ section.settings.title | default: 'Inscripciones Guadalajara 2026' }}</h2>
+      <p class="registration-gdl__subtitle">{{ section.settings.subtitle | default: 'Junio 2026 • Guadalajara, México' }}</p>
+    </div>
+
+    {% if section.settings.status == 'coming_soon' %}
+      <div class="registration-gdl__coming-soon" data-aos="fade-up" data-aos-delay="100">
+        <div class="registration-gdl__coming-soon-icon">
+          <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+            <circle cx="40" cy="40" r="35" stroke="currentColor" stroke-width="3"/>
+            <path d="M40 20V40L52 52" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="registration-gdl__coming-soon-title">PRÓXIMAMENTE</h3>
+        <p class="registration-gdl__coming-soon-text">{{ section.settings.coming_soon_message | default: 'Las inscripciones estarán disponibles pronto' }}</p>
+      </div>
+    {% else %}
+      <div class="registration-gdl__info" data-aos="fade-up" data-aos-delay="100">
+        <div class="registration-gdl__price-card">
+          <div class="registration-gdl__price-label">Precio por inscripción</div>
+          <div style="display: flex; align-items: baseline;">
+            <div class="registration-gdl__price">{{ section.settings.price | default: '$1,300' }}</div>
+            <span class="registration-gdl__price-currency">MXN</span>
+          </div>
+        </div>
+
+        <div class="registration-gdl__details">
+          <div class="registration-gdl__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Número de corredor oficial</span>
+          </div>
+          <div class="registration-gdl__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Mecánica Neutral Shimano</span>
+          </div>
+          <div class="registration-gdl__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Puntos campeonato nacional</span>
+          </div>
+          <div class="registration-gdl__detail">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>$100,000 MXN en premios</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="registration-gdl__categories" data-aos="fade-up" data-aos-delay="200">
+        <h3 class="registration-gdl__categories-title">Selecciona tu categoría</h3>
+
+        <div class="registration-gdl__grid">
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Elite Hombres')">
+            <span class="registration-gdl__category-name">Elite Hombres</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Elite Mujeres')">
+            <span class="registration-gdl__category-name">Elite Mujeres</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Sub-Elite Hombres')">
+            <span class="registration-gdl__category-name">Sub-Elite Hombres</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Sub-Elite Mujeres')">
+            <span class="registration-gdl__category-name">Sub-Elite Mujeres</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Master A (30-39 años)')">
+            <span class="registration-gdl__category-name">Master A (30-39 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Master B (40-49 años)')">
+            <span class="registration-gdl__category-name">Master B (40-49 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Master C (50+ años)')">
+            <span class="registration-gdl__category-name">Master C (50+ años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Juvenil Varonil (17-19 años)')">
+            <span class="registration-gdl__category-name">Juvenil Varonil (17-19 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Juvenil Femenil (17-19 años)')">
+            <span class="registration-gdl__category-name">Juvenil Femenil (17-19 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Infantil Varonil (15-16 años)')">
+            <span class="registration-gdl__category-name">Infantil Varonil (15-16 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Infantil Femenil (15-16 años)')">
+            <span class="registration-gdl__category-name">Infantil Femenil (15-16 años)</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Principiantes Varonil')">
+            <span class="registration-gdl__category-name">Principiantes Varonil</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+
+          <button type="button" class="registration-gdl__category" onclick="goToProductGDL('Principiantes Femenil')">
+            <span class="registration-gdl__category-name">Principiantes Femenil</span>
+            <span class="registration-gdl__category-price">{{ section.settings.price | default: '$1,300' }} MXN</span>
+          </button>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  function goToProductGDL(categoryName) {
+    const productUrl = '{{ section.settings.product_url | default: "/products/inscripcion-guadalajara-2026" }}';
+    sessionStorage.setItem('selectedCategory', categoryName);
+    window.location.href = productUrl;
+  }
+</script>
+
+{% stylesheet %}
+  .registration-gdl {
+    min-height: 100vh;
+    padding: 140px 24px 80px;
+    background: #000000;
+  }
+
+  .registration-gdl__container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .registration-gdl__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .registration-gdl__badge {
+    display: inline-block;
+    background: #00A651;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.75rem;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 20px;
+  }
+
+  .registration-gdl__title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 16px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .registration-gdl__subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 400;
+  }
+
+  /* Coming Soon State */
+  .registration-gdl__coming-soon {
+    padding: 80px 32px;
+    text-align: center;
+    background: rgba(0, 166, 81, 0.05);
+    border: 1px solid rgba(0, 166, 81, 0.2);
+    border-radius: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .registration-gdl__coming-soon-icon {
+    color: #00A651;
+    margin-bottom: 24px;
+  }
+
+  .registration-gdl__coming-soon-title {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #00A651;
+    margin-bottom: 12px;
+    letter-spacing: 0.1em;
+  }
+
+  .registration-gdl__coming-soon-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .registration-gdl__info {
+    margin-bottom: 60px;
+  }
+
+  .registration-gdl__price-card {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 166, 81, 0.3);
+    border-radius: 8px;
+    padding: 18px 24px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .registration-gdl__price-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+  }
+
+  .registration-gdl__price {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #00A651;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .registration-gdl__price-currency {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  .registration-gdl__details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .registration-gdl__detail {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+  }
+
+  .registration-gdl__detail svg {
+    color: #00A651;
+    flex-shrink: 0;
+  }
+
+  .registration-gdl__categories {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 40px;
+  }
+
+  .registration-gdl__categories-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-align: center;
+    margin-bottom: 32px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .registration-gdl__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .registration-gdl__category {
+    padding: 20px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .registration-gdl__category:hover {
+    border-color: rgba(0, 166, 81, 0.5);
+    background: rgba(0, 166, 81, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 166, 81, 0.2);
+  }
+
+  .registration-gdl__category-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #FFFFFF;
+  }
+
+  .registration-gdl__category-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00A651;
+  }
+
+  @media (max-width: 968px) {
+    .registration-gdl {
+      padding: 100px 16px 60px;
+    }
+
+    .registration-gdl__categories {
+      padding: 24px;
+    }
+
+    .registration-gdl__grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .registration-gdl__details {
+      grid-template-columns: 1fr;
+    }
+
+    .registration-gdl__category {
+      padding: 16px 20px;
+    }
+
+    .registration-gdl__price-card {
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+    }
+
+    .registration-gdl__coming-soon {
+      padding: 60px 24px;
+    }
+
+    .registration-gdl__coming-soon-title {
+      font-size: 1.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Registro Guadalajara",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "Inscripciones Guadalajara 2026"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Junio 2026 • Guadalajara, México"
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Precio",
+      "default": "$1,300"
+    },
+    {
+      "type": "url",
+      "id": "product_url",
+      "label": "URL del Producto"
+    },
+    {
+      "type": "select",
+      "id": "status",
+      "label": "Estado",
+      "options": [
+        {
+          "value": "active",
+          "label": "Activo"
+        },
+        {
+          "value": "coming_soon",
+          "label": "Próximamente"
+        }
+      ],
+      "default": "coming_soon"
+    },
+    {
+      "type": "text",
+      "id": "coming_soon_message",
+      "label": "Mensaje Próximamente",
+      "default": "Las inscripciones estarán disponibles pronto"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Registro Guadalajara",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

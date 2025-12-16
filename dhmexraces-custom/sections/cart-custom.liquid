@@ -1,0 +1,517 @@
+{% comment %}
+  Custom Cart for DHMEXRACES - Shows registration summary
+{% endcomment %}
+
+<section class="cart-custom">
+  <div class="cart-custom__container">
+    <h1 class="cart-custom__title" data-aos="fade-up">Carrito de Inscripciones</h1>
+
+    {% if cart.item_count > 0 %}
+      <div class="cart-custom__content">
+        {%- comment -%} Cart Items {%- endcomment -%}
+        <div class="cart-custom__items" data-aos="fade-up" data-aos-delay="100">
+          <h2 class="cart-custom__section-title">Resumen de Inscripciones</h2>
+
+          <div class="cart-custom__list">
+            {% for item in cart.items %}
+              <div class="cart-item" data-cart-item data-line="{{ forloop.index }}">
+                <div class="cart-item__image">
+                  {% if item.image %}
+                    <img src="{{ item.image | image_url: width: 150 }}" alt="{{ item.title }}" width="150" height="100">
+                  {% endif %}
+                </div>
+
+                <div class="cart-item__details">
+                  <h3 class="cart-item__title">{{ item.product.title }}</h3>
+                  <p class="cart-item__variant">Categoría: <strong>{{ item.variant.title }}</strong></p>
+                  <p class="cart-item__price">{{ item.final_price | money }} MXN</p>
+                </div>
+
+                <div class="cart-item__quantity">
+                  <label for="quantity-{{ forloop.index }}">Cantidad:</label>
+                  <div class="cart-item__qty-controls">
+                    <button type="button" class="cart-item__qty-btn" onclick="updateQuantity({{ forloop.index }}, -1)">−</button>
+                    <input type="number"
+                           id="quantity-{{ forloop.index }}"
+                           value="{{ item.quantity }}"
+                           min="1"
+                           max="10"
+                           readonly
+                           class="cart-item__qty-input">
+                    <button type="button" class="cart-item__qty-btn" onclick="updateQuantity({{ forloop.index }}, 1)">+</button>
+                  </div>
+                </div>
+
+                <div class="cart-item__subtotal">
+                  <span class="cart-item__subtotal-label">Subtotal:</span>
+                  <span class="cart-item__subtotal-price">{{ item.final_line_price | money }} MXN</span>
+                </div>
+
+                <button type="button" class="cart-item__remove" onclick="removeItem({{ forloop.index }})">
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                    <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        {%- comment -%} Summary {%- endcomment -%}
+        <div class="cart-custom__summary" data-aos="fade-up" data-aos-delay="200">
+          <h2 class="cart-custom__section-title">Resumen del Pedido</h2>
+
+          <div class="cart-summary">
+            <div class="cart-summary__row">
+              <span>Total de inscripciones:</span>
+              <strong id="total-items">{{ cart.item_count }}</strong>
+            </div>
+
+            <div class="cart-summary__row cart-summary__row--total">
+              <span>Total a Pagar:</span>
+              <strong id="cart-total">{{ cart.total_price | money }} MXN</strong>
+            </div>
+
+            <div class="cart-summary__info">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="2"/>
+                <path d="M10 10V14M10 6H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              <p>Necesitarás completar un formulario por cada inscripción</p>
+            </div>
+
+            <button type="button" class="cart-summary__button" onclick="proceedToRegistration()">
+              Continuar al Registro
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+
+            <a href="/" class="cart-summary__link">← Seguir comprando</a>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="cart-custom__empty" data-aos="fade-up">
+        <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+          <circle cx="50" cy="50" r="45" stroke="var(--color-primary)" stroke-width="4"/>
+          <path d="M35 35L65 65M65 35L35 65" stroke="var(--color-primary)" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+        <h2>Tu carrito está vacío</h2>
+        <p>Agrega inscripciones para continuar</p>
+        <a href="/products/inscripcion-guanajuato-2026" class="cart-custom__empty-button">
+          Ver Inscripciones
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<script>
+  function updateQuantity(line, change) {
+    const input = document.getElementById(`quantity-${line}`);
+    const currentQty = parseInt(input.value);
+    const newQty = Math.max(1, Math.min(10, currentQty + change));
+
+    if (newQty !== currentQty) {
+      updateCart(line, newQty);
+    }
+  }
+
+  function removeItem(line) {
+    if (confirm('¿Eliminar esta inscripción del carrito?')) {
+      updateCart(line, 0);
+    }
+  }
+
+  function updateCart(line, quantity) {
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ line: line, quantity: quantity })
+    })
+    .then(response => response.json())
+    .then(() => {
+      window.location.reload();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('Error al actualizar el carrito');
+    });
+  }
+
+  function proceedToRegistration() {
+    // Get cart data
+    fetch('/cart.js')
+      .then(response => response.json())
+      .then(cart => {
+        // Store cart items in sessionStorage for the registration form
+        const cartData = cart.items.map(item => ({
+          variant_id: item.variant_id,
+          variant_title: item.variant_title,
+          product_title: item.product_title,
+          quantity: item.quantity,
+          price: item.price,
+          line_price: item.line_price
+        }));
+
+        sessionStorage.setItem('registrationCartData', JSON.stringify(cartData));
+
+        // Redirect to registration form page
+        window.location.href = '/pages/formulario-de-inscripcion';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al procesar. Intenta de nuevo.');
+      });
+  }
+</script>
+
+{% stylesheet %}
+  .cart-custom {
+    min-height: 100vh;
+    padding: 140px 24px 80px;
+    background: #000000;
+  }
+
+  .cart-custom__container {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .cart-custom__title {
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    color: #FFFFFF;
+    text-align: center;
+    margin-bottom: 60px;
+    letter-spacing: -0.02em;
+  }
+
+  .cart-custom__content {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 40px;
+    align-items: start;
+  }
+
+  .cart-custom__section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 24px;
+  }
+
+  /* Cart Items */
+  .cart-custom__items {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .cart-custom__list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .cart-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 100px 1fr auto auto auto;
+    gap: 20px;
+    align-items: center;
+    position: relative;
+  }
+
+  .cart-item__image {
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .cart-item__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .cart-item__details {
+    color: #FFFFFF;
+  }
+
+  .cart-item__title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .cart-item__variant {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 4px;
+  }
+
+  .cart-item__variant strong {
+    color: var(--color-primary);
+  }
+
+  .cart-item__price {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .cart-item__quantity label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .cart-item__qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cart-item__qty-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid var(--color-border-accent);
+    border-radius: 6px;
+    color: var(--color-primary);
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .cart-item__qty-btn:hover {
+    background: rgba(228, 44, 44, 0.2);
+    border-color: var(--color-primary);
+  }
+
+  .cart-item__qty-input {
+    width: 60px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    color: #FFFFFF;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  .cart-item__subtotal {
+    text-align: right;
+  }
+
+  .cart-item__subtotal-label {
+    display: block;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
+  }
+
+  .cart-item__subtotal-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .cart-item__remove {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    border-radius: 6px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #ff4444;
+    transition: all 0.3s ease;
+  }
+
+  .cart-item__remove:hover {
+    background: rgba(255, 0, 0, 0.2);
+    border-color: #ff4444;
+  }
+
+  /* Summary */
+  .cart-custom__summary {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    position: sticky;
+    top: 160px;
+  }
+
+  .cart-summary__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+  }
+
+  .cart-summary__row--total {
+    border-bottom: none;
+    padding-top: 20px;
+    font-size: 1.25rem;
+    color: #FFFFFF;
+  }
+
+  .cart-summary__row--total strong {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+  }
+
+  .cart-summary__info {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid rgba(228, 44, 44, 0.2);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 24px 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.85rem;
+  }
+
+  .cart-summary__info svg {
+    color: var(--color-primary);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .cart-summary__button {
+    width: 100%;
+    padding: 18px 32px;
+    background: var(--color-primary);
+    border: none;
+    border-radius: 12px;
+    color: #000000;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .cart-summary__button:hover {
+    background: #E85050;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px var(--color-border-accent);
+  }
+
+  .cart-summary__link {
+    display: block;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+
+  .cart-summary__link:hover {
+    color: var(--color-primary);
+  }
+
+  /* Empty Cart */
+  .cart-custom__empty {
+    text-align: center;
+    padding: 80px 20px;
+  }
+
+  .cart-custom__empty svg {
+    margin: 0 auto 32px;
+  }
+
+  .cart-custom__empty h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 16px;
+  }
+
+  .cart-custom__empty p {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 32px;
+  }
+
+  .cart-custom__empty-button {
+    display: inline-block;
+    padding: 16px 40px;
+    background: var(--color-primary);
+    color: #000000;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .cart-custom__empty-button:hover {
+    background: #E85050;
+    transform: translateY(-2px);
+  }
+
+  /* Mobile */
+  @media (max-width: 968px) {
+    .cart-custom {
+      padding: 100px 16px 60px;
+    }
+
+    .cart-custom__content {
+      grid-template-columns: 1fr;
+    }
+
+    .cart-custom__summary {
+      position: relative;
+      top: 0;
+    }
+
+    .cart-item {
+      grid-template-columns: 80px 1fr;
+      gap: 16px;
+    }
+
+    .cart-item__quantity,
+    .cart-item__subtotal {
+      grid-column: 1 / -1;
+    }
+
+    .cart-item__remove {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Cart Custom",
+  "settings": []
+}
+{% endschema %}

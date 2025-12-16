@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Convertidor Excel a Ranking - DHMEXRACES</title>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+      color: #FFFFFF;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FF4D00, #FFB800);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      color: #FF4D00;
+      margin-bottom: 20px;
+    }
+
+    .upload-area {
+      border: 2px dashed rgba(255, 77, 0, 0.5);
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      background: rgba(255, 77, 0, 0.05);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .upload-area:hover {
+      border-color: #FF4D00;
+      background: rgba(255, 77, 0, 0.1);
+    }
+
+    .upload-area.dragover {
+      border-color: #FFB800;
+      background: rgba(255, 184, 0, 0.1);
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+
+    .upload-text {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    .upload-hint {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #FF4D00, #FFB800);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 77, 0, 0.4);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .output {
+      background: #000;
+      border: 1px solid rgba(255, 77, 0, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      color: #00ff00;
+      min-height: 200px;
+      max-height: 400px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .output:empty::before {
+      content: 'Los datos convertidos aparecerán aquí...';
+      color: rgba(255, 255, 255, 0.3);
+    }
+
+    .instructions {
+      background: rgba(255, 184, 0, 0.1);
+      border-left: 4px solid #FFB800;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .instructions h3 {
+      color: #FFB800;
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+    }
+
+    .instructions ol {
+      margin-left: 20px;
+      color: rgba(255, 255, 255, 0.8);
+      line-height: 1.8;
+    }
+
+    .instructions code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      color: #FF4D00;
+      font-family: 'Courier New', monospace;
+    }
+
+    .example-table {
+      margin-top: 16px;
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .example-table th,
+    .example-table td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .example-table th {
+      background: rgba(255, 77, 0, 0.2);
+      color: #FF4D00;
+      font-weight: 700;
+    }
+
+    .example-table td {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .success {
+      background: rgba(0, 255, 0, 0.1);
+      border: 1px solid rgba(0, 255, 0, 0.3);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      color: #00ff00;
+      text-align: center;
+      font-weight: 600;
+      display: none;
+    }
+
+    .success.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🏁 Convertidor Excel a Ranking</h1>
+      <p class="subtitle">DHMEXRACES - Herramienta de Importación</p>
+    </div>
+
+    <div class="instructions">
+      <h3>📋 Formato del archivo Excel:</h3>
+      <ol>
+        <li>Tu archivo Excel debe tener las siguientes columnas (en este orden):</li>
+      </ol>
+      <table class="example-table">
+        <thead>
+          <tr>
+            <th>Posición</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Equipo</th>
+            <th>Tiempo</th>
+            <th>Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Juan Pérez</td>
+            <td>Elite</td>
+            <td>Team Scott</td>
+            <td>2:15:30</td>
+            <td>100</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>María González</td>
+            <td>Amateur</td>
+            <td>Shimano Racing</td>
+            <td>2:20:45</td>
+            <td>80</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Carlos López</td>
+            <td>Junior</td>
+            <td>Sin equipo</td>
+            <td>2:25:15</td>
+            <td>60</td>
+          </tr>
+        </tbody>
+      </table>
+      <ol start="2" style="margin-top: 16px;">
+        <li>La primera fila debe contener los encabezados (serán ignorados)</li>
+        <li>Formatos aceptados: <code>.xlsx</code>, <code>.xls</code></li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>1️⃣ Sube tu archivo Excel</h2>
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text">Arrastra tu archivo Excel aquí</div>
+        <div class="upload-hint">o haz click para seleccionar</div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls">
+      </div>
+      <div id="fileName" style="margin-top: 16px; color: rgba(255, 255, 255, 0.7); text-align: center;"></div>
+    </div>
+
+    <div class="card">
+      <h2>2️⃣ Resultado Convertido</h2>
+      <div class="output" id="output"></div>
+      <div class="success" id="successMsg">✅ ¡Datos convertidos exitosamente! Copia el texto de arriba.</div>
+      <div style="text-align: center; margin-top: 20px;">
+        <button class="btn" id="copyBtn" disabled>📋 Copiar al Portapapeles</button>
+      </div>
+    </div>
+
+    <div class="instructions">
+      <h3>🎯 ¿Cómo usar el resultado?</h3>
+      <ol>
+        <li>Copia el texto generado (usando el botón de arriba)</li>
+        <li>Ve al Theme Customizer de Shopify</li>
+        <li>Selecciona la sección de <code>Ranking</code></li>
+        <li>Haz click en el bloque de la carrera que quieras editar</li>
+        <li>Pega el texto en el campo <code>Resultados</code></li>
+        <li>Cambia el estado a <code>Completada</code></li>
+        <li>Guarda los cambios</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const output = document.getElementById('output');
+    const copyBtn = document.getElementById('copyBtn');
+    const fileName = document.getElementById('fileName');
+    const successMsg = document.getElementById('successMsg');
+
+    // Click en el área para abrir el selector de archivos
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Drag and drop
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.classList.add('dragover');
+    });
+
+    uploadArea.addEventListener('dragleave', () => {
+      uploadArea.classList.remove('dragover');
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove('dragover');
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFile(files[0]);
+      }
+    });
+
+    // Cambio en el input de archivo
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        handleFile(e.target.files[0]);
+      }
+    });
+
+    // Procesar el archivo
+    function handleFile(file) {
+      fileName.textContent = `📁 ${file.name}`;
+
+      const reader = new FileReader();
+
+      reader.onload = function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+
+          // Obtener la primera hoja
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+
+          // Convertir a JSON manteniendo los tipos de datos
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: false, dateNF: 'h:mm:ss' });
+
+          // Procesar datos
+          const results = [];
+
+          for (let i = 0; i < jsonData.length; i++) {
+            const row = jsonData[i];
+
+            // Saltar filas vacías
+            if (!row || row.length === 0 || !row[0]) continue;
+
+            // Detectar si es una fila de encabezados revisando TODOS los valores
+            const firstCell = String(row[0]).toLowerCase().trim();
+            const secondCell = row[1] ? String(row[1]).toLowerCase().trim() : '';
+            const thirdCell = row[2] ? String(row[2]).toLowerCase().trim() : '';
+
+            // Lista de palabras clave de encabezados
+            const headerKeywords = ['posicion', 'pos', 'position', 'nombre', 'name', 'corredor', 'rider', 'categoria', 'category', 'equipo', 'team', 'tiempo', 'time', 'puntos', 'points'];
+
+            // Si alguna celda contiene palabras de encabezado, saltar esta fila
+            const isHeader =
+              headerKeywords.includes(firstCell) ||
+              headerKeywords.includes(secondCell) ||
+              headerKeywords.includes(thirdCell);
+
+            if (isHeader) continue;
+
+            // Obtener valores
+            let position = row[0] || '';
+            let name = row[1] || '';
+            let category = row[2] || '';
+            let team = row[3] || '';
+            let time = row[4] || '';
+            let points = row[5] || '';
+
+            // Limpiar valores
+            position = String(position).trim();
+            name = String(name).trim();
+            category = String(category).trim();
+            team = String(team).trim();
+            points = String(points).trim();
+
+            // Convertir tiempo si es un número decimal de Excel
+            if (typeof time === 'number') {
+              time = excelSerialToTime(time);
+            } else {
+              time = String(time).trim();
+            }
+
+            // Validar que la posición sea un número (no texto)
+            if (isNaN(position) || !position) continue;
+
+            // Validar que al menos tengamos nombre
+            if (!name) continue;
+
+            results.push(`${position}|${name}|${category}|${team}|${time}|${points}`);
+          }
+
+          // Unir con ||
+          const formattedData = results.join('||');
+
+          // Mostrar resultado
+          output.textContent = formattedData;
+          copyBtn.disabled = false;
+          successMsg.classList.add('show');
+
+        } catch (error) {
+          output.textContent = `❌ Error al procesar el archivo: ${error.message}`;
+          copyBtn.disabled = true;
+          successMsg.classList.remove('show');
+        }
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Convertir número serial de Excel a formato de tiempo HH:MM:SS
+    function excelSerialToTime(serial) {
+      // Excel guarda el tiempo como fracción de un día
+      // 0.5 = 12:00:00, 0.25 = 06:00:00, etc.
+      const totalSeconds = Math.round(serial * 24 * 60 * 60);
+
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      // Formatear a HH:MM:SS o H:MM:SS
+      return `${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    // Copiar al portapapeles
+    copyBtn.addEventListener('click', () => {
+      const text = output.textContent;
+
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = copyBtn.textContent;
+        copyBtn.textContent = '✅ ¡Copiado!';
+        copyBtn.style.background = 'linear-gradient(135deg, #00ff00, #00cc00)';
+
+        setTimeout(() => {
+          copyBtn.textContent = originalText;
+          copyBtn.style.background = 'linear-gradient(135deg, #FF4D00, #FFB800)';
+        }, 2000);
+      }).catch(err => {
+        alert('Error al copiar: ' + err);
+      });
+    });
+  </script>
+</body>
+</html>

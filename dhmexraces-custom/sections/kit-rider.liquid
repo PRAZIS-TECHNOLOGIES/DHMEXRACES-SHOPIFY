@@ -1,0 +1,704 @@
+{% comment %}
+  Kit del Rider - DHMEXRACES
+  Muestra lo que incluye la inscripcion al campeonato
+{% endcomment %}
+
+<section class="kit-rider" id="kit-rider">
+  <div class="kit-rider__container">
+
+    {%- comment -%} Header {%- endcomment -%}
+    <div class="kit-rider__header">
+      {% if section.settings.subtitle != blank %}
+        <p class="kit-rider__subtitle" data-aos="fade-up">{{ section.settings.subtitle }}</p>
+      {% endif %}
+      {% if section.settings.title != blank %}
+        <h1 class="kit-rider__title" data-aos="fade-up" data-aos-delay="100">{{ section.settings.title }}</h1>
+      {% endif %}
+      {% if section.settings.description != blank %}
+        <p class="kit-rider__description" data-aos="fade-up" data-aos-delay="200">{{ section.settings.description }}</p>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Main Kit Items {%- endcomment -%}
+    <div class="kit-rider__grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'item' %}
+          <div class="kit-item {% if block.settings.featured %}kit-item--featured{% endif %}"
+               data-aos="fade-up"
+               data-aos-delay="{{ forloop.index | times: 50 }}"
+               {{ block.shopify_attributes }}>
+
+            {% if block.settings.featured %}
+              <div class="kit-item__badge">Destacado</div>
+            {% endif %}
+
+            <div class="kit-item__icon">
+              {% case block.settings.icon %}
+                {% when 'medal' %}
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="6" stroke="currentColor" stroke-width="2"/><path d="M12 14v8M8 22l4-4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {% when 'tshirt' %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M20 7l-4-3H8L4 7l3 2v12h10V9l3-2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 4v4M16 4v4" stroke="currentColor" stroke-width="2"/></svg>
+                {% when 'timer' %}
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="13" r="8" stroke="currentColor" stroke-width="2"/><path d="M12 9v4l2 2M10 2h4M12 2v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                {% when 'plate' %}
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/><path d="M7 9h10M7 13h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                {% when 'camera' %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2v11z" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="4" stroke="currentColor" stroke-width="2"/></svg>
+                {% when 'ambulance' %}
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="1" y="6" width="15" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M16 10h4l3 3v5h-7v-8z" stroke="currentColor" stroke-width="2"/><circle cx="5.5" cy="18" r="2.5" fill="currentColor"/><circle cx="18.5" cy="18" r="2.5" fill="currentColor"/><path d="M8 9v4M6 11h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                {% when 'beer' %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M17 11h1a3 3 0 010 6h-1" stroke="currentColor" stroke-width="2"/><path d="M5 7h12v12a2 2 0 01-2 2H7a2 2 0 01-2-2V7zM9 3v4M13 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                {% when 'trophy' %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M6 9H3a1 1 0 01-1-1V5a1 1 0 011-1h3M18 9h3a1 1 0 001-1V5a1 1 0 00-1-1h-3" stroke="currentColor" stroke-width="2"/><path d="M6 4h12v8a6 6 0 11-12 0V4z" stroke="currentColor" stroke-width="2"/><path d="M12 18v3M8 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                {% when 'money' %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {% else %}
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>
+              {% endcase %}
+            </div>
+
+            <div class="kit-item__content">
+              <h3 class="kit-item__title">{{ block.settings.title }}</h3>
+              {% if block.settings.subtitle != blank %}
+                <p class="kit-item__subtitle">{{ block.settings.subtitle }}</p>
+              {% endif %}
+              {% if block.settings.description != blank %}
+                <p class="kit-item__description">{{ block.settings.description }}</p>
+              {% endif %}
+              {% if block.settings.sponsor != blank %}
+                <div class="kit-item__sponsor">
+                  <span>Powered by</span>
+                  <strong>{{ block.settings.sponsor }}</strong>
+                </div>
+              {% endif %}
+            </div>
+
+            {% if block.settings.value != blank %}
+              <div class="kit-item__value">{{ block.settings.value }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {%- comment -%} Premios Section {%- endcomment -%}
+    {% assign has_prizes = false %}
+    {% for block in section.blocks %}
+      {% if block.type == 'prize' %}
+        {% assign has_prizes = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_prizes %}
+      <div class="kit-rider__prizes">
+        <div class="kit-rider__prizes-header" data-aos="fade-up">
+          <h2 class="kit-rider__prizes-title">{{ section.settings.prizes_title | default: 'Premios del Campeonato' }}</h2>
+          <p class="kit-rider__prizes-subtitle">{{ section.settings.prizes_subtitle | default: 'Lo que puedes ganar compitiendo' }}</p>
+        </div>
+
+        <div class="kit-rider__prizes-grid">
+          {% for block in section.blocks %}
+            {% if block.type == 'prize' %}
+              <div class="prize-card" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 100 }}" {{ block.shopify_attributes }}>
+                <div class="prize-card__glow"></div>
+                <div class="prize-card__icon">
+                  {% if block.settings.prize_icon == 'money' %}
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  {% elsif block.settings.prize_icon == 'sponsorship' %}
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/></svg>
+                  {% else %}
+                    <svg viewBox="0 0 24 24" fill="none"><path d="M6 9H3a1 1 0 01-1-1V5a1 1 0 011-1h3M18 9h3a1 1 0 001-1V5a1 1 0 00-1-1h-3" stroke="currentColor" stroke-width="2"/><path d="M6 4h12v8a6 6 0 11-12 0V4z" stroke="currentColor" stroke-width="2"/><path d="M12 18v3M8 21h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                  {% endif %}
+                </div>
+                <h3 class="prize-card__title">{{ block.settings.prize_title }}</h3>
+                <p class="prize-card__description">{{ block.settings.prize_description }}</p>
+                <div class="prize-card__value">{{ block.settings.prize_value }}</div>
+                {% if block.settings.prize_sponsor != blank %}
+                  <div class="prize-card__sponsor">by {{ block.settings.prize_sponsor }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} CTA Final {%- endcomment -%}
+    {% if section.settings.cta_title != blank %}
+      <div class="kit-rider__cta" data-aos="fade-up">
+        <h3 class="kit-rider__cta-title">{{ section.settings.cta_title }}</h3>
+        {% if section.settings.cta_text != blank %}
+          <p class="kit-rider__cta-text">{{ section.settings.cta_text }}</p>
+        {% endif %}
+        {% if section.settings.cta_button != blank %}
+          <a href="{{ section.settings.cta_link }}" class="kit-rider__cta-button">
+            {{ section.settings.cta_button }}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% stylesheet %}
+  .kit-rider {
+    min-height: 100vh;
+    padding: 140px 24px 100px;
+    background: #000000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kit-rider::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(228, 44, 44, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(0, 102, 179, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .kit-rider__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .kit-rider__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .kit-rider__subtitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #0066B3;
+    margin-bottom: 1rem;
+  }
+
+  .kit-rider__title {
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+    margin-bottom: 1.5rem;
+    line-height: 1;
+  }
+
+  .kit-rider__description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Grid */
+  .kit-rider__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 80px;
+  }
+
+  /* Kit Item */
+  .kit-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .kit-item:hover {
+    transform: translateY(-6px);
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .kit-item--featured {
+    background: linear-gradient(135deg, rgba(228, 44, 44, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 2px solid rgba(228, 44, 44, 0.3);
+    grid-column: span 2;
+  }
+
+  .kit-item--featured:hover {
+    border-color: rgba(228, 44, 44, 0.5);
+    box-shadow: 0 20px 50px rgba(228, 44, 44, 0.2);
+  }
+
+  .kit-item__badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: #E42C2C;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .kit-item__icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 102, 179, 0.15);
+    border-radius: 12px;
+    color: #0066B3;
+  }
+
+  .kit-item__icon svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .kit-item--featured .kit-item__icon {
+    background: rgba(228, 44, 44, 0.15);
+    color: #E42C2C;
+    width: 56px;
+    height: 56px;
+  }
+
+  .kit-item--featured .kit-item__icon svg {
+    width: 28px;
+    height: 28px;
+  }
+
+  .kit-item__content {
+    flex: 1;
+  }
+
+  .kit-item__title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+  }
+
+  .kit-item--featured .kit-item__title {
+    font-size: 1.5rem;
+    color: #E42C2C;
+  }
+
+  .kit-item__subtitle {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .kit-item__description {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+  }
+
+  .kit-item__sponsor {
+    margin-top: 12px;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .kit-item__sponsor strong {
+    color: #0066B3;
+    font-weight: 700;
+  }
+
+  .kit-item__value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #0066B3;
+    background: rgba(0, 102, 179, 0.1);
+    padding: 6px 12px;
+    border-radius: 6px;
+    align-self: flex-start;
+  }
+
+  .kit-item--featured .kit-item__value {
+    color: #E42C2C;
+    background: rgba(228, 44, 44, 0.1);
+    font-size: 0.9rem;
+  }
+
+  /* Prizes Section */
+  .kit-rider__prizes {
+    margin-bottom: 80px;
+  }
+
+  .kit-rider__prizes-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .kit-rider__prizes-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .kit-rider__prizes-subtitle {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .kit-rider__prizes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  /* Prize Card */
+  .prize-card {
+    background: linear-gradient(135deg, rgba(228, 44, 44, 0.1) 0%, rgba(0, 0, 0, 0.6) 100%);
+    border: 2px solid rgba(228, 44, 44, 0.25);
+    border-radius: 20px;
+    padding: 40px 32px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+
+  .prize-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(228, 44, 44, 0.6);
+    box-shadow: 0 24px 60px rgba(228, 44, 44, 0.25);
+  }
+
+  .prize-card__glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(228, 44, 44, 0.08) 0%, transparent 50%);
+    animation: rotate 20s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .prize-card__icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(228, 44, 44, 0.15);
+    border-radius: 50%;
+    color: #E42C2C;
+  }
+
+  .prize-card__icon svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  .prize-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 8px;
+  }
+
+  .prize-card__description {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  .prize-card__value {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #E42C2C;
+    margin-bottom: 8px;
+  }
+
+  .prize-card__sponsor {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  /* CTA */
+  .kit-rider__cta {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, rgba(0, 102, 179, 0.15) 0%, rgba(0, 102, 179, 0.02) 100%);
+    border: 1px solid rgba(0, 102, 179, 0.25);
+    border-radius: 24px;
+  }
+
+  .kit-rider__cta-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+  }
+
+  .kit-rider__cta-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .kit-rider__cta-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 18px 48px;
+    background: #0066B3;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+  }
+
+  .kit-rider__cta-button:hover {
+    background: #E42C2C;
+    transform: translateY(-3px);
+    box-shadow: 0 16px 40px rgba(228, 44, 44, 0.4);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .kit-rider {
+      padding: 120px 16px 60px;
+    }
+
+    .kit-rider__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .kit-item--featured {
+      grid-column: span 1;
+    }
+
+    .kit-rider__prizes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .prize-card {
+      padding: 32px 24px;
+    }
+
+    .kit-rider__cta {
+      padding: 40px 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Kit del Rider",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Encabezado"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitulo",
+      "default": "COPA SCOTT DHMEXRACES 2026"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titulo",
+      "default": "Kit del Rider"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Descripcion",
+      "default": "Todo lo que incluye tu inscripcion al campeonato nacional de downhill"
+    },
+    {
+      "type": "header",
+      "content": "Seccion Premios"
+    },
+    {
+      "type": "text",
+      "id": "prizes_title",
+      "label": "Titulo premios",
+      "default": "Premios del Campeonato"
+    },
+    {
+      "type": "text",
+      "id": "prizes_subtitle",
+      "label": "Subtitulo premios",
+      "default": "Lo que puedes ganar compitiendo"
+    },
+    {
+      "type": "header",
+      "content": "Llamado a la accion"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "Titulo CTA",
+      "default": "Listo para correr?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Texto CTA",
+      "default": "Inscribete ahora y recibe todo esto en tu primera carrera"
+    },
+    {
+      "type": "text",
+      "id": "cta_button",
+      "label": "Texto boton",
+      "default": "Inscribirme"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link boton"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item del Kit",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Titulo",
+          "default": "Item"
+        },
+        {
+          "type": "text",
+          "id": "subtitle",
+          "label": "Subtitulo",
+          "info": "Ej: Para primeros 100 inscritos"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Descripcion"
+        },
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icono",
+          "options": [
+            { "value": "medal", "label": "Medalla" },
+            { "value": "tshirt", "label": "Playera" },
+            { "value": "timer", "label": "Cronometro" },
+            { "value": "plate", "label": "Placa" },
+            { "value": "camera", "label": "Camara" },
+            { "value": "ambulance", "label": "Ambulancia" },
+            { "value": "beer", "label": "Cerveza" },
+            { "value": "trophy", "label": "Trofeo" },
+            { "value": "money", "label": "Dinero" },
+            { "value": "star", "label": "Estrella" }
+          ],
+          "default": "star"
+        },
+        {
+          "type": "text",
+          "id": "value",
+          "label": "Valor/Etiqueta",
+          "info": "Ej: Incluido, 100 por sede"
+        },
+        {
+          "type": "text",
+          "id": "sponsor",
+          "label": "Patrocinador",
+          "info": "Quien lo aporta (opcional)"
+        },
+        {
+          "type": "checkbox",
+          "id": "featured",
+          "label": "Destacado",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "prize",
+      "name": "Premio",
+      "settings": [
+        {
+          "type": "text",
+          "id": "prize_title",
+          "label": "Titulo",
+          "default": "Premio"
+        },
+        {
+          "type": "textarea",
+          "id": "prize_description",
+          "label": "Descripcion"
+        },
+        {
+          "type": "text",
+          "id": "prize_value",
+          "label": "Valor",
+          "default": "$50,000 MXN"
+        },
+        {
+          "type": "select",
+          "id": "prize_icon",
+          "label": "Icono",
+          "options": [
+            { "value": "trophy", "label": "Trofeo" },
+            { "value": "money", "label": "Dinero" },
+            { "value": "sponsorship", "label": "Patrocinio" }
+          ],
+          "default": "trophy"
+        },
+        {
+          "type": "text",
+          "id": "prize_sponsor",
+          "label": "Patrocinador"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Kit del Rider",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

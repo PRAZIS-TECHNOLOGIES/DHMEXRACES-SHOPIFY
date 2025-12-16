@@ -1,0 +1,23 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "ranking-overall": {
+      "type": "ranking-overall",
+      "settings": {
+        "title": "Ranking Overall 2026",
+        "subtitle": "Clasificación general acumulada de todas las fechas del campeonato"
+      }
+    }
+  },
+  "order": [
+    "ranking-overall"
+  ]
+}

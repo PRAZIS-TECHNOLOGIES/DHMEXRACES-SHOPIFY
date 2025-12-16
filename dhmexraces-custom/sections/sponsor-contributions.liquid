@@ -1,0 +1,905 @@
+{% comment %}
+  Sponsor Contributions Page - DHMEXRACES
+  Muestra los aportes detallados de cada patrocinador
+{% endcomment %}
+
+<section class="contributions" id="contributions">
+  <div class="contributions__container">
+
+    {%- comment -%} Header {%- endcomment -%}
+    <div class="contributions__header">
+      {% if section.settings.subtitle != blank %}
+        <p class="contributions__subtitle" data-aos="fade-up">{{ section.settings.subtitle }}</p>
+      {% endif %}
+      {% if section.settings.title != blank %}
+        <h1 class="contributions__title" data-aos="fade-up" data-aos-delay="100">{{ section.settings.title }}</h1>
+      {% endif %}
+      {% if section.settings.description != blank %}
+        <p class="contributions__description" data-aos="fade-up" data-aos-delay="200">{{ section.settings.description }}</p>
+      {% endif %}
+    </div>
+
+    {%- comment -%} Stats Summary {%- endcomment -%}
+    {% if section.settings.show_stats %}
+      <div class="contributions__stats" data-aos="fade-up" data-aos-delay="300">
+        <div class="contributions__stat">
+          <span class="contributions__stat-value">{{ section.settings.total_sponsors | default: '15+' }}</span>
+          <span class="contributions__stat-label">Patrocinadores</span>
+        </div>
+        <div class="contributions__stat-divider"></div>
+        <div class="contributions__stat">
+          <span class="contributions__stat-value">{{ section.settings.total_value | default: '$500K+' }}</span>
+          <span class="contributions__stat-label">En Aportes</span>
+        </div>
+        <div class="contributions__stat-divider"></div>
+        <div class="contributions__stat">
+          <span class="contributions__stat-value">{{ section.settings.total_prizes | default: '$530K' }}</span>
+          <span class="contributions__stat-label">En Premios</span>
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} TITULO PATROCINADORES {%- endcomment -%}
+    {% assign has_title = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.tier == 'title' %}
+        {% assign has_title = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_title %}
+      <div class="contributions__tier contributions__tier--title">
+        <div class="contributions__tier-header" data-aos="fade-up">
+          <div class="contributions__tier-badge contributions__tier-badge--title">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+            Patrocinador Título
+          </div>
+          <p class="contributions__tier-subtitle">Máximo nivel de patrocinio</p>
+        </div>
+        <div class="contributions__grid contributions__grid--title">
+          {% for block in section.blocks %}
+            {% if block.settings.tier == 'title' %}
+              <div class="contribution-card contribution-card--title" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 100 }}" {{ block.shopify_attributes }}>
+                <div class="contribution-card__glow"></div>
+                <div class="contribution-card__header">
+                  {% if block.settings.logo != blank %}
+                    <div class="contribution-card__logo">
+                      {{ block.settings.logo | image_url: width: 400 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                    </div>
+                  {% else %}
+                    <div class="contribution-card__logo-placeholder">
+                      <span>{{ block.settings.name }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="contribution-card__content">
+                  <h3 class="contribution-card__name">{{ block.settings.name }}</h3>
+                  {% if block.settings.contribution_type != blank %}
+                    <div class="contribution-card__type">
+                      {% case block.settings.contribution_type %}
+                        {% when 'money' %}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        {% when 'products' %}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>
+                        {% when 'services' %}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="2"/></svg>
+                        {% else %}
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                      {% endcase %}
+                      <span>{{ block.settings.contribution_type_label | default: block.settings.contribution_type }}</span>
+                    </div>
+                  {% endif %}
+                  {% if block.settings.contribution_detail != blank %}
+                    <p class="contribution-card__detail">{{ block.settings.contribution_detail }}</p>
+                  {% endif %}
+                  {% if block.settings.contribution_value != blank %}
+                    <div class="contribution-card__value">{{ block.settings.contribution_value }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} ORO PATROCINADORES {%- endcomment -%}
+    {% assign has_gold = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.tier == 'gold' %}
+        {% assign has_gold = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_gold %}
+      <div class="contributions__tier contributions__tier--gold">
+        <div class="contributions__tier-header" data-aos="fade-up">
+          <div class="contributions__tier-badge contributions__tier-badge--gold">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+              <path d="M12 6v6l4 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            Patrocinadores Oro
+          </div>
+        </div>
+        <div class="contributions__grid contributions__grid--gold">
+          {% for block in section.blocks %}
+            {% if block.settings.tier == 'gold' %}
+              <div class="contribution-card contribution-card--gold" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 100 }}" {{ block.shopify_attributes }}>
+                <div class="contribution-card__header">
+                  {% if block.settings.logo != blank %}
+                    <div class="contribution-card__logo">
+                      {{ block.settings.logo | image_url: width: 300 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                    </div>
+                  {% else %}
+                    <div class="contribution-card__logo-placeholder">
+                      <span>{{ block.settings.name }}</span>
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="contribution-card__content">
+                  <h3 class="contribution-card__name">{{ block.settings.name }}</h3>
+                  {% if block.settings.contribution_type != blank %}
+                    <div class="contribution-card__type">
+                      {% case block.settings.contribution_type %}
+                        {% when 'money' %}
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                        {% when 'products' %}
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke="currentColor" stroke-width="2"/></svg>
+                        {% when 'services' %}
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="currentColor" stroke-width="2"/></svg>
+                        {% else %}
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>
+                      {% endcase %}
+                      <span>{{ block.settings.contribution_type_label | default: block.settings.contribution_type }}</span>
+                    </div>
+                  {% endif %}
+                  {% if block.settings.contribution_detail != blank %}
+                    <p class="contribution-card__detail">{{ block.settings.contribution_detail }}</p>
+                  {% endif %}
+                  {% if block.settings.contribution_value != blank %}
+                    <div class="contribution-card__value">{{ block.settings.contribution_value }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} PLATA PATROCINADORES {%- endcomment -%}
+    {% assign has_silver = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.tier == 'silver' %}
+        {% assign has_silver = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_silver %}
+      <div class="contributions__tier contributions__tier--silver">
+        <div class="contributions__tier-header" data-aos="fade-up">
+          <div class="contributions__tier-badge contributions__tier-badge--silver">
+            Patrocinadores Plata
+          </div>
+        </div>
+        <div class="contributions__grid contributions__grid--silver">
+          {% for block in section.blocks %}
+            {% if block.settings.tier == 'silver' %}
+              <div class="contribution-card contribution-card--silver" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+                <div class="contribution-card__header">
+                  {% if block.settings.logo != blank %}
+                    <div class="contribution-card__logo">
+                      {{ block.settings.logo | image_url: width: 250 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                    </div>
+                  {% endif %}
+                </div>
+                <div class="contribution-card__content">
+                  <h3 class="contribution-card__name">{{ block.settings.name }}</h3>
+                  {% if block.settings.contribution_detail != blank %}
+                    <p class="contribution-card__detail">{{ block.settings.contribution_detail }}</p>
+                  {% endif %}
+                  {% if block.settings.contribution_value != blank %}
+                    <div class="contribution-card__value">{{ block.settings.contribution_value }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} BRONCE PATROCINADORES {%- endcomment -%}
+    {% assign has_bronze = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.tier == 'bronze' %}
+        {% assign has_bronze = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_bronze %}
+      <div class="contributions__tier contributions__tier--bronze">
+        <div class="contributions__tier-header" data-aos="fade-up">
+          <div class="contributions__tier-badge contributions__tier-badge--bronze">
+            Patrocinadores Bronce
+          </div>
+        </div>
+        <div class="contributions__grid contributions__grid--bronze">
+          {% for block in section.blocks %}
+            {% if block.settings.tier == 'bronze' %}
+              <div class="contribution-card contribution-card--bronze" data-aos="fade-up" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+                {% if block.settings.logo != blank %}
+                  <div class="contribution-card__logo">
+                    {{ block.settings.logo | image_url: width: 200 | image_tag: loading: 'lazy', alt: block.settings.name }}
+                  </div>
+                {% endif %}
+                <h3 class="contribution-card__name">{{ block.settings.name }}</h3>
+                {% if block.settings.contribution_detail != blank %}
+                  <p class="contribution-card__detail">{{ block.settings.contribution_detail }}</p>
+                {% endif %}
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+
+    {%- comment -%} CTA Final {%- endcomment -%}
+    {% if section.settings.cta_title != blank %}
+      <div class="contributions__cta" data-aos="fade-up">
+        <h3 class="contributions__cta-title">{{ section.settings.cta_title }}</h3>
+        {% if section.settings.cta_text != blank %}
+          <p class="contributions__cta-text">{{ section.settings.cta_text }}</p>
+        {% endif %}
+        {% if section.settings.cta_button != blank %}
+          <a href="{{ section.settings.cta_link }}" class="contributions__cta-button">
+            {{ section.settings.cta_button }}
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% stylesheet %}
+  .contributions {
+    min-height: 100vh;
+    padding: 140px 24px 100px;
+    background: #000000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contributions::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(228, 44, 44, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(0, 102, 179, 0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .contributions__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .contributions__header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .contributions__subtitle {
+    font-size: 0.875rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #0066B3;
+    margin-bottom: 1rem;
+  }
+
+  .contributions__title {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: #FFFFFF;
+    margin-bottom: 1.5rem;
+    line-height: 1;
+  }
+
+  .contributions__description {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.6);
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Stats */
+  .contributions__stats {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 80px;
+    padding: 32px 48px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
+    flex-wrap: wrap;
+  }
+
+  .contributions__stat {
+    text-align: center;
+  }
+
+  .contributions__stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #E42C2C;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .contributions__stat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .contributions__stat-divider {
+    width: 1px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Tiers */
+  .contributions__tier {
+    margin-bottom: 80px;
+  }
+
+  .contributions__tier-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .contributions__tier-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 100px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .contributions__tier-badge--title {
+    background: linear-gradient(135deg, #E42C2C 0%, #ff6b6b 100%);
+    color: #FFFFFF;
+    box-shadow: 0 8px 32px rgba(228, 44, 44, 0.4);
+  }
+
+  .contributions__tier-badge--gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    color: #FFD700;
+  }
+
+  .contributions__tier-badge--silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(192, 192, 192, 0.1) 100%);
+    border: 1px solid rgba(192, 192, 192, 0.4);
+    color: #C0C0C0;
+  }
+
+  .contributions__tier-badge--bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(205, 127, 50, 0.1) 100%);
+    border: 1px solid rgba(205, 127, 50, 0.4);
+    color: #CD7F32;
+  }
+
+  .contributions__tier-subtitle {
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 12px;
+  }
+
+  /* Grids */
+  .contributions__grid {
+    display: grid;
+    gap: 24px;
+    justify-content: center;
+  }
+
+  .contributions__grid--title {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .contributions__grid--gold {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .contributions__grid--silver {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+
+  .contributions__grid--bronze {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+
+  /* Cards */
+  .contribution-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 20px;
+    padding: 32px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contribution-card:hover {
+    transform: translateY(-8px);
+  }
+
+  /* Title Card */
+  .contribution-card--title {
+    background: linear-gradient(135deg, rgba(228, 44, 44, 0.08) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 2px solid rgba(228, 44, 44, 0.3);
+    padding: 48px 40px;
+  }
+
+  .contribution-card--title .contribution-card__glow {
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(228, 44, 44, 0.1) 0%, transparent 50%);
+    animation: rotate 20s linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .contribution-card--title:hover {
+    border-color: rgba(228, 44, 44, 0.6);
+    box-shadow: 0 24px 64px rgba(228, 44, 44, 0.3);
+  }
+
+  .contribution-card--title .contribution-card__name {
+    font-size: 1.75rem;
+    color: #E42C2C;
+  }
+
+  .contribution-card--title .contribution-card__value {
+    font-size: 1.5rem;
+    color: #E42C2C;
+  }
+
+  /* Gold Card */
+  .contribution-card--gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+  }
+
+  .contribution-card--gold:hover {
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 20px 50px rgba(255, 215, 0, 0.15);
+  }
+
+  .contribution-card--gold .contribution-card__name {
+    color: #FFD700;
+  }
+
+  .contribution-card--gold .contribution-card__value {
+    color: #FFD700;
+  }
+
+  .contribution-card--gold .contribution-card__type {
+    color: rgba(255, 215, 0, 0.7);
+  }
+
+  /* Silver Card */
+  .contribution-card--silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border: 1px solid rgba(192, 192, 192, 0.2);
+    padding: 24px;
+  }
+
+  .contribution-card--silver:hover {
+    border-color: rgba(192, 192, 192, 0.5);
+    box-shadow: 0 16px 40px rgba(192, 192, 192, 0.1);
+  }
+
+  .contribution-card--silver .contribution-card__name {
+    color: #C0C0C0;
+    font-size: 1rem;
+  }
+
+  .contribution-card--silver .contribution-card__value {
+    color: #C0C0C0;
+    font-size: 1rem;
+  }
+
+  /* Bronze Card */
+  .contribution-card--bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.05) 0%, rgba(0, 0, 0, 0.3) 100%);
+    border: 1px solid rgba(205, 127, 50, 0.2);
+    padding: 20px;
+    text-align: center;
+  }
+
+  .contribution-card--bronze:hover {
+    border-color: rgba(205, 127, 50, 0.5);
+    box-shadow: 0 12px 32px rgba(205, 127, 50, 0.1);
+  }
+
+  .contribution-card--bronze .contribution-card__name {
+    color: #CD7F32;
+    font-size: 0.9rem;
+  }
+
+  .contribution-card--bronze .contribution-card__logo {
+    margin-bottom: 12px;
+  }
+
+  .contribution-card--bronze .contribution-card__logo img {
+    max-height: 50px;
+  }
+
+  /* Card Elements */
+  .contribution-card__header {
+    margin-bottom: 20px;
+  }
+
+  .contribution-card__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .contribution-card__logo img {
+    max-width: 100%;
+    max-height: 80px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: filter 0.3s ease;
+  }
+
+  .contribution-card:hover .contribution-card__logo img {
+    filter: none;
+  }
+
+  .contribution-card__logo-placeholder {
+    padding: 20px;
+    text-align: center;
+  }
+
+  .contribution-card__logo-placeholder span {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.3);
+    text-transform: uppercase;
+  }
+
+  .contribution-card__content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .contribution-card__name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #FFFFFF;
+  }
+
+  .contribution-card__type {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 12px;
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+  }
+
+  .contribution-card__detail {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .contribution-card__value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #FFFFFF;
+  }
+
+  /* CTA */
+  .contributions__cta {
+    text-align: center;
+    padding: 60px 40px;
+    background: linear-gradient(135deg, rgba(0, 102, 179, 0.1) 0%, rgba(0, 102, 179, 0.02) 100%);
+    border: 1px solid rgba(0, 102, 179, 0.2);
+    border-radius: 24px;
+    margin-top: 40px;
+  }
+
+  .contributions__cta-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 12px;
+  }
+
+  .contributions__cta-text {
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 24px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .contributions__cta-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 16px 40px;
+    background: #0066B3;
+    color: #FFFFFF;
+    font-weight: 700;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+  }
+
+  .contributions__cta-button:hover {
+    background: #E42C2C;
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(228, 44, 44, 0.4);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .contributions {
+      padding: 120px 16px 60px;
+    }
+
+    .contributions__stats {
+      flex-direction: column;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .contributions__stat-divider {
+      width: 60px;
+      height: 1px;
+    }
+
+    .contributions__stat-value {
+      font-size: 2rem;
+    }
+
+    .contributions__grid--title,
+    .contributions__grid--gold {
+      grid-template-columns: 1fr;
+    }
+
+    .contributions__grid--silver {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .contributions__grid--bronze {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .contribution-card--title {
+      padding: 32px 24px;
+    }
+
+    .contribution-card--silver,
+    .contribution-card--bronze {
+      padding: 16px;
+    }
+
+    .contribution-card__logo img {
+      max-height: 60px;
+    }
+
+    .contributions__cta {
+      padding: 40px 24px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Aportes Patrocinadores",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Encabezado"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitulo",
+      "default": "DHMEXRACES 2026"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Titulo",
+      "default": "Aportes de Patrocinadores"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Descripcion",
+      "default": "Gracias a nuestros patrocinadores, DHMEXRACES ofrece la mejor experiencia de downhill en Mexico"
+    },
+    {
+      "type": "header",
+      "content": "Estadisticas"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_stats",
+      "label": "Mostrar estadisticas",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "total_sponsors",
+      "label": "Total patrocinadores",
+      "default": "15+"
+    },
+    {
+      "type": "text",
+      "id": "total_value",
+      "label": "Valor total aportes",
+      "default": "$500K+"
+    },
+    {
+      "type": "text",
+      "id": "total_prizes",
+      "label": "Total en premios",
+      "default": "$530K"
+    },
+    {
+      "type": "header",
+      "content": "Llamado a la accion"
+    },
+    {
+      "type": "text",
+      "id": "cta_title",
+      "label": "Titulo CTA",
+      "default": "Quieres ser patrocinador?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Texto CTA",
+      "default": "Unete al campeonato de downhill mas grande de Mexico"
+    },
+    {
+      "type": "text",
+      "id": "cta_button",
+      "label": "Texto boton",
+      "default": "Contactar"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Link boton"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "sponsor",
+      "name": "Patrocinador",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre",
+          "default": "Patrocinador"
+        },
+        {
+          "type": "image_picker",
+          "id": "logo",
+          "label": "Logo"
+        },
+        {
+          "type": "select",
+          "id": "tier",
+          "label": "Nivel",
+          "options": [
+            { "value": "title", "label": "Titulo (Maximo)" },
+            { "value": "gold", "label": "Oro" },
+            { "value": "silver", "label": "Plata" },
+            { "value": "bronze", "label": "Bronce" }
+          ],
+          "default": "gold"
+        },
+        {
+          "type": "select",
+          "id": "contribution_type",
+          "label": "Tipo de aporte",
+          "options": [
+            { "value": "money", "label": "Dinero" },
+            { "value": "products", "label": "Productos" },
+            { "value": "services", "label": "Servicios" },
+            { "value": "mixed", "label": "Mixto" }
+          ],
+          "default": "products"
+        },
+        {
+          "type": "text",
+          "id": "contribution_type_label",
+          "label": "Etiqueta tipo (opcional)",
+          "info": "Ej: Productos, Efectivo, Mecanica"
+        },
+        {
+          "type": "textarea",
+          "id": "contribution_detail",
+          "label": "Detalle del aporte",
+          "info": "Descripcion de lo que aporta"
+        },
+        {
+          "type": "text",
+          "id": "contribution_value",
+          "label": "Valor del aporte",
+          "info": "Ej: $50,000 MXN, 100 productos"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Aportes Patrocinadores",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

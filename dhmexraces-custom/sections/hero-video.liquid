@@ -1,0 +1,472 @@
+{% comment %}
+  Hero section with video background for DHMEXRACES
+  Supports separate videos for desktop (horizontal) and mobile (vertical)
+{% endcomment %}
+
+<section class="hero-video" id="hero">
+  <div class="hero-video__container">
+    {% if section.settings.video_url != blank or section.settings.video_url_mobile != blank %}
+      <div class="hero-video__background">
+
+        {% comment %} Desktop Video (Horizontal) {% endcomment %}
+        {% if section.settings.video_url != blank %}
+          <div class="hero-video__desktop">
+            {% if section.settings.video_url contains 'youtube.com' or section.settings.video_url contains 'youtu.be' %}
+              {% assign video_id = section.settings.video_url | split: 'v=' | last | split: '/' | last | split: '&' | first %}
+              <iframe
+                src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&loop=1&playlist={{ video_id }}&controls=0&showinfo=0&rel=0&modestbranding=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                class="hero-video__iframe">
+              </iframe>
+            {% elsif section.settings.video_url contains 'vimeo.com' %}
+              {% assign video_id = section.settings.video_url | split: '/' | last %}
+              <iframe
+                src="https://player.vimeo.com/video/{{ video_id }}?autoplay=1&muted=1&loop=1&background=1&controls=0"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                class="hero-video__iframe">
+              </iframe>
+            {% else %}
+              <video autoplay muted loop playsinline class="hero-video__video">
+                <source src="{{ section.settings.video_url }}" type="video/mp4">
+              </video>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {% comment %} Mobile Video (Vertical) {% endcomment %}
+        {% if section.settings.video_url_mobile != blank %}
+          <div class="hero-video__mobile">
+            {% if section.settings.video_url_mobile contains 'youtube.com' or section.settings.video_url_mobile contains 'youtu.be' %}
+              {% assign video_id_mobile = section.settings.video_url_mobile | split: 'v=' | last | split: '/' | last | split: '&' | first %}
+              <iframe
+                src="https://www.youtube.com/embed/{{ video_id_mobile }}?autoplay=1&mute=1&loop=1&playlist={{ video_id_mobile }}&controls=0&showinfo=0&rel=0&modestbranding=1"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                class="hero-video__iframe">
+              </iframe>
+            {% elsif section.settings.video_url_mobile contains 'vimeo.com' %}
+              {% assign video_id_mobile = section.settings.video_url_mobile | split: '/' | last %}
+              <iframe
+                src="https://player.vimeo.com/video/{{ video_id_mobile }}?autoplay=1&muted=1&loop=1&background=1&controls=0"
+                frameborder="0"
+                allow="autoplay; encrypted-media"
+                allowfullscreen
+                class="hero-video__iframe">
+              </iframe>
+            {% else %}
+              <video autoplay muted loop playsinline class="hero-video__video">
+                <source src="{{ section.settings.video_url_mobile }}" type="video/mp4">
+              </video>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        <div class="hero-video__overlay"></div>
+      </div>
+    {% elsif section.settings.image != blank %}
+      <div class="hero-video__background">
+        {{ section.settings.image | image_url: width: 1920 | image_tag: class: 'hero-video__image', loading: 'eager' }}
+        <div class="hero-video__overlay"></div>
+      </div>
+    {% endif %}
+
+    <div class="hero-video__content">
+      <div class="hero-video__text">
+        {% if section.settings.subtitle != blank %}
+          <p class="hero-video__subtitle" data-aos="fade-up">{{ section.settings.subtitle }}</p>
+        {% endif %}
+
+        {% if section.settings.title != blank %}
+          <h1 class="hero-video__title" data-aos="fade-up" data-aos-delay="100">{{ section.settings.title }}</h1>
+        {% endif %}
+
+        {% if section.settings.description != blank %}
+          <p class="hero-video__description" data-aos="fade-up" data-aos-delay="200">{{ section.settings.description }}</p>
+        {% endif %}
+
+        <div class="hero-video__buttons" data-aos="fade-up" data-aos-delay="300">
+          {% if section.settings.button_label != blank %}
+            <a href="{{ section.settings.button_link }}" class="hero-video__button hero-video__button--primary">
+              {{ section.settings.button_label }}
+            </a>
+          {% endif %}
+
+          {% if section.settings.button_label_2 != blank %}
+            <a href="{{ section.settings.button_link_2 }}" class="hero-video__button hero-video__button--secondary">
+              {{ section.settings.button_label_2 }}
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .hero-video {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--color-bg-dark);
+  }
+
+  .hero-video__container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hero-video__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .hero-video__background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 30% 50%, var(--color-border-accent) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(0, 102, 179, 0.15) 0%, transparent 50%);
+    z-index: 1;
+    animation: pulse 8s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  .hero-video__iframe,
+  .hero-video__video,
+  .hero-video__image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    pointer-events: none !important;
+    z-index: 0;
+  }
+
+  .hero-video__background {
+    pointer-events: none !important;
+  }
+
+  /* Desktop/Mobile video switching */
+  .hero-video__desktop,
+  .hero-video__mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero-video__desktop {
+    display: block;
+  }
+
+  .hero-video__mobile {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .hero-video__desktop {
+      display: none;
+    }
+
+    .hero-video__mobile {
+      display: block;
+    }
+  }
+
+  .hero-video__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(0px);
+    pointer-events: none !important;
+  }
+
+  .hero-video__content {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    color: #fff;
+    padding: 0 30px;
+    max-width: 1400px;
+    width: 100%;
+    pointer-events: none;
+  }
+
+  .hero-video__content * {
+    pointer-events: auto;
+  }
+
+  .hero-video__subtitle {
+    font-size: clamp(0.875rem, 2vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 2rem;
+    color: var(--color-secondary);
+    filter: drop-shadow(0 4px 12px rgba(0, 102, 179, 0.8));
+  }
+
+  .hero-video__title {
+    font-size: clamp(3.5rem, 12vw, 9rem);
+    font-weight: 900;
+    line-height: 0.9;
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    filter: drop-shadow(0 10px 40px rgba(228, 44, 44, 0.8)) drop-shadow(0 0 30px rgba(0, 0, 0, 1));
+    position: relative;
+  }
+
+  .hero-video__description {
+    font-size: clamp(1.125rem, 2.5vw, 1.75rem);
+    line-height: 1.5;
+    margin-bottom: 4rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 300;
+    color: #FFFFFF;
+    text-shadow:
+      0 2px 10px rgba(0, 0, 0, 1),
+      0 4px 20px rgba(0, 0, 0, 0.9),
+      0 0 40px rgba(0, 0, 0, 0.8);
+  }
+
+  .hero-video__buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-video__button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 3.5rem;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 800;
+    text-decoration: none;
+    border-radius: 100px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    overflow: hidden;
+  }
+
+  .hero-video__button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: rgba(255,255,255,0.2);
+    transition: left 0.5s;
+  }
+
+  .hero-video__button:hover::before {
+    left: 100%;
+  }
+
+  .hero-video__button--primary {
+    background: var(--color-secondary);
+    color: #fff;
+    box-shadow: 0 20px 60px rgba(0, 102, 179, 0.5);
+  }
+
+  .hero-video__button--primary:hover {
+    transform: translateY(-5px) scale(1.05);
+    background: var(--color-primary);
+    box-shadow: 0 30px 80px rgba(228, 44, 44, 0.7);
+  }
+
+  .hero-video__button--secondary {
+    background: transparent;
+    color: #fff;
+    border: 3px solid var(--color-secondary);
+    box-shadow: 0 0 30px rgba(0, 102, 179, 0.3),
+                inset 0 0 30px rgba(0, 102, 179, 0.1);
+  }
+
+  .hero-video__button--secondary:hover {
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 0 50px rgba(0, 102, 179, 0.6),
+                inset 0 0 50px rgba(0, 102, 179, 0.2);
+  }
+
+  @media (max-width: 768px) {
+    .hero-video__subtitle {
+      letter-spacing: 0.2em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-video__title {
+      margin-bottom: 1.5rem;
+    }
+
+    .hero-video__description {
+      margin-bottom: 3rem;
+    }
+
+    .hero-video__buttons {
+      flex-direction: column;
+      gap: 1.5rem;
+      align-items: stretch;
+    }
+
+    .hero-video__button {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 1.25rem 2.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Hero Video",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Video Desktop (Horizontal)"
+    },
+    {
+      "type": "url",
+      "id": "video_url",
+      "label": "Video Desktop",
+      "info": "Video horizontal para computadora (YouTube, Vimeo, o MP4)"
+    },
+    {
+      "type": "header",
+      "content": "Video Móvil (Vertical)"
+    },
+    {
+      "type": "url",
+      "id": "video_url_mobile",
+      "label": "Video Móvil",
+      "info": "Video vertical para teléfono (YouTube, Vimeo, o MP4)"
+    },
+    {
+      "type": "header",
+      "content": "Imagen de Respaldo"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Fallback Image",
+      "info": "Se usa si no hay video configurado"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay Color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay Opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Downhill MTB Racing"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "DHMEXRACES"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "La mejor experiencia de downhill en México. Adrenalina pura en cada carrera."
+    },
+    {
+      "type": "header",
+      "content": "Buttons"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Primary Button Label",
+      "default": "Inscríbete Ahora"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Primary Button Link"
+    },
+    {
+      "type": "text",
+      "id": "button_label_2",
+      "label": "Secondary Button Label",
+      "default": "Ver Fechas"
+    },
+    {
+      "type": "url",
+      "id": "button_link_2",
+      "label": "Secondary Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Video",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

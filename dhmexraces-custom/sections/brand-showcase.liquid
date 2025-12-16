@@ -1,0 +1,270 @@
+{% comment %}
+  Brand Showcase Section - Logo grande con texto promocional
+{% endcomment %}
+
+<section class="brand-showcase">
+  <div class="brand-showcase__container">
+    {% if section.settings.title != blank %}
+      <h2 class="brand-showcase__title" data-aos="fade-up">
+        {{ section.settings.title }}
+      </h2>
+    {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+      <p class="brand-showcase__subtitle" data-aos="fade-up" data-aos-delay="100">
+        {{ section.settings.subtitle }}
+      </p>
+    {% endif %}
+
+    {% if section.settings.description != blank %}
+      <div class="brand-showcase__description" data-aos="fade-up" data-aos-delay="150">
+        {{ section.settings.description }}
+      </div>
+    {% endif %}
+
+    {% if section.settings.button_text != blank %}
+      <a href="{{ section.settings.button_link }}" class="brand-showcase__button" data-aos="fade-up" data-aos-delay="200">
+        {{ section.settings.button_text }}
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4.16675 10H15.8334" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M10 4.16663L15.8333 9.99996L10 15.8333" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    {% endif %}
+
+    {% if section.settings.logo != blank %}
+      <div class="brand-showcase__logo" data-aos="zoom-in" data-aos-delay="250">
+        <img
+          src="{{ section.settings.logo | image_url: width: 600 }}"
+          alt="{{ section.settings.logo_alt | default: 'DHMEXRACES' }}"
+          class="brand-showcase__logo-img"
+          loading="lazy"
+        >
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .brand-showcase {
+    padding: 60px 20px;
+    background: {{ section.settings.background_color }};
+    position: relative;
+    overflow: hidden;
+  }
+
+  .brand-showcase::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(228, 44, 44, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 70% 80%, rgba(255, 215, 0, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .brand-showcase__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .brand-showcase__logo {
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .brand-showcase__logo-img {
+    width: {{ section.settings.logo_width }}px;
+    max-width: 100%;
+    height: auto;
+    filter: drop-shadow(0 10px 40px rgba(228, 44, 44, 0.3));
+    transition: transform 0.5s ease;
+  }
+
+  .brand-showcase__logo-img:hover {
+    transform: scale(1.05);
+  }
+
+  .brand-showcase__title {
+    font-size: clamp(1.75rem, 4vw, 3rem);
+    font-weight: 900;
+    color: {{ section.settings.title_color }};
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .brand-showcase__subtitle {
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: {{ section.settings.subtitle_color }};
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .brand-showcase__description {
+    font-size: clamp(0.95rem, 1.5vw, 1.1rem);
+    color: {{ section.settings.text_color }};
+    max-width: 700px;
+    margin: 0 auto 2rem;
+    line-height: 1.7;
+  }
+
+  .brand-showcase__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 2.5rem;
+    background: var(--color-primary);
+    color: #fff;
+    text-decoration: none;
+    border-radius: 100px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(228, 44, 44, 0.3);
+  }
+
+  .brand-showcase__button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 40px rgba(228, 44, 44, 0.5);
+  }
+
+  .brand-showcase__button svg {
+    transition: transform 0.4s ease;
+  }
+
+  .brand-showcase__button:hover svg {
+    transform: translateX(5px);
+  }
+
+  @media (max-width: 768px) {
+    .brand-showcase {
+      padding: 40px 15px;
+    }
+
+    .brand-showcase__logo {
+      margin-top: 25px;
+    }
+
+    .brand-showcase__logo-img {
+      max-width: 85%;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Brand Showcase",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Logo"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo Image",
+      "info": "Sube el logo de DHMEXRACES en alta resolución"
+    },
+    {
+      "type": "text",
+      "id": "logo_alt",
+      "label": "Logo Alt Text",
+      "default": "DHMEXRACES"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 0,
+      "max": 600,
+      "step": 25,
+      "unit": "px",
+      "label": "Logo Width",
+      "default": 300
+    },
+    {
+      "type": "header",
+      "content": "Texto"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título",
+      "default": "El Campeonato Nacional de Downhill"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtítulo",
+      "default": "Temporada 2026"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Descripción",
+      "default": "<p>DHMEXRACES es el campeonato de Downhill más importante de México. Cinco sedes, los mejores riders y la adrenalina al máximo.</p>"
+    },
+    {
+      "type": "header",
+      "content": "Botón"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Texto del Botón",
+      "default": "Ver Fechas"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link del Botón"
+    },
+    {
+      "type": "header",
+      "content": "Colores"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Color de Fondo",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Color del Título",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Color del Subtítulo",
+      "default": "#E42C2C"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Color del Texto",
+      "default": "#CCCCCC"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Brand Showcase",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

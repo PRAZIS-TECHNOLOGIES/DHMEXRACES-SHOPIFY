@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    {% # Inlined CSS Variables %}
+    {% render 'css-variables' %}
+
+    {% comment %}
+      Font preloading:
+      1. Preconnect to font CDN for faster connection
+      2. Preload only the critical font variant (base weight)
+      3. Additional variants load on-demand via @font-face
+    {% endcomment %}
+    {% comment %} Font preloading removed - configure in theme settings if needed {% endcomment %}
+
+    {% # Load and preload the critical CSS %}
+    {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
+
+    {% # Social, title, etc. %}
+    {% render 'meta-tags' %}
+
+    {% # AOS Animations %}
+    {% render 'aos-animations' %}
+
+    {{ content_for_header }}
+  </head>
+
+  <body>
+    {% sections 'header-group' %}
+
+    {{ content_for_layout }}
+
+    {% sections 'footer-group' %}
+  </body>
+</html>

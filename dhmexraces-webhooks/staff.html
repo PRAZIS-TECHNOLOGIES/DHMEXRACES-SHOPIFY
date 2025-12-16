@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Check-in Staff | DHMEXRACES 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 24px;
+    }
+
+    .header img {
+      height: 60px;
+      margin-bottom: 12px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 700;
+      color: #E42C2C;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: rgba(255,255,255,0.5);
+      margin-top: 4px;
+    }
+
+    /* Scanner Container */
+    .scanner-container {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    #reader {
+      width: 100%;
+    }
+
+    #reader video {
+      border-radius: 12px;
+    }
+
+    /* Manual Input */
+    .manual-input {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .manual-input input {
+      flex: 1;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      color: #fff;
+      font-size: 16px;
+      font-family: monospace;
+      text-transform: uppercase;
+    }
+
+    .manual-input input:focus {
+      outline: none;
+      border-color: #E42C2C;
+    }
+
+    .manual-input input::placeholder {
+      color: rgba(255,255,255,0.3);
+      text-transform: none;
+    }
+
+    .manual-input button {
+      padding: 14px 20px;
+      background: #E42C2C;
+      border: none;
+      border-radius: 10px;
+      color: #000;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .manual-input button:hover {
+      background: #ff3c3c;
+    }
+
+    .manual-input button:disabled {
+      background: #444;
+      cursor: not-allowed;
+    }
+
+    /* Status Display */
+    .status {
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .status.success {
+      display: block;
+      background: linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%);
+      border: 1px solid rgba(34,197,94,0.3);
+    }
+
+    .status.warning {
+      display: block;
+      background: linear-gradient(135deg, rgba(234,179,8,0.15) 0%, rgba(234,179,8,0.05) 100%);
+      border: 1px solid rgba(234,179,8,0.3);
+    }
+
+    .status.error {
+      display: block;
+      background: linear-gradient(135deg, rgba(228,44,44,0.15) 0%, rgba(228,44,44,0.05) 100%);
+      border: 1px solid rgba(228,44,44,0.3);
+    }
+
+    .status-icon {
+      font-size: 48px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .status-title {
+      font-size: 18px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .status.success .status-title { color: #22c55e; }
+    .status.warning .status-title { color: #eab308; }
+    .status.error .status-title { color: #E42C2C; }
+
+    .status-message {
+      font-size: 14px;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+    }
+
+    /* Runner Card */
+    .runner-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+      display: none;
+    }
+
+    .runner-card.visible {
+      display: block;
+    }
+
+    .runner-name {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .runner-team {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .runner-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .detail-item {
+      background: rgba(255,255,255,0.03);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .detail-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .detail-value.categoria {
+      color: #E42C2C;
+    }
+
+    /* Check-in Time */
+    .checkin-time {
+      background: rgba(34,197,94,0.1);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      margin-top: 16px;
+    }
+
+    .checkin-time .label {
+      font-size: 10px;
+      color: #22c55e;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .checkin-time .time {
+      font-size: 16px;
+      font-weight: 700;
+      color: #22c55e;
+      margin-top: 4px;
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 20px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: #E42C2C;
+    }
+
+    .stat-label {
+      font-size: 10px;
+      color: rgba(255,255,255,0.4);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: #E42C2C;
+      color: #000;
+      border: none;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Loading */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading.visible {
+      display: block;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(255,255,255,0.1);
+      border-top-color: #E42C2C;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Audio feedback */
+    .audio-success { display: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <img src="https://endhurorace.com/cdn/shop/files/dhmexscottshimanologo.png?v=1763690918&width=400" alt="DHMEXRACES">
+      <h1>Check-in Staff</h1>
+      <p>Escanea el QR del corredor</p>
+    </div>
+
+    <!-- Scanner -->
+    <div class="scanner-container">
+      <div id="reader"></div>
+    </div>
+
+    <!-- Manual Input -->
+    <div class="manual-input">
+      <input type="text" id="manualCode" placeholder="Ingresa el código manual">
+      <button onclick="checkInManual()" id="manualBtn">Buscar</button>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p>Verificando...</p>
+    </div>
+
+    <!-- Status Display -->
+    <div class="status" id="status">
+      <div class="status-icon" id="statusIcon"></div>
+      <div class="status-title" id="statusTitle"></div>
+      <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <!-- Runner Card -->
+    <div class="runner-card" id="runnerCard">
+      <div class="runner-name" id="runnerName"></div>
+      <div class="runner-team" id="runnerTeam"></div>
+      <div class="runner-details">
+        <div class="detail-item">
+          <div class="detail-label">Categoria</div>
+          <div class="detail-value categoria" id="runnerCategoria"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Sede</div>
+          <div class="detail-value" id="runnerSede"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Orden</div>
+          <div class="detail-value" id="runnerOrden"></div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Telefono</div>
+          <div class="detail-value" id="runnerTelefono"></div>
+        </div>
+      </div>
+      <div class="checkin-time" id="checkinTime">
+        <div class="label">Check-in realizado</div>
+        <div class="time" id="checkinTimeValue"></div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+      <div class="stat-item">
+        <div class="stat-value" id="statScanned">0</div>
+        <div class="stat-label">Escaneados</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statSuccess">0</div>
+        <div class="stat-label">Exitosos</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value" id="statDuplicate">0</div>
+        <div class="stat-label">Ya registrados</div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <button class="btn btn-primary" onclick="resetScanner()">
+        <span>Escanear otro</span>
+      </button>
+      <a href="dashboard.html" class="btn btn-secondary">
+        <span>Ver Dashboard</span>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'https://dhmexraces-webhooks.vercel.app/api/check-in';
+
+    let html5QrcodeScanner;
+    let isProcessing = false;
+    let stats = { scanned: 0, success: 0, duplicate: 0 };
+
+    // Inicializar escaner
+    function initScanner() {
+      html5QrcodeScanner = new Html5Qrcode("reader");
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1
+      };
+
+      html5QrcodeScanner.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess,
+        onScanError
+      ).catch(err => {
+        console.error("Error al iniciar cámara:", err);
+        document.getElementById('reader').innerHTML = `
+          <div style="padding: 40px; text-align: center; color: rgba(255,255,255,0.5);">
+            <p>No se pudo acceder a la cámara.</p>
+            <p style="margin-top: 8px; font-size: 12px;">Usa el campo de texto para ingresar el código manualmente.</p>
+          </div>
+        `;
+      });
+    }
+
+    // Cuando escanea exitosamente
+    async function onScanSuccess(decodedText) {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      // Vibrar si está disponible
+      if (navigator.vibrate) {
+        navigator.vibrate(100);
+      }
+
+      await processCheckIn(decodedText);
+
+      // Pausar escaner brevemente
+      setTimeout(() => {
+        isProcessing = false;
+      }, 2000);
+    }
+
+    function onScanError(error) {
+      // Silencioso - es normal cuando no hay QR
+    }
+
+    // Check-in manual
+    async function checkInManual() {
+      const code = document.getElementById('manualCode').value.trim().toUpperCase();
+      if (!code) {
+        alert('Ingresa un código');
+        return;
+      }
+      await processCheckIn(code);
+    }
+
+    // Procesar check-in
+    async function processCheckIn(code) {
+      showLoading(true);
+      hideStatus();
+      hideRunner();
+      stats.scanned++;
+      updateStats();
+
+      try {
+        const response = await fetch(`${API_URL}?code=${encodeURIComponent(code)}`);
+        const data = await response.json();
+
+        showLoading(false);
+
+        if (!response.ok || !data.success) {
+          showStatus('error', 'No encontrado', data.message || 'Código no válido');
+          playSound('error');
+          return;
+        }
+
+        if (data.alreadyCheckedIn) {
+          showStatus('warning', 'Ya registrado', `Este corredor ya hizo check-in`);
+          stats.duplicate++;
+          playSound('warning');
+        } else {
+          showStatus('success', '¡Check-in exitoso!', 'El corredor ha sido registrado');
+          stats.success++;
+          playSound('success');
+        }
+
+        showRunner(data.runner, data.checkInTime);
+        updateStats();
+
+      } catch (error) {
+        showLoading(false);
+        showStatus('error', 'Error de conexión', 'No se pudo conectar al servidor');
+        playSound('error');
+        console.error('Error:', error);
+      }
+    }
+
+    // UI helpers
+    function showLoading(show) {
+      document.getElementById('loading').classList.toggle('visible', show);
+    }
+
+    function showStatus(type, title, message) {
+      const statusEl = document.getElementById('status');
+      statusEl.className = `status ${type}`;
+      document.getElementById('statusIcon').textContent =
+        type === 'success' ? '✓' :
+        type === 'warning' ? '⚠' : '✕';
+      document.getElementById('statusTitle').textContent = title;
+      document.getElementById('statusMessage').textContent = message;
+    }
+
+    function hideStatus() {
+      document.getElementById('status').className = 'status';
+    }
+
+    function showRunner(runner, checkInTime) {
+      document.getElementById('runnerName').textContent = runner.nombre;
+      document.getElementById('runnerTeam').textContent = runner.equipo || 'Independiente';
+      document.getElementById('runnerCategoria').textContent = runner.categoria;
+      document.getElementById('runnerSede').textContent = runner.sede;
+      document.getElementById('runnerOrden').textContent = runner.orden;
+      document.getElementById('runnerTelefono').textContent = runner.telefono || 'N/A';
+      document.getElementById('checkinTimeValue').textContent = checkInTime;
+      document.getElementById('runnerCard').classList.add('visible');
+    }
+
+    function hideRunner() {
+      document.getElementById('runnerCard').classList.remove('visible');
+    }
+
+    function updateStats() {
+      document.getElementById('statScanned').textContent = stats.scanned;
+      document.getElementById('statSuccess').textContent = stats.success;
+      document.getElementById('statDuplicate').textContent = stats.duplicate;
+    }
+
+    function resetScanner() {
+      hideStatus();
+      hideRunner();
+      document.getElementById('manualCode').value = '';
+      isProcessing = false;
+    }
+
+    // Audio feedback (simple beeps using Web Audio API)
+    function playSound(type) {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'success') {
+          oscillator.frequency.value = 800;
+          gainNode.gain.value = 0.3;
+        } else if (type === 'warning') {
+          oscillator.frequency.value = 400;
+          gainNode.gain.value = 0.3;
+        } else {
+          oscillator.frequency.value = 200;
+          gainNode.gain.value = 0.3;
+        }
+
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 150);
+      } catch (e) {
+        // Audio not supported
+      }
+    }
+
+    // Enter key for manual input
+    document.getElementById('manualCode').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        checkInManual();
+      }
+    });
+
+    // Init
+    initScanner();
+  </script>
+</body>
+</html>

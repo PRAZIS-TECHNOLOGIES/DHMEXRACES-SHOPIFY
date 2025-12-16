@@ -1,0 +1,504 @@
+{% comment %}
+  Sponsors Section for DHMEXRACES
+{% endcomment %}
+
+<section class="sponsors" id="sponsors">
+  <div class="sponsors__container">
+    {% if section.settings.title != blank %}
+      <h2 class="sponsors__title" data-aos="fade-up">{{ section.settings.title }}</h2>
+    {% endif %}
+
+    {% if section.settings.subtitle != blank %}
+      <p class="sponsors__subtitle" data-aos="fade-up" data-aos-delay="100">{{ section.settings.subtitle }}</p>
+    {% endif %}
+
+    {%- comment -%} Gold Sponsors {%- endcomment -%}
+    {% assign has_gold = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.sponsor_tier == 'gold' %}
+        {% assign has_gold = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_gold %}
+      <div class="sponsors__tier-grid sponsors__tier-grid--gold">
+        {% for block in section.blocks %}
+          {% if block.settings.sponsor_tier == 'gold' %}
+            {% if block.settings.url != blank %}
+              <a href="{{ block.settings.url }}" target="_blank" rel="noopener" class="sponsor-card sponsor-card--gold" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% else %}
+              <div class="sponsor-card sponsor-card--gold" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% endif %}
+              {% if block.settings.image != blank %}
+                <div class="sponsor-card__image">
+                  {{ block.settings.image | image_url: width: 600 | image_tag: class: 'sponsor-card__img', loading: 'lazy', alt: block.settings.name }}
+                </div>
+              {% else %}
+                <div class="sponsor-card__placeholder">
+                  <span class="sponsor-card__name">{{ block.settings.name }}</span>
+                </div>
+              {% endif %}
+            {% if block.settings.url != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Silver Sponsors {%- endcomment -%}
+    {% assign has_silver = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.sponsor_tier == 'silver' %}
+        {% assign has_silver = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_silver %}
+      <div class="sponsors__tier-grid sponsors__tier-grid--silver">
+        {% for block in section.blocks %}
+          {% if block.settings.sponsor_tier == 'silver' %}
+            {% if block.settings.url != blank %}
+              <a href="{{ block.settings.url }}" target="_blank" rel="noopener" class="sponsor-card sponsor-card--silver" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% else %}
+              <div class="sponsor-card sponsor-card--silver" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% endif %}
+              {% if block.settings.image != blank %}
+                <div class="sponsor-card__image">
+                  {{ block.settings.image | image_url: width: 500 | image_tag: class: 'sponsor-card__img', loading: 'lazy', alt: block.settings.name }}
+                </div>
+              {% else %}
+                <div class="sponsor-card__placeholder">
+                  <span class="sponsor-card__name">{{ block.settings.name }}</span>
+                </div>
+              {% endif %}
+            {% if block.settings.url != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {%- comment -%} Bronze Sponsors {%- endcomment -%}
+    {% assign has_bronze = false %}
+    {% for block in section.blocks %}
+      {% if block.settings.sponsor_tier == 'bronze' %}
+        {% assign has_bronze = true %}
+        {% break %}
+      {% endif %}
+    {% endfor %}
+
+    {% if has_bronze %}
+      <div class="sponsors__tier-grid sponsors__tier-grid--bronze">
+        {% for block in section.blocks %}
+          {% if block.settings.sponsor_tier == 'bronze' %}
+            {% if block.settings.url != blank %}
+              <a href="{{ block.settings.url }}" target="_blank" rel="noopener" class="sponsor-card sponsor-card--bronze" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% else %}
+              <div class="sponsor-card sponsor-card--bronze" data-aos="zoom-in" data-aos-delay="{{ forloop.index | times: 50 }}" {{ block.shopify_attributes }}>
+            {% endif %}
+              {% if block.settings.image != blank %}
+                <div class="sponsor-card__image">
+                  {{ block.settings.image | image_url: width: 400 | image_tag: class: 'sponsor-card__img', loading: 'lazy', alt: block.settings.name }}
+                </div>
+              {% else %}
+                <div class="sponsor-card__placeholder">
+                  <span class="sponsor-card__name">{{ block.settings.name }}</span>
+                </div>
+              {% endif %}
+            {% if block.settings.url != blank %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+{% stylesheet %}
+  .sponsors {
+    padding: 100px 20px;
+    background: #000000;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .sponsors::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      radial-gradient(circle at 50% 50%, rgba(228, 44, 44, 0.1) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .sponsors__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .sponsors__title {
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 900;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    filter: drop-shadow(0 0 40px rgba(228, 44, 44, 0.5));
+  }
+
+  .sponsors__subtitle {
+    text-align: center;
+    font-size: clamp(1rem, 2vw, 1.25rem);
+    color: #CCCCCC;
+    margin-bottom: 4rem;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 300;
+  }
+
+  /* Tier Grids */
+  .sponsors__tier-grid {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+
+  .sponsors__tier-grid--gold {
+    gap: 3rem;
+    margin-bottom: 4rem;
+  }
+
+  .sponsors__tier-grid--silver {
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .sponsors__tier-grid--bronze {
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Gold Sponsors */
+  .sponsor-card--gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 215, 0, 0.02) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    padding: 3rem;
+    min-height: 200px;
+    max-width: 380px;
+    min-width: 300px;
+    text-decoration: none;
+  }
+
+  .sponsor-card--gold:hover {
+    transform: translateY(-10px) scale(1.05);
+    background: rgba(255, 215, 0, 0.12);
+    border-color: rgba(255, 215, 0, 0.6);
+    box-shadow: 0 20px 60px rgba(255, 215, 0, 0.25);
+  }
+
+  .sponsor-card--gold .sponsor-card__img {
+    max-height: 140px;
+    filter: brightness(0) saturate(100%) invert(83%) sepia(30%) saturate(1000%) hue-rotate(359deg) brightness(103%) contrast(106%);
+  }
+
+  .sponsor-card--gold:hover .sponsor-card__img {
+    transform: scale(1.05);
+  }
+
+  .sponsor-card--gold .sponsor-card__name {
+    color: #FFD700;
+    font-size: 2rem;
+  }
+
+  /* Silver Sponsors */
+  .sponsor-card--silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.08) 0%, rgba(192, 192, 192, 0.02) 100%);
+    border: 2px solid rgba(192, 192, 192, 0.3);
+    padding: 2.5rem;
+    min-height: 160px;
+    max-width: 300px;
+    min-width: 220px;
+    text-decoration: none;
+  }
+
+  .sponsor-card--silver:hover {
+    transform: translateY(-8px) scale(1.03);
+    background: rgba(192, 192, 192, 0.12);
+    border-color: rgba(192, 192, 192, 0.6);
+    box-shadow: 0 16px 50px rgba(192, 192, 192, 0.2);
+  }
+
+  .sponsor-card--silver .sponsor-card__img {
+    max-height: 100px;
+    filter: brightness(0) saturate(100%) invert(80%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%) contrast(100%);
+  }
+
+  .sponsor-card--silver:hover .sponsor-card__img {
+    transform: scale(1.05);
+  }
+
+  .sponsor-card--silver .sponsor-card__name {
+    color: #C0C0C0;
+    font-size: 1.5rem;
+  }
+
+  /* Bronze Sponsors */
+  .sponsor-card--bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.08) 0%, rgba(205, 127, 50, 0.02) 100%);
+    border: 2px solid rgba(205, 127, 50, 0.3);
+    padding: 2rem;
+    min-height: 130px;
+    max-width: 220px;
+    min-width: 160px;
+    text-decoration: none;
+  }
+
+  .sponsor-card--bronze:hover {
+    transform: translateY(-6px) scale(1.02);
+    background: rgba(205, 127, 50, 0.12);
+    border-color: rgba(205, 127, 50, 0.6);
+    box-shadow: 0 12px 40px rgba(205, 127, 50, 0.2);
+  }
+
+  .sponsor-card--bronze .sponsor-card__img {
+    max-height: 70px;
+    filter: brightness(0) saturate(100%) invert(55%) sepia(30%) saturate(600%) hue-rotate(350deg) brightness(95%) contrast(90%);
+  }
+
+  .sponsor-card--bronze:hover .sponsor-card__img {
+    transform: scale(1.05);
+  }
+
+  .sponsor-card--bronze .sponsor-card__name {
+    color: #CD7F32;
+    font-size: 1.25rem;
+  }
+
+  .sponsors__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .sponsor-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 150px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .sponsor-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    background: rgba(228, 44, 44, 0.08);
+    border-color: var(--color-border-accent);
+    box-shadow: 0 20px 60px rgba(228, 44, 44, 0.2);
+  }
+
+  .sponsor-card__image {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sponsor-card__img {
+    max-width: 100%;
+    height: auto;
+    max-height: 80px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+    transition: all 0.4s ease;
+  }
+
+  .sponsor-card:hover .sponsor-card__img {
+    filter: brightness(1) invert(0);
+  }
+
+  .sponsor-card__placeholder {
+    width: 100%;
+    text-align: center;
+  }
+
+  .sponsor-card__name {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .sponsor-card:hover .sponsor-card__name {
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 768px) {
+    .sponsors {
+      padding: 60px 15px;
+    }
+
+    .sponsors__tier-grid--gold {
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .sponsors__tier-grid--silver {
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .sponsors__tier-grid--bronze {
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .sponsor-card--gold {
+      padding: 2rem;
+      min-height: 160px;
+      min-width: 200px;
+      max-width: 280px;
+    }
+
+    .sponsor-card--gold .sponsor-card__img {
+      max-height: 100px;
+    }
+
+    .sponsor-card--silver {
+      padding: 1.5rem;
+      min-height: 130px;
+      min-width: 160px;
+      max-width: 220px;
+    }
+
+    .sponsor-card--silver .sponsor-card__img {
+      max-height: 70px;
+    }
+
+    .sponsor-card--bronze {
+      padding: 1.25rem;
+      min-height: 100px;
+      min-width: 120px;
+      max-width: 160px;
+    }
+
+    .sponsor-card--bronze .sponsor-card__img {
+      max-height: 50px;
+    }
+
+    .sponsors__grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .sponsor-card {
+      padding: 1.5rem;
+      min-height: 120px;
+    }
+
+    .sponsor-card__img {
+      max-height: 60px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Sponsors",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Sponsors Oficiales"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "El line-up de sponsors más grande en la historia del DH mexicano"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "sponsor",
+      "name": "Sponsor",
+      "settings": [
+        {
+          "type": "text",
+          "id": "name",
+          "label": "Nombre del Sponsor",
+          "default": "Sponsor"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Logo"
+        },
+        {
+          "type": "url",
+          "id": "url",
+          "label": "Sitio Web"
+        },
+        {
+          "type": "select",
+          "id": "sponsor_tier",
+          "label": "Nivel de Sponsor",
+          "options": [
+            {
+              "value": "gold",
+              "label": "Oro (Principal)"
+            },
+            {
+              "value": "silver",
+              "label": "Plata (Secundario)"
+            },
+            {
+              "value": "bronze",
+              "label": "Bronce (Regular)"
+            }
+          ],
+          "default": "bronze"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Sponsors",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,36 @@
+# Shopify CLI
+.shopify/
+
+# OS Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (si se usa npm para algo)
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backups
+*.bak
+*.backup
+nul
+sections/nul
+snippets/nul
