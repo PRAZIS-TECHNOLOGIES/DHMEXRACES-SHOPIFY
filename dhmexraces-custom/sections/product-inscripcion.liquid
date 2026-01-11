@@ -3,6 +3,62 @@
   Orden Mobile-First: Titulo > Categorias Info > FOMO > Precio > Timeline > Selector > Cantidad > Pagar > Imagen
 {% endcomment %}
 
+{%- comment -%} Burbuja de Ayuda Flotante {%- endcomment -%}
+<div class="help-bubble" id="helpBubble">
+  <button class="help-bubble__btn" onclick="toggleHelpMenu()" aria-label="Ayuda">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+      <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  </button>
+
+  <div class="help-bubble__menu" id="helpMenu">
+    <div class="help-bubble__header">
+      <span>¿Necesitas ayuda?</span>
+      <button onclick="toggleHelpMenu()" class="help-bubble__close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div class="help-bubble__options">
+      <button class="help-bubble__option" onclick="iniciarTour()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <polygon points="10 8 16 12 10 16 10 8"/>
+        </svg>
+        <span>No entendí cómo inscribirme</span>
+      </button>
+      <a href="https://wa.me/524421234567" target="_blank" class="help-bubble__option">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+        </svg>
+        <span>Contactar por WhatsApp</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+{%- comment -%} Tour Guiado Overlay {%- endcomment -%}
+<div class="tour-overlay" id="tourOverlay">
+  <div class="tour-highlight" id="tourHighlight"></div>
+  <div class="tour-tooltip" id="tourTooltip">
+    <div class="tour-tooltip__content">
+      <span class="tour-tooltip__step" id="tourStepNumber">Paso 1 de 4</span>
+      <h3 class="tour-tooltip__title" id="tourTitle">Título</h3>
+      <p class="tour-tooltip__text" id="tourText">Descripción</p>
+    </div>
+    <div class="tour-tooltip__actions">
+      <button class="tour-tooltip__btn tour-tooltip__btn--skip" onclick="terminarTour()">Saltar</button>
+      <button class="tour-tooltip__btn tour-tooltip__btn--next" onclick="siguientePasoTour()" id="tourNextBtn">Siguiente</button>
+    </div>
+    <div class="tour-tooltip__progress">
+      <div class="tour-tooltip__progress-bar" id="tourProgress"></div>
+    </div>
+  </div>
+</div>
+
 {%- comment -%} Toast Notification - Fixed al top {%- endcomment -%}
 <div class="inscripcion__toast" id="toastNotification">
   <div class="inscripcion__toast-content">
@@ -508,10 +564,123 @@
     </svg> AGREGAR AL CARRITO`;
   }
 
+  // ============ TOUR GUIADO ============
+  const tourSteps = [
+    {
+      element: '.inscripcion__categorias-info',
+      title: '1. Selecciona tu categoría',
+      text: 'Toca la categoría que corresponde a tu edad. Verás un check verde cuando esté seleccionada.',
+      position: 'bottom'
+    },
+    {
+      element: '.inscripcion__precio-card',
+      title: '2. Revisa el precio',
+      text: 'Aquí ves el precio actual de inscripción. Puede cambiar según la fase de venta.',
+      position: 'top'
+    },
+    {
+      element: '.inscripcion__quantity',
+      title: '3. Elige la cantidad',
+      text: '¿Inscribes a más personas? Ajusta la cantidad aquí.',
+      position: 'top'
+    },
+    {
+      element: '.inscripcion__actions',
+      title: '4. Agrega al carrito o paga',
+      text: 'Puedes agregar varias inscripciones al carrito o pagar directo. ¡Después llenarás los datos de cada participante!',
+      position: 'top'
+    }
+  ];
+
+  let currentTourStep = 0;
+
+  function toggleHelpMenu() {
+    const menu = document.getElementById('helpMenu');
+    const bubble = document.getElementById('helpBubble');
+    menu.classList.toggle('show');
+    bubble.classList.toggle('active');
+  }
+
+  function iniciarTour() {
+    toggleHelpMenu();
+    currentTourStep = 0;
+    document.getElementById('tourOverlay').classList.add('active');
+    document.body.style.overflow = 'hidden';
+    mostrarPasoTour();
+  }
+
+  function terminarTour() {
+    document.getElementById('tourOverlay').classList.remove('active');
+    document.body.style.overflow = '';
+    // Guardar que el usuario ya vio el tour
+    localStorage.setItem('tourCompleted', 'true');
+  }
+
+  function mostrarPasoTour() {
+    const step = tourSteps[currentTourStep];
+    const element = document.querySelector(step.element);
+
+    if (!element) {
+      siguientePasoTour();
+      return;
+    }
+
+    // Scroll al elemento
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    setTimeout(() => {
+      const rect = element.getBoundingClientRect();
+      const highlight = document.getElementById('tourHighlight');
+      const tooltip = document.getElementById('tourTooltip');
+
+      // Posicionar highlight
+      highlight.style.top = (rect.top + window.scrollY - 8) + 'px';
+      highlight.style.left = (rect.left - 8) + 'px';
+      highlight.style.width = (rect.width + 16) + 'px';
+      highlight.style.height = (rect.height + 16) + 'px';
+
+      // Posicionar tooltip
+      if (step.position === 'bottom') {
+        tooltip.style.top = (rect.bottom + window.scrollY + 20) + 'px';
+      } else {
+        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 20) + 'px';
+      }
+      tooltip.style.left = Math.max(16, rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
+
+      // Actualizar contenido
+      document.getElementById('tourStepNumber').textContent = `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
+      document.getElementById('tourTitle').textContent = step.title;
+      document.getElementById('tourText').textContent = step.text;
+      document.getElementById('tourProgress').style.width = ((currentTourStep + 1) / tourSteps.length * 100) + '%';
+
+      // Cambiar texto del botón en último paso
+      const nextBtn = document.getElementById('tourNextBtn');
+      if (currentTourStep === tourSteps.length - 1) {
+        nextBtn.textContent = '¡Entendido!';
+      } else {
+        nextBtn.textContent = 'Siguiente';
+      }
+    }, 400);
+  }
+
+  function siguientePasoTour() {
+    currentTourStep++;
+    if (currentTourStep >= tourSteps.length) {
+      terminarTour();
+    } else {
+      mostrarPasoTour();
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     initDynamicPricing();
     initFomoInventory();
-    actualizarBadgesCarrito(); // Cargar badges al inicio
+    actualizarBadgesCarrito();
+
+    // Mostrar tour automáticamente para usuarios nuevos (opcional)
+    // if (!localStorage.getItem('tourCompleted')) {
+    //   setTimeout(iniciarTour, 2000);
+    // }
   });
 
   function initDynamicPricing() {
@@ -599,6 +768,257 @@
 </script>
 
 {% stylesheet %}
+  /* ============ HELP BUBBLE ============ */
+  .help-bubble {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9990;
+  }
+
+  .help-bubble__btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .help-bubble__btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 28px rgba(39, 174, 96, 0.5);
+  }
+
+  .help-bubble.active .help-bubble__btn {
+    background: #1a1a1a;
+  }
+
+  .help-bubble__menu {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 280px;
+    background: #1a1a1a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95);
+    transition: all 0.3s ease;
+  }
+
+  .help-bubble__menu.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .help-bubble__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .help-bubble__header span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .help-bubble__close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+  }
+
+  .help-bubble__close:hover {
+    color: #fff;
+  }
+
+  .help-bubble__options {
+    padding: 8px;
+  }
+
+  .help-bubble__option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 12px;
+    background: none;
+    border: none;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+
+  .help-bubble__option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+
+  .help-bubble__option svg {
+    color: #27ae60;
+    flex-shrink: 0;
+  }
+
+  /* ============ TOUR OVERLAY ============ */
+  .tour-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .tour-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .tour-highlight {
+    position: absolute;
+    border-radius: 16px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
+    background: transparent;
+    transition: all 0.4s ease;
+    pointer-events: none;
+  }
+
+  .tour-tooltip {
+    position: absolute;
+    width: 320px;
+    max-width: calc(100vw - 32px);
+    background: #1a1a1a;
+    border: 1px solid rgba(39, 174, 96, 0.3);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    transition: all 0.4s ease;
+    z-index: 10001;
+  }
+
+  .tour-tooltip__content {
+    padding: 24px;
+  }
+
+  .tour-tooltip__step {
+    display: inline-block;
+    background: rgba(39, 174, 96, 0.15);
+    color: #27ae60;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+  }
+
+  .tour-tooltip__title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+
+  .tour-tooltip__text {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.5;
+  }
+
+  .tour-tooltip__actions {
+    display: flex;
+    gap: 12px;
+    padding: 0 24px 20px;
+  }
+
+  .tour-tooltip__btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .tour-tooltip__btn--skip {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .tour-tooltip__btn--skip:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+  }
+
+  .tour-tooltip__btn--next {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    border: none;
+    color: #fff;
+  }
+
+  .tour-tooltip__btn--next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(39, 174, 96, 0.4);
+  }
+
+  .tour-tooltip__progress {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .tour-tooltip__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #27ae60, #2ecc71);
+    transition: width 0.4s ease;
+  }
+
+  @media (max-width: 500px) {
+    .help-bubble {
+      bottom: 16px;
+      right: 16px;
+    }
+
+    .help-bubble__btn {
+      width: 50px;
+      height: 50px;
+    }
+
+    .help-bubble__menu {
+      width: 260px;
+      right: -8px;
+    }
+
+    .tour-tooltip {
+      left: 16px !important;
+      right: 16px;
+      width: auto;
+    }
+  }
+
   /* TOAST NOTIFICATION */
   .inscripcion__toast {
     position: fixed;
