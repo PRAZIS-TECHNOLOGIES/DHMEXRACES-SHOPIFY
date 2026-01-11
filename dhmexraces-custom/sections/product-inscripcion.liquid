@@ -1,0 +1,1648 @@
+{% comment %}
+  Product Inscripcion - Layout especial para paginas de inscripcion DHMEXRACES
+  Orden Mobile-First: Titulo > Categorias Info > FOMO > Precio > Timeline > Selector > Cantidad > Pagar > Imagen
+{% endcomment %}
+
+{%- comment -%} Toast Notification - Fixed al top {%- endcomment -%}
+<div class="inscripcion__toast" id="toastNotification">
+  <div class="inscripcion__toast-content">
+    <svg class="inscripcion__toast-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+    <div class="inscripcion__toast-text">
+      <span class="inscripcion__toast-title">¡Agregado al carrito!</span>
+      <span class="inscripcion__toast-subtitle" id="toastSubtitle">1x Senior</span>
+    </div>
+    <a href="/cart" class="inscripcion__toast-btn">Ver carrito</a>
+    <button class="inscripcion__toast-close" onclick="cerrarToast()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<section class="inscripcion">
+  <div class="inscripcion__container">
+
+    {%- comment -%} 1. TITULO DEL PRODUCTO {%- endcomment -%}
+    <div class="inscripcion__header">
+      {% if product.metafields.custom.race_round != blank %}
+        <div class="inscripcion__badge">
+          {{ product.metafields.custom.race_round }}
+        </div>
+      {% endif %}
+      <h1 class="inscripcion__title">{{ product.title }}</h1>
+
+      {% if product.metafields.custom.race_date != blank or product.metafields.custom.race_location != blank %}
+        <div class="inscripcion__meta">
+          {% if product.metafields.custom.race_date != blank %}
+            <span class="inscripcion__meta-item">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M6 2V5M14 2V5M3 8H17M5 4H15C16.1046 4 17 4.89543 17 6V16C17 17.1046 16.1046 18 15 18H5C3.89543 18 3 17.1046 3 16V6C3 4.89543 3.89543 4 5 4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+              {{ product.metafields.custom.race_date }}
+            </span>
+          {% endif %}
+          {% if product.metafields.custom.race_location != blank %}
+            <span class="inscripcion__meta-item">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                <path d="M10 2C7.23858 2 5 4.23858 5 7C5 11.5 10 18 10 18C10 18 15 11.5 15 7C15 4.23858 12.7614 2 10 2Z" stroke="currentColor" stroke-width="2"/>
+                <circle cx="10" cy="7" r="2" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              {{ product.metafields.custom.race_location }}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {%- comment -%} 2. CATEGORIAS - Lista clickeable que funciona como selector {%- endcomment -%}
+    <div class="inscripcion__categorias-info">
+      <h2 class="inscripcion__categorias-title">1. Selecciona tu Categoría</h2>
+      <p class="inscripcion__categorias-subtitle">Toca tu categoría según tu edad</p>
+
+      {% assign current_variant = product.selected_or_first_available_variant %}
+      <input type="hidden" name="id" id="selectedVariantId" value="{{ current_variant.id }}" form="inscripcion-form">
+
+      <div class="inscripcion__categorias-list">
+        {% assign category_ages = "Minis:10 a 11 Años (Obligatorio Mochilero)|Infantil:12 a 14 Años|Cadetes:15 a 16 Años|Junior:17 a 18 Años|Senior:19 a 29 Años|Principiantes:Edad Libre|Master 30:30 a 39 Años|Master 40:40 a 49 Años|Master 50:50+ Años|Femenil:Edad Libre|PRO:19+ Años|Elite:19+ Años|EBIKE:Edad Libre|EBIKE Full Power:Edad Libre" | split: "|" %}
+
+        {% for variant in product.variants %}
+          {% assign age_info = "" %}
+          {% for cat_age in category_ages %}
+            {% assign cat_parts = cat_age | split: ":" %}
+            {% assign cat_name = cat_parts[0] | downcase | strip %}
+            {% assign variant_name = variant.title | downcase | strip %}
+            {% if variant_name contains cat_name %}
+              {% assign age_info = cat_parts[1] %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+
+          <button
+            type="button"
+            class="inscripcion__categoria-row {% if variant == current_variant %}selected{% endif %} {% unless variant.available %}agotado{% endunless %}"
+            data-variant-id="{{ variant.id }}"
+            data-variant-title="{{ variant.title }}"
+            data-price="{{ variant.price | money }}"
+            {% unless variant.available %}disabled{% endunless %}
+            onclick="selectCategoria(this)">
+            <span class="inscripcion__categoria-name">
+              {{ variant.title }}
+              <span class="inscripcion__categoria-cart-badge" data-cart-badge="{{ variant.id }}" style="display: none;">0</span>
+            </span>
+            <span class="inscripcion__categoria-age">
+              {% if variant.available %}
+                {{ age_info | default: "—" }}
+              {% else %}
+                AGOTADO
+              {% endif %}
+            </span>
+            <span class="inscripcion__categoria-check">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </button>
+        {% endfor %}
+      </div>
+    </div>
+
+    {%- comment -%} Config para JS {%- endcomment -%}
+    <script id="sedeConfig" type="application/json">
+      {
+        "productTitle": {{ product.title | json }},
+        "apiUrl": "https://dhmexraces-webhooks.vercel.app/api/inventory",
+        "eventDate": "{{ product.metafields.custom.event_date | date: '%Y-%m-%dT%H:%M:%S' }}",
+        "eventDateLabel": {{ product.metafields.custom.event_date_label | default: "" | json }},
+        "closeDate": "{{ product.metafields.custom.close_date | date: '%Y-%m-%dT%H:%M:%S' }}"
+      }
+    </script>
+
+    {%- comment -%} 3. FOMO BADGES - Playeras y Medallas {%- endcomment -%}
+    <div class="inscripcion__fomo" id="fomoContainer" style="display: none;">
+      <div class="inscripcion__fomo-badge inscripcion__fomo-badge--playeras" id="fomoPlayeras">
+        <div class="inscripcion__fomo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path d="M20 7L12 3L4 7M20 7V17L12 21M20 7L12 11M12 21L4 17V7M12 21V11M4 7L12 11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="inscripcion__fomo-content">
+          <span class="inscripcion__fomo-label">PLAYERA OFICIAL</span>
+          <span class="inscripcion__fomo-value" id="fomoPlayerasValue">Cargando...</span>
+        </div>
+      </div>
+      <div class="inscripcion__fomo-badge inscripcion__fomo-badge--medallas" id="fomoMedallas">
+        <div class="inscripcion__fomo-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="8" r="6" stroke="currentColor" stroke-width="2"/>
+            <path d="M9 13L7 22L12 19L17 22L15 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="inscripcion__fomo-content">
+          <span class="inscripcion__fomo-label">MEDALLA CONMEMORATIVA</span>
+          <span class="inscripcion__fomo-value" id="fomoMedallasValue">Cargando...</span>
+        </div>
+      </div>
+    </div>
+
+    {%- comment -%} 4. PRECIO - Verde con texto Naranja {%- endcomment -%}
+    {% assign pricing_enabled = product.metafields.custom.pricing_enabled %}
+    <div class="inscripcion__precio-card" id="dynamicPriceCard">
+      {% if pricing_enabled %}
+        <span class="inscripcion__precio-badge" id="phaseBadge">PRECIO NORMAL</span>
+      {% endif %}
+      <div class="inscripcion__precio-label">PRECIO POR INSCRIPCION</div>
+      <div class="inscripcion__precio-wrapper">
+        <span class="inscripcion__precio" id="productPrice">
+          {{ product.selected_or_first_available_variant.price | money }}
+        </span>
+        <span class="inscripcion__precio-currency">MXN</span>
+      </div>
+    </div>
+
+    {%- comment -%} 5. TIMELINE DE PRECIOS {%- endcomment -%}
+    {% if pricing_enabled %}
+      <div class="inscripcion__timeline" id="priceTimeline">
+        {% if product.metafields.custom.phase1_price != blank %}
+          <div class="inscripcion__timeline-phase" data-phase="1">
+            <div class="inscripcion__timeline-dot"></div>
+            <div class="inscripcion__timeline-info">
+              <span class="inscripcion__timeline-label">{{ product.metafields.custom.phase1_label | default: 'PRECIO NORMAL' }}</span>
+              <span class="inscripcion__timeline-price">${{ product.metafields.custom.phase1_price }}</span>
+            </div>
+          </div>
+        {% endif %}
+        {% if product.metafields.custom.phase2_price != blank %}
+          <div class="inscripcion__timeline-phase" data-phase="2">
+            <div class="inscripcion__timeline-dot"></div>
+            <div class="inscripcion__timeline-info">
+              <span class="inscripcion__timeline-label">{{ product.metafields.custom.phase2_label | default: 'INSCRIPCION TARDIA' }}</span>
+              <span class="inscripcion__timeline-price">${{ product.metafields.custom.phase2_price }}</span>
+            </div>
+          </div>
+        {% endif %}
+        {% if product.metafields.custom.phase3_price != blank %}
+          <div class="inscripcion__timeline-phase" data-phase="3">
+            <div class="inscripcion__timeline-dot"></div>
+            <div class="inscripcion__timeline-info">
+              <span class="inscripcion__timeline-label">{{ product.metafields.custom.phase3_label | default: 'ULTIMO MOMENTO' }}</span>
+              <span class="inscripcion__timeline-price">${{ product.metafields.custom.phase3_price }}</span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <script id="pricingConfig" type="application/json">
+        {
+          "enabled": true,
+          "phases": [
+            {
+              "start": "{{ product.metafields.custom.phase1_start }}",
+              "end": "{{ product.metafields.custom.phase1_end }}",
+              "price": {{ product.metafields.custom.phase1_price | default: 0 }},
+              "label": "{{ product.metafields.custom.phase1_label | default: 'PRECIO NORMAL' }}"
+            },
+            {
+              "start": "{{ product.metafields.custom.phase2_start }}",
+              "end": "{{ product.metafields.custom.phase2_end }}",
+              "price": {{ product.metafields.custom.phase2_price | default: 0 }},
+              "label": "{{ product.metafields.custom.phase2_label | default: 'INSCRIPCION TARDIA' }}"
+            },
+            {
+              "start": "{{ product.metafields.custom.phase3_start }}",
+              "end": "{{ product.metafields.custom.phase3_end }}",
+              "price": {{ product.metafields.custom.phase3_price | default: 0 }},
+              "label": "{{ product.metafields.custom.phase3_label | default: 'ULTIMO MOMENTO' }}"
+            }
+          ]
+        }
+      </script>
+    {% endif %}
+
+    {%- comment -%} Registration Status Check {%- endcomment -%}
+    {% assign registration_status = product.metafields.custom.registration_status | default: 'open' %}
+
+    {% if registration_status == 'coming_soon' %}
+      <div class="inscripcion__status inscripcion__status--coming-soon">
+        <svg viewBox="0 0 24 24" fill="none" width="48" height="48">
+          <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M12 6V12L16 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3>Proximamente</h3>
+        <p>Las inscripciones estaran disponibles pronto</p>
+      </div>
+    {% elsif registration_status == 'closed' %}
+      <div class="inscripcion__status inscripcion__status--closed">
+        <svg viewBox="0 0 24 24" fill="none" width="48" height="48">
+          <path d="M18.364 5.636a9 9 0 11-12.728 12.728 9 9 0 0112.728-12.728zM6 6l12 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <h3>Inscripciones Cerradas</h3>
+        <p>Las inscripciones para esta sede han finalizado</p>
+      </div>
+    {% else %}
+      {%- comment -%} 6. FORMULARIO SIMPLIFICADO {%- endcomment -%}
+      {% form 'product', product, class: 'inscripcion__form', id: 'inscripcion-form' %}
+        {% assign current_variant = product.selected_or_first_available_variant %}
+
+        {%- comment -%} Resumen de seleccion {%- endcomment -%}
+        <div class="inscripcion__resumen" id="resumenSeleccion">
+          <div class="inscripcion__resumen-header">
+            <span class="inscripcion__resumen-label">Tu selección:</span>
+          </div>
+          <div class="inscripcion__resumen-content">
+            <span class="inscripcion__resumen-categoria" id="resumenCategoria">{{ current_variant.title }}</span>
+            <span class="inscripcion__resumen-precio" id="resumenPrecio">{{ current_variant.price | money }}</span>
+          </div>
+        </div>
+
+        {%- comment -%} Carrito actual {%- endcomment -%}
+        <div class="inscripcion__carrito-resumen" id="carritoResumen" style="display: none;">
+          <div class="inscripcion__carrito-header">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span>En tu carrito:</span>
+          </div>
+          <div class="inscripcion__carrito-items" id="carritoItems">
+            <!-- Se llena dinamicamente -->
+          </div>
+          <a href="/cart" class="inscripcion__carrito-link">Ver carrito completo →</a>
+        </div>
+
+        {%- comment -%} 7. CANTIDAD {%- endcomment -%}
+        <div class="inscripcion__field">
+          <label class="inscripcion__label">2. ¿Cuántas inscripciones?</label>
+          <div class="inscripcion__quantity">
+            <button type="button" class="inscripcion__qty-btn inscripcion__qty-btn--minus" onclick="decreaseQty()" aria-label="Disminuir">
+              <svg width="16" height="2" viewBox="0 0 16 2" fill="none">
+                <path d="M0 1H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+            <input type="number" name="quantity" id="quantity" min="1" value="1" class="inscripcion__qty-input" readonly>
+            <button type="button" class="inscripcion__qty-btn inscripcion__qty-btn--plus" onclick="increaseQty()" aria-label="Aumentar">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M8 0V16M0 8H16" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {%- comment -%} Info del proceso {%- endcomment -%}
+        <div class="inscripcion__proceso-info">
+          <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+            <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 10V14M10 6H10.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span>Después de agregar al carrito, llenarás el formulario de cada participante</span>
+        </div>
+
+        {%- comment -%} 8. BOTONES DE ACCION {%- endcomment -%}
+        <div class="inscripcion__actions">
+          <div class="inscripcion__action-group">
+            <button type="button" class="inscripcion__btn inscripcion__btn--cart" onclick="agregarAlCarrito()" {% unless current_variant.available %}disabled{% endunless %}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              AGREGAR AL CARRITO
+            </button>
+            <p class="inscripcion__btn-hint">Para inscribir varias personas en diferentes categorías</p>
+          </div>
+
+          <div class="inscripcion__action-group">
+            <button type="submit" class="inscripcion__btn inscripcion__btn--pay" {% unless current_variant.available %}disabled{% endunless %}>
+              PAGAR AHORA
+            </button>
+            <p class="inscripcion__btn-hint">Ir directo al checkout</p>
+          </div>
+        </div>
+
+      {% endform %}
+    {% endif %}
+
+    {%- comment -%} 9. IMAGEN DEL PRODUCTO - Al final {%- endcomment -%}
+    <div class="inscripcion__gallery">
+      {% if product.images.size > 0 %}
+        <div class="inscripcion__main-image">
+          <img
+            src="{{ product.featured_image | image_url: width: 800 }}"
+            alt="{{ product.title }}"
+            id="mainProductImage"
+            class="inscripcion__image"
+            loading="lazy">
+        </div>
+        {% if product.images.size > 1 %}
+          <div class="inscripcion__thumbnails">
+            {% for image in product.images %}
+              <button
+                type="button"
+                class="inscripcion__thumbnail {% if forloop.first %}active{% endif %}"
+                data-image="{{ image | image_url: width: 800 }}"
+                onclick="changeMainImage(this)">
+                <img src="{{ image | image_url: width: 150 }}" alt="{{ product.title }}">
+              </button>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function changeMainImage(button) {
+    const newImage = button.getAttribute('data-image');
+    document.getElementById('mainProductImage').src = newImage;
+    document.querySelectorAll('.inscripcion__thumbnail').forEach(thumb => thumb.classList.remove('active'));
+    button.classList.add('active');
+  }
+
+  function selectCategoria(button) {
+    if (button.disabled) return;
+
+    // Quitar seleccion anterior
+    document.querySelectorAll('.inscripcion__categoria-row').forEach(row => row.classList.remove('selected'));
+
+    // Seleccionar nueva
+    button.classList.add('selected');
+
+    // Actualizar hidden input
+    document.getElementById('selectedVariantId').value = button.getAttribute('data-variant-id');
+
+    // Actualizar resumen - usar data-variant-title para evitar el badge
+    const nombre = button.getAttribute('data-variant-title');
+    const precio = button.getAttribute('data-price');
+    document.getElementById('resumenCategoria').textContent = nombre;
+    document.getElementById('resumenPrecio').textContent = precio;
+
+    // Scroll suave al resumen
+    document.getElementById('resumenSeleccion').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function increaseQty() {
+    const input = document.getElementById('quantity');
+    input.value = parseInt(input.value) + 1;
+  }
+
+  function decreaseQty() {
+    const input = document.getElementById('quantity');
+    if (parseInt(input.value) > 1) input.value = parseInt(input.value) - 1;
+  }
+
+  function mostrarToast(cantidad, categoria) {
+    const toast = document.getElementById('toastNotification');
+    const subtitle = document.getElementById('toastSubtitle');
+    subtitle.textContent = cantidad + 'x ' + categoria;
+    toast.classList.add('show');
+
+    // Auto cerrar despues de 4 segundos
+    setTimeout(() => {
+      cerrarToast();
+    }, 4000);
+  }
+
+  function cerrarToast() {
+    const toast = document.getElementById('toastNotification');
+    toast.classList.remove('show');
+  }
+
+  async function actualizarBadgesCarrito() {
+    try {
+      const response = await fetch('/cart.js');
+      const cart = await response.json();
+
+      // Resetear todos los badges
+      document.querySelectorAll('[data-cart-badge]').forEach(badge => {
+        badge.style.display = 'none';
+        badge.textContent = '0';
+      });
+
+      // Filtrar items de este producto
+      const productItems = cart.items.filter(item => {
+        const badge = document.querySelector(`[data-cart-badge="${item.variant_id}"]`);
+        return badge !== null;
+      });
+
+      // Actualizar badges con items del carrito
+      productItems.forEach(item => {
+        const badge = document.querySelector(`[data-cart-badge="${item.variant_id}"]`);
+        if (badge) {
+          badge.textContent = item.quantity;
+          badge.style.display = 'inline-flex';
+        }
+      });
+
+      // Actualizar resumen del carrito
+      const carritoResumen = document.getElementById('carritoResumen');
+      const carritoItems = document.getElementById('carritoItems');
+
+      if (productItems.length > 0) {
+        // Mostrar el resumen
+        carritoResumen.style.display = 'block';
+
+        // Crear lista de items
+        const itemsHTML = productItems.map(item => {
+          return `<span class="inscripcion__carrito-item">${item.quantity}x ${item.variant_title}</span>`;
+        }).join('');
+
+        carritoItems.innerHTML = itemsHTML;
+      } else {
+        carritoResumen.style.display = 'none';
+      }
+
+      // Actualizar contador global del carrito
+      const cartCount = document.querySelector('.cart-count, .cart-item-count, [data-cart-count]');
+      if (cartCount) {
+        cartCount.textContent = cart.item_count;
+      }
+    } catch (error) {
+      console.error('Error actualizando badges:', error);
+    }
+  }
+
+  async function agregarAlCarrito() {
+    const variantId = document.getElementById('selectedVariantId').value;
+    const quantity = document.getElementById('quantity').value;
+    const btn = document.querySelector('.inscripcion__btn--cart');
+    const selectedRow = document.querySelector('.inscripcion__categoria-row.selected');
+    const categoriaName = selectedRow ? selectedRow.getAttribute('data-variant-title') : 'Inscripción';
+
+    // Deshabilitar boton
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-spinner"></span> Agregando...';
+
+    try {
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: parseInt(quantity)
+        })
+      });
+
+      if (response.ok) {
+        // Mostrar toast
+        mostrarToast(quantity, categoriaName);
+
+        // Actualizar badges del carrito
+        await actualizarBadgesCarrito();
+      } else {
+        alert('Error al agregar al carrito. Intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al agregar al carrito. Intenta de nuevo.');
+    }
+
+    // Restaurar boton
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+    </svg> AGREGAR AL CARRITO`;
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    initDynamicPricing();
+    initFomoInventory();
+    actualizarBadgesCarrito(); // Cargar badges al inicio
+  });
+
+  function initDynamicPricing() {
+    const configEl = document.getElementById('pricingConfig');
+    if (!configEl) return;
+    try {
+      const config = JSON.parse(configEl.textContent);
+      if (!config.enabled) return;
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const validPhases = config.phases.filter(p => p.start && p.end && p.price > 0);
+      if (validPhases.length === 0) return;
+      let currentPhase = null;
+      let currentPhaseIndex = -1;
+      for (let i = 0; i < validPhases.length; i++) {
+        const phase = validPhases[i];
+        const startDate = new Date(phase.start);
+        const endDate = new Date(phase.end);
+        if (today >= startDate && today <= endDate) {
+          currentPhase = phase;
+          currentPhaseIndex = i;
+          break;
+        }
+      }
+      const priceEl = document.getElementById('productPrice');
+      const badgeEl = document.getElementById('phaseBadge');
+      if (currentPhase) {
+        priceEl.textContent = '$' + currentPhase.price.toLocaleString('es-MX');
+        if (badgeEl) badgeEl.textContent = currentPhase.label;
+        document.querySelectorAll('.inscripcion__timeline-phase').forEach((el, idx) => {
+          if (idx < currentPhaseIndex) el.classList.add('past');
+          else if (idx === currentPhaseIndex) el.classList.add('current');
+        });
+      }
+    } catch (e) {
+      console.error('Error pricing:', e);
+    }
+  }
+
+  async function initFomoInventory() {
+    const configEl = document.getElementById('sedeConfig');
+    if (!configEl) return;
+    try {
+      const config = JSON.parse(configEl.textContent);
+      const productTitle = config.productTitle.toLowerCase();
+      let sede = null;
+      if (productTitle.includes('guanajuato')) sede = 'guanajuato';
+      else if (productTitle.includes('puebla')) sede = 'puebla';
+      else if (productTitle.includes('guadalajara')) sede = 'guadalajara';
+      else if (productTitle.includes('ixtapan')) sede = 'ixtapan';
+      else if (productTitle.includes('taxco')) sede = 'taxco';
+      if (!sede) return;
+      const response = await fetch(`${config.apiUrl}?sede=${sede}`);
+      if (!response.ok) throw new Error('API error');
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error);
+      const container = document.getElementById('fomoContainer');
+      const playerasEl = document.getElementById('fomoPlayeras');
+      const medallasEl = document.getElementById('fomoMedallas');
+      const playerasValueEl = document.getElementById('fomoPlayerasValue');
+      const medallasValueEl = document.getElementById('fomoMedallasValue');
+      if (data.playeras.agotadas) {
+        playerasValueEl.textContent = 'Agotadas';
+        playerasEl.classList.add('inscripcion__fomo-badge--agotado');
+      } else if (data.playeras.disponibles <= 10) {
+        playerasValueEl.textContent = `${data.playeras.disponibles} de ${data.playeras.total} disponibles`;
+        playerasEl.classList.add('inscripcion__fomo-badge--urgente');
+      } else {
+        playerasValueEl.textContent = `${data.playeras.disponibles} de ${data.playeras.total} disponibles`;
+      }
+      if (data.medallas.agotadas) {
+        medallasValueEl.textContent = 'Agotadas';
+        medallasEl.classList.add('inscripcion__fomo-badge--agotado');
+      } else if (data.medallas.disponibles <= 20) {
+        medallasValueEl.textContent = `${data.medallas.disponibles} de ${data.medallas.total} disponibles`;
+        medallasEl.classList.add('inscripcion__fomo-badge--urgente');
+      } else {
+        medallasValueEl.textContent = `${data.medallas.disponibles} de ${data.medallas.total} disponibles`;
+      }
+      container.style.display = 'flex';
+    } catch (e) {
+      console.error('Error FOMO:', e);
+    }
+  }
+</script>
+
+{% stylesheet %}
+  /* TOAST NOTIFICATION */
+  .inscripcion__toast {
+    position: fixed;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    width: 90%;
+    max-width: 420px;
+    transition: top 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  .inscripcion__toast.show {
+    top: 90px;
+  }
+
+  .inscripcion__toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
+    border: 2px solid #27ae60;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(39, 174, 96, 0.3);
+  }
+
+  .inscripcion__toast-icon {
+    width: 32px;
+    height: 32px;
+    color: #27ae60;
+    flex-shrink: 0;
+    background: rgba(39, 174, 96, 0.15);
+    padding: 6px;
+    border-radius: 50%;
+  }
+
+  .inscripcion__toast-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .inscripcion__toast-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #27ae60;
+  }
+
+  .inscripcion__toast-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.8);
+    font-weight: 500;
+  }
+
+  .inscripcion__toast-btn {
+    padding: 10px 18px;
+    background: #27ae60;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    border-radius: 10px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .inscripcion__toast-btn:hover {
+    background: #2ecc71;
+    transform: scale(1.05);
+  }
+
+  .inscripcion__toast-close {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .inscripcion__toast-close:hover {
+    background: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  @media (max-width: 500px) {
+    .inscripcion__toast {
+      left: 12px;
+      right: 12px;
+      width: auto;
+      transform: none;
+    }
+
+    .inscripcion__toast.show {
+      top: 80px;
+    }
+
+    .inscripcion__toast-content {
+      padding: 14px 14px;
+      gap: 10px;
+      border-radius: 16px;
+    }
+
+    .inscripcion__toast-icon {
+      width: 28px;
+      height: 28px;
+      padding: 5px;
+    }
+
+    .inscripcion__toast-title {
+      font-size: 0.9rem;
+    }
+
+    .inscripcion__toast-subtitle {
+      font-size: 0.8rem;
+    }
+
+    .inscripcion__toast-btn {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+    }
+
+    .inscripcion__toast-close {
+      padding: 6px;
+    }
+  }
+
+  /* CART BADGE en categorias */
+  .inscripcion__categoria-cart-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: #E42C2C;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 10px;
+    margin-left: 8px;
+    animation: badgePop 0.3s ease;
+  }
+
+  @keyframes badgePop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  /* RESET - Prevenir overflow horizontal en todo el sitio */
+  .inscripcion *,
+  .inscripcion *::before,
+  .inscripcion *::after {
+    box-sizing: border-box;
+  }
+
+  .inscripcion {
+    min-height: 100vh;
+    padding: 120px 16px 60px;
+    background: #000;
+    color: #fff;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .inscripcion__container {
+    max-width: 100%;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow: hidden;
+  }
+
+  @media (min-width: 480px) {
+    .inscripcion__container {
+      max-width: 500px;
+    }
+  }
+
+  /* 1. HEADER */
+  .inscripcion__header {
+    text-align: center;
+  }
+
+  .inscripcion__badge {
+    display: inline-block;
+    background: var(--color-primary);
+    color: #000;
+    font-weight: 700;
+    font-size: 0.7rem;
+    padding: 6px 14px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .inscripcion__title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+
+  .inscripcion__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .inscripcion__meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .inscripcion__meta-item svg {
+    color: var(--color-primary);
+  }
+
+  /* 2. CATEGORIAS - SELECTOR CLICKEABLE */
+  .inscripcion__categorias-info {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .inscripcion__categorias-title {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+    color: #27ae60;
+  }
+
+  .inscripcion__categorias-subtitle {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 16px;
+  }
+
+  .inscripcion__categorias-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .inscripcion__categoria-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    width: 100%;
+    text-align: left;
+  }
+
+  .inscripcion__categoria-row:hover:not(.agotado) {
+    background: rgba(39, 174, 96, 0.1);
+    border-color: rgba(39, 174, 96, 0.3);
+    transform: translateX(4px);
+  }
+
+  .inscripcion__categoria-row.selected {
+    background: rgba(39, 174, 96, 0.15);
+    border-color: #27ae60;
+    box-shadow: 0 0 0 1px #27ae60;
+  }
+
+  .inscripcion__categoria-row.agotado {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .inscripcion__categoria-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .inscripcion__categoria-age {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.6);
+    flex: 1;
+    text-align: right;
+    padding: 0 12px;
+  }
+
+  .inscripcion__categoria-row.agotado .inscripcion__categoria-age {
+    color: #E42C2C;
+    font-weight: 600;
+  }
+
+  .inscripcion__categoria-check {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s ease;
+  }
+
+  .inscripcion__categoria-check svg {
+    width: 12px;
+    height: 12px;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .inscripcion__categoria-row.selected .inscripcion__categoria-check {
+    background: #27ae60;
+    border-color: #27ae60;
+  }
+
+  .inscripcion__categoria-row.selected .inscripcion__categoria-check svg {
+    opacity: 1;
+    color: #fff;
+  }
+
+  /* RESUMEN DE SELECCION */
+  .inscripcion__resumen {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .inscripcion__resumen-header {
+    margin-bottom: 8px;
+  }
+
+  .inscripcion__resumen-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .inscripcion__resumen-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .inscripcion__resumen-categoria {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .inscripcion__resumen-precio {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #fff;
+  }
+
+  /* CARRITO RESUMEN */
+  .inscripcion__carrito-resumen {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%);
+    border: 1px solid rgba(39, 174, 96, 0.25);
+    border-radius: 12px;
+    padding: 16px;
+  }
+
+  .inscripcion__carrito-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #27ae60;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  .inscripcion__carrito-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .inscripcion__carrito-item {
+    background: rgba(39, 174, 96, 0.15);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .inscripcion__carrito-link {
+    display: block;
+    text-align: center;
+    margin-top: 12px;
+    color: #27ae60;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .inscripcion__carrito-link:hover {
+    text-decoration: underline;
+    color: #2ecc71;
+  }
+
+  /* INFO DEL PROCESO */
+  .inscripcion__proceso-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+
+  .inscripcion__proceso-info svg {
+    color: rgba(255, 255, 255, 0.5);
+    flex-shrink: 0;
+  }
+
+  .inscripcion__proceso-info span {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+  }
+
+  /* HINTS DE BOTONES */
+  .inscripcion__btn-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+
+  /* 3. FOMO BADGES */
+  .inscripcion__fomo {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .inscripcion__fomo-badge {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+  }
+
+  .inscripcion__fomo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .inscripcion__fomo-badge--playeras .inscripcion__fomo-icon {
+    background: rgba(0, 136, 204, 0.15);
+    color: #0088CC;
+  }
+
+  .inscripcion__fomo-badge--medallas .inscripcion__fomo-icon {
+    background: rgba(204, 163, 0, 0.2);
+    color: #CCA300;
+  }
+
+  .inscripcion__fomo-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .inscripcion__fomo-label {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+
+  .inscripcion__fomo-value {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .inscripcion__fomo-badge--urgente {
+    background: rgba(228, 44, 44, 0.1);
+    border-color: rgba(228, 44, 44, 0.3);
+    animation: fomoPulse 2s ease-in-out infinite;
+  }
+
+  .inscripcion__fomo-badge--urgente .inscripcion__fomo-value {
+    color: #E42C2C;
+  }
+
+  .inscripcion__fomo-badge--agotado {
+    opacity: 0.5;
+  }
+
+  .inscripcion__fomo-badge--agotado .inscripcion__fomo-value {
+    text-decoration: line-through;
+  }
+
+  @keyframes fomoPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(228, 44, 44, 0.4); }
+    50% { box-shadow: 0 0 0 8px rgba(228, 44, 44, 0); }
+  }
+
+  /* 4. PRECIO CARD - Verde */
+  .inscripcion__precio-card {
+    background: rgba(0,0,0,0.4);
+    border: 2px solid rgba(39, 174, 96, 0.4);
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .inscripcion__precio-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .inscripcion__precio-label {
+    font-size: 0.85rem;
+    color: #FF8C00;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .inscripcion__precio-wrapper {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .inscripcion__precio {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: #27ae60;
+    line-height: 1;
+  }
+
+  .inscripcion__precio-currency {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+    font-weight: 600;
+  }
+
+  /* 5. TIMELINE */
+  .inscripcion__timeline {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 0;
+    position: relative;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .inscripcion__timeline::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 15%;
+    right: 15%;
+    height: 2px;
+    background: rgba(255,255,255,0.1);
+    transform: translateY(-50%);
+  }
+
+  .inscripcion__timeline-phase {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  .inscripcion__timeline-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    border: 2px solid rgba(255,255,255,0.3);
+    transition: all 0.3s;
+  }
+
+  .inscripcion__timeline-phase.current .inscripcion__timeline-dot {
+    background: #27ae60;
+    border-color: #27ae60;
+    box-shadow: 0 0 12px rgba(39, 174, 96, 0.5);
+  }
+
+  .inscripcion__timeline-phase.past .inscripcion__timeline-dot {
+    background: rgba(255,255,255,0.3);
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  .inscripcion__timeline-info {
+    text-align: center;
+  }
+
+  .inscripcion__timeline-label {
+    display: block;
+    font-size: 0.6rem;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 2px;
+  }
+
+  .inscripcion__timeline-phase.current .inscripcion__timeline-label {
+    color: #27ae60;
+    font-weight: 600;
+  }
+
+  .inscripcion__timeline-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .inscripcion__timeline-phase.current .inscripcion__timeline-price {
+    color: #27ae60;
+  }
+
+  .inscripcion__timeline-phase.past .inscripcion__timeline-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+  }
+
+  /* STATUS */
+  .inscripcion__status {
+    text-align: center;
+    padding: 40px 24px;
+    border-radius: 16px;
+  }
+
+  .inscripcion__status--coming-soon {
+    background: rgba(0, 102, 179, 0.1);
+    border: 1px solid rgba(0, 102, 179, 0.2);
+    color: #0066B3;
+  }
+
+  .inscripcion__status--closed {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.5);
+  }
+
+  .inscripcion__status h3 {
+    font-size: 1rem;
+    margin: 16px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .inscripcion__status p {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+
+  /* 6. FORM */
+  .inscripcion__form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .inscripcion__field {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .inscripcion__label {
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #27ae60;
+  }
+
+
+  /* 7. CANTIDAD */
+  .inscripcion__quantity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .inscripcion__qty-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .inscripcion__qty-btn--minus {
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid rgba(228, 44, 44, 0.3);
+    color: #E42C2C;
+  }
+
+  .inscripcion__qty-btn--minus:hover {
+    background: rgba(228, 44, 44, 0.2);
+  }
+
+  .inscripcion__qty-btn--plus {
+    background: rgba(39, 174, 96, 0.1);
+    border: 1px solid rgba(39, 174, 96, 0.3);
+    color: #27ae60;
+  }
+
+  .inscripcion__qty-btn--plus:hover {
+    background: rgba(39, 174, 96, 0.2);
+  }
+
+  .inscripcion__qty-input {
+    flex: 1;
+    padding: 14px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* 8. BOTONES DE ACCION */
+  .inscripcion__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .inscripcion__btn {
+    width: 100%;
+    padding: 18px 24px;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .inscripcion__btn--cart {
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .inscripcion__btn--cart:hover:not(:disabled) {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.4);
+    transform: translateY(-2px);
+  }
+
+  .inscripcion__btn--pay {
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+    color: #fff;
+    box-shadow: 0 8px 24px rgba(39, 174, 96, 0.4);
+  }
+
+  .inscripcion__btn--pay:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(39, 174, 96, 0.5);
+  }
+
+  .inscripcion__btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .inscripcion__btn svg {
+    flex-shrink: 0;
+  }
+
+  /* Loading spinner */
+  .loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+
+  /* 9. GALLERY - Al final */
+  .inscripcion__gallery {
+    margin-top: 20px;
+  }
+
+  .inscripcion__main-image {
+    border-radius: 16px;
+    overflow: hidden;
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .inscripcion__image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .inscripcion__thumbnails {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .inscripcion__thumbnail {
+    border: 2px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s;
+  }
+
+  .inscripcion__thumbnail:hover {
+    border-color: rgba(228, 44, 44, 0.4);
+  }
+
+  .inscripcion__thumbnail.active {
+    border-color: var(--color-primary);
+  }
+
+  .inscripcion__thumbnail img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* DESKTOP */
+  @media (min-width: 768px) {
+    .inscripcion__container {
+      max-width: 600px;
+    }
+
+    .inscripcion__title {
+      font-size: 2.25rem;
+    }
+
+    .inscripcion__precio {
+      font-size: 3rem;
+    }
+
+    .inscripcion__categoria-row {
+      padding: 16px 20px;
+    }
+
+    .inscripcion__categoria-name {
+      font-size: 1rem;
+    }
+
+    .inscripcion__categoria-age {
+      font-size: 0.85rem;
+    }
+  }
+
+  /* MOBILE SMALL - Pantallas muy pequenas */
+  @media (max-width: 380px) {
+    .inscripcion {
+      padding: 110px 12px 50px;
+    }
+
+    .inscripcion__categorias-info {
+      padding: 16px;
+    }
+
+    .inscripcion__categorias-title,
+    .inscripcion__label {
+      font-size: 0.85rem;
+    }
+
+    .inscripcion__categoria-row {
+      padding: 12px;
+    }
+
+    .inscripcion__categoria-name {
+      font-size: 0.8rem;
+    }
+
+    .inscripcion__categoria-age {
+      font-size: 0.65rem;
+      padding: 0 8px;
+    }
+
+    .inscripcion__categoria-check {
+      width: 18px;
+      height: 18px;
+    }
+
+    .inscripcion__title {
+      font-size: 1.5rem;
+    }
+
+    .inscripcion__precio {
+      font-size: 2rem;
+    }
+
+    .inscripcion__timeline-label {
+      font-size: 0.55rem;
+    }
+
+    .inscripcion__timeline-price {
+      font-size: 0.8rem;
+    }
+
+    .inscripcion__resumen-categoria {
+      font-size: 0.95rem;
+    }
+
+    .inscripcion__resumen-precio {
+      font-size: 1.1rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .inscripcion {
+      padding: 140px 40px 80px;
+    }
+
+    .inscripcion__container {
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: start;
+    }
+
+    .inscripcion__header {
+      grid-column: 1 / -1;
+      text-align: left;
+    }
+
+    .inscripcion__meta {
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    .inscripcion__gallery {
+      grid-column: 1;
+      grid-row: 2 / 10;
+      position: sticky;
+      top: 140px;
+      margin-top: 0;
+    }
+
+    .inscripcion__categorias-info,
+    .inscripcion__fomo,
+    .inscripcion__precio-card,
+    .inscripcion__timeline,
+    .inscripcion__status,
+    .inscripcion__form {
+      grid-column: 2;
+    }
+
+    .inscripcion__categorias-list span {
+      font-size: 0.85rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Inscripcion Producto",
+  "settings": [],
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

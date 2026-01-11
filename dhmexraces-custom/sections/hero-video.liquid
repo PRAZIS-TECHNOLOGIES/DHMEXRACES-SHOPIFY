@@ -14,7 +14,8 @@
             {% if section.settings.video_url contains 'youtube.com' or section.settings.video_url contains 'youtu.be' %}
               {% assign video_id = section.settings.video_url | split: 'v=' | last | split: '/' | last | split: '&' | first %}
               <iframe
-                src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&loop=1&playlist={{ video_id }}&controls=0&showinfo=0&rel=0&modestbranding=1"
+                id="youtube-desktop"
+                src="https://www.youtube.com/embed/{{ video_id }}?autoplay=1&mute=1&loop=1&playlist={{ video_id }}&controls=0&showinfo=0&rel=0&modestbranding=1&enablejsapi=1"
                 frameborder="0"
                 allow="autoplay; encrypted-media"
                 allowfullscreen
@@ -43,7 +44,8 @@
             {% if section.settings.video_url_mobile contains 'youtube.com' or section.settings.video_url_mobile contains 'youtu.be' %}
               {% assign video_id_mobile = section.settings.video_url_mobile | split: 'v=' | last | split: '/' | last | split: '&' | first %}
               <iframe
-                src="https://www.youtube.com/embed/{{ video_id_mobile }}?autoplay=1&mute=1&loop=1&playlist={{ video_id_mobile }}&controls=0&showinfo=0&rel=0&modestbranding=1"
+                id="youtube-mobile"
+                src="https://www.youtube.com/embed/{{ video_id_mobile }}?autoplay=1&mute=1&loop=1&playlist={{ video_id_mobile }}&controls=0&showinfo=0&rel=0&modestbranding=1&enablejsapi=1"
                 frameborder="0"
                 allow="autoplay; encrypted-media"
                 allowfullscreen
@@ -67,6 +69,20 @@
         {% endif %}
 
         <div class="hero-video__overlay"></div>
+
+        {% comment %} Sound Toggle Button {% endcomment %}
+        <button class="hero-video__sound-toggle" id="sound-toggle" aria-label="Activar sonido">
+          <span class="sound-label">Activar audio</span>
+          <svg class="sound-icon sound-icon--muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+          <svg class="sound-icon sound-icon--unmuted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </button>
       </div>
     {% elsif section.settings.image != blank %}
       <div class="hero-video__background">
@@ -307,15 +323,92 @@
   }
 
   .hero-video__button--primary {
-    background: var(--color-secondary);
+    background: linear-gradient(135deg, #1e8449 0%, #27ae60 50%, #1e8449 100%);
+    background-size: 200% 200%;
     color: #fff;
-    box-shadow: 0 20px 60px rgba(0, 102, 179, 0.5);
+    box-shadow:
+      0 0 20px rgba(39, 174, 96, 0.5),
+      0 0 40px rgba(39, 174, 96, 0.3),
+      0 0 60px rgba(39, 174, 96, 0.15),
+      0 10px 40px rgba(0, 0, 0, 0.3);
+    animation:
+      buttonPulse 2s ease-in-out infinite,
+      gradientShift 3s ease-in-out infinite,
+      glowPulse 2s ease-in-out infinite;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+  }
+
+  .hero-video__button--primary::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.35), transparent);
+    border-radius: 100px;
+    animation: shimmer 2.5s ease-in-out infinite;
+    z-index: -1;
+  }
+
+  @keyframes buttonPulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  @keyframes gradientShift {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 20px rgba(39, 174, 96, 0.5),
+        0 0 40px rgba(39, 174, 96, 0.3),
+        0 0 60px rgba(39, 174, 96, 0.15),
+        0 10px 40px rgba(0, 0, 0, 0.3);
+    }
+    50% {
+      box-shadow:
+        0 0 30px rgba(39, 174, 96, 0.7),
+        0 0 60px rgba(39, 174, 96, 0.5),
+        0 0 90px rgba(39, 174, 96, 0.3),
+        0 15px 50px rgba(0, 0, 0, 0.4);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      opacity: 0;
+      transform: translateX(-100%) skewX(-15deg);
+    }
+    20% {
+      opacity: 1;
+    }
+    40%, 100% {
+      opacity: 0;
+      transform: translateX(100%) skewX(-15deg);
+    }
   }
 
   .hero-video__button--primary:hover {
-    transform: translateY(-5px) scale(1.05);
-    background: var(--color-primary);
-    box-shadow: 0 30px 80px rgba(228, 44, 44, 0.7);
+    transform: translateY(-5px) scale(1.08);
+    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 50%, #27ae60 100%);
+    box-shadow:
+      0 0 40px rgba(39, 174, 96, 0.8),
+      0 0 80px rgba(39, 174, 96, 0.5),
+      0 0 120px rgba(39, 174, 96, 0.3),
+      0 20px 60px rgba(0, 0, 0, 0.4);
+    animation: none;
   }
 
   .hero-video__button--secondary {
@@ -338,14 +431,20 @@
     .hero-video__subtitle {
       letter-spacing: 0.2em;
       margin-bottom: 1.5rem;
+      font-size: 0.8rem;
     }
 
     .hero-video__title {
+      font-size: clamp(2.8rem, 11vw, 5rem);
       margin-bottom: 1.5rem;
+      line-height: 0.95;
+      letter-spacing: -0.02em;
     }
 
     .hero-video__description {
-      margin-bottom: 3rem;
+      margin-bottom: 2.5rem;
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
     .hero-video__buttons {
@@ -359,6 +458,105 @@
       max-width: 400px;
       margin: 0 auto;
       padding: 1.25rem 2.5rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .hero-video__title {
+      font-size: 2.5rem;
+      line-height: 1;
+    }
+
+    .hero-video__description {
+      font-size: 0.9rem;
+    }
+
+    .hero-video__subtitle {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+    }
+  }
+
+  /* Sound Toggle Button - Minimal Design */
+  .hero-video__sound-toggle {
+    position: absolute;
+    bottom: 25px;
+    right: 25px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(8px);
+    pointer-events: auto !important;
+    animation: soundPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes soundPulse {
+    0%, 100% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+    }
+    50% {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 8px rgba(255, 255, 255, 0);
+    }
+  }
+
+  .hero-video__sound-toggle:hover {
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.3);
+    animation: none;
+  }
+
+  .hero-video__sound-toggle.active {
+    background: rgba(39, 174, 96, 0.3);
+    color: #fff;
+    border-color: rgba(39, 174, 96, 0.5);
+    animation: none;
+  }
+
+  .hero-video__sound-toggle.active .sound-label {
+    display: none;
+  }
+
+  .sound-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+  }
+
+  .sound-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .hero-video__sound-toggle {
+      top: 80px;
+      bottom: auto;
+      right: 15px;
+      padding: 8px 12px;
+      gap: 6px;
+    }
+
+    .sound-label {
+      font-size: 10px;
+    }
+
+    .sound-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 {% endstylesheet %}
@@ -470,3 +668,117 @@
   ]
 }
 {% endschema %}
+
+<script>
+  // YouTube IFrame API for sound control
+  (function() {
+    // Load YouTube API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var desktopPlayer, mobilePlayer;
+    var isMuted = true;
+
+    // Check if mobile view
+    function isMobileView() {
+      return window.innerWidth <= 768;
+    }
+
+    // Get the active player based on screen size
+    function getActivePlayer() {
+      return isMobileView() ? mobilePlayer : desktopPlayer;
+    }
+
+    // Called when YouTube API is ready
+    window.onYouTubeIframeAPIReady = function() {
+      var desktopIframe = document.getElementById('youtube-desktop');
+      var mobileIframe = document.getElementById('youtube-mobile');
+
+      if (desktopIframe) {
+        desktopPlayer = new YT.Player('youtube-desktop', {
+          events: {
+            'onReady': function(event) {
+              event.target.mute();
+              event.target.playVideo();
+            },
+            'onStateChange': function(event) {
+              // Loop: when video ends, restart it
+              if (event.data === YT.PlayerState.ENDED) {
+                event.target.seekTo(0);
+                event.target.playVideo();
+              }
+            }
+          }
+        });
+      }
+
+      if (mobileIframe) {
+        mobilePlayer = new YT.Player('youtube-mobile', {
+          events: {
+            'onReady': function(event) {
+              event.target.mute();
+              event.target.playVideo();
+            },
+            'onStateChange': function(event) {
+              // Loop: when video ends, restart it
+              if (event.data === YT.PlayerState.ENDED) {
+                event.target.seekTo(0);
+                event.target.playVideo();
+              }
+            }
+          }
+        });
+      }
+    };
+
+    // Sound toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      var soundToggle = document.getElementById('sound-toggle');
+      if (!soundToggle) return;
+
+      var mutedIcon = soundToggle.querySelector('.sound-icon--muted');
+      var unmutedIcon = soundToggle.querySelector('.sound-icon--unmuted');
+
+      soundToggle.addEventListener('click', function() {
+        isMuted = !isMuted;
+        var activePlayer = getActivePlayer();
+
+        if (isMuted) {
+          // Mute only the active player
+          if (activePlayer && typeof activePlayer.mute === 'function') {
+            activePlayer.mute();
+          }
+          mutedIcon.style.display = 'inline';
+          unmutedIcon.style.display = 'none';
+          soundToggle.classList.remove('active');
+        } else {
+          // Unmute only the active player (keep the other muted)
+          if (activePlayer && typeof activePlayer.unMute === 'function') {
+            activePlayer.unMute();
+            activePlayer.setVolume(100);
+          }
+          mutedIcon.style.display = 'none';
+          unmutedIcon.style.display = 'inline';
+          soundToggle.classList.add('active');
+        }
+      });
+
+      // Handle resize - mute when switching views
+      window.addEventListener('resize', function() {
+        if (!isMuted) {
+          // Mute all and unmute only active
+          if (desktopPlayer && typeof desktopPlayer.mute === 'function') desktopPlayer.mute();
+          if (mobilePlayer && typeof mobilePlayer.mute === 'function') mobilePlayer.mute();
+
+          var activePlayer = getActivePlayer();
+          if (activePlayer && typeof activePlayer.unMute === 'function') {
+            activePlayer.unMute();
+            activePlayer.setVolume(100);
+          }
+        }
+      });
+    });
+  })();
+</script>
