@@ -18,7 +18,7 @@
       <a href="/products/inscripcion-guanajuato-2026" class="header__menu-link">Inscripciones</a>
       <a href="/pages/ranking-2026" class="header__menu-link">Ranking 2026</a>
       <a href="/pages/kit-rider" class="header__menu-link">Kit del Rider</a>
-      <a href="/pages/merch-oficial" class="header__menu-link header__menu-link--merch">Merch Oficial</a>
+      <a href="/pages/merch-oficial" class="header__menu-link">Merch Oficial</a>
       <a href="/pages/ranking-2025" class="header__menu-link">Campeonato 2025</a>
       <a href="/pages/bases-del-sorteo" class="header__menu-link header__menu-link--rifa">
         <span class="rifa-icon">🎁</span>
@@ -43,7 +43,10 @@
         {% if cart.item_count > 0 %}
           <span class="cart__count">{{ cart.item_count }}</span>
         {% endif %}
-        {{ 'icon-cart.svg' | inline_asset_content }}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
       </a>
     </div>
   </div>
@@ -219,20 +222,6 @@
     background: var(--color-gold);
   }
 
-  /* Merch Oficial - Premium style */
-  .header__menu-link--merch {
-    color: var(--color-primary) !important;
-    position: relative;
-  }
-
-  .header__menu-link--merch:hover {
-    color: #fff !important;
-  }
-
-  .header__menu-link--merch::after {
-    background: var(--color-primary) !important;
-  }
-
   /* Rifa FOX 40 - Premium badge style */
   .header__menu-link--rifa {
     display: inline-flex !important;
@@ -293,7 +282,9 @@
   .header__icon svg {
     width: 24px;
     height: 24px;
-    fill: currentColor;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.5;
   }
 
   .header__icon:hover {
