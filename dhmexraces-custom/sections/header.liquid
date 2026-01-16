@@ -18,7 +18,12 @@
       <a href="/products/inscripcion-guanajuato-2026" class="header__menu-link">Inscripciones</a>
       <a href="/pages/ranking-2026" class="header__menu-link">Ranking 2026</a>
       <a href="/pages/kit-rider" class="header__menu-link">Kit del Rider</a>
+      <a href="/pages/merch-oficial" class="header__menu-link header__menu-link--merch">Merch Oficial</a>
       <a href="/pages/ranking-2025" class="header__menu-link">Campeonato 2025</a>
+      <a href="/pages/bases-del-sorteo" class="header__menu-link header__menu-link--rifa">
+        <span class="rifa-icon">🎁</span>
+        Sorteo FOX 40
+      </a>
     </nav>
 
     <div class="header__icons">
@@ -43,6 +48,36 @@
     </div>
   </div>
 </header>
+
+{% unless page.handle == 'bases-del-sorteo' %}
+<!-- Rifa Promo Top Bar -->
+<div class="rifa-topbar">
+  <a href="/pages/bases-del-sorteo" class="rifa-topbar__link">
+    <div class="rifa-topbar__container">
+      <div class="rifa-topbar__prize">
+        <img src="https://cdn.shopify.com/s/files/1/0691/9556/3244/files/910_21_280_40_MY25_F_Orange_GripX2_Front.webp?v=1768319279" alt="FOX 40" class="rifa-topbar__fox">
+      </div>
+      <div class="rifa-topbar__content">
+        <div class="rifa-topbar__main">
+          <span class="rifa-topbar__badge">🎁 SORTEO</span>
+          <span class="rifa-topbar__title">GANA UNA <strong>FOX 40</strong></span>
+          <span class="rifa-topbar__value">$50,000 MXN</span>
+        </div>
+        <div class="rifa-topbar__divider"></div>
+        <div class="rifa-topbar__how">
+          <span class="rifa-topbar__formula">1 INSCRIPCIÓN = 1 BOLETO</span>
+          <span class="rifa-topbar__sub">Automático al inscribirte</span>
+        </div>
+      </div>
+      <div class="rifa-topbar__cta">
+        <span class="rifa-topbar__btn">Ver Bases</span>
+      </div>
+    </div>
+  </a>
+</div>
+<!-- Spacer for fixed elements -->
+<div class="header-spacer"></div>
+{% endunless %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
@@ -182,6 +217,63 @@
 
   .header__menu-link--gold::after {
     background: var(--color-gold);
+  }
+
+  /* Merch Oficial - Premium style */
+  .header__menu-link--merch {
+    color: var(--color-primary) !important;
+    position: relative;
+  }
+
+  .header__menu-link--merch:hover {
+    color: #fff !important;
+  }
+
+  .header__menu-link--merch::after {
+    background: var(--color-primary) !important;
+  }
+
+  /* Rifa FOX 40 - Premium badge style */
+  .header__menu-link--rifa {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+    color: #000 !important;
+    font-weight: 800 !important;
+    padding: 8px 16px !important;
+    border-radius: 100px;
+    font-size: 0.8rem !important;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: rifaPulse 2s ease-in-out infinite;
+  }
+
+  .header__menu-link--rifa:hover {
+    color: #000 !important;
+    transform: scale(1.08) translateY(-2px);
+    box-shadow: 0 8px 25px rgba(255, 107, 0, 0.6);
+  }
+
+  .header__menu-link--rifa::after {
+    display: none !important;
+  }
+
+  .rifa-icon {
+    font-size: 1rem;
+    animation: rifaShake 1.5s ease-in-out infinite;
+  }
+
+  @keyframes rifaPulse {
+    0%, 100% { box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4); }
+    50% { box-shadow: 0 4px 20px rgba(255, 107, 0, 0.7); }
+  }
+
+  @keyframes rifaShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
   }
 
   .header__icons {
@@ -345,6 +437,360 @@
   /* Prevent body scroll when menu is open */
   body.menu-open {
     overflow: hidden;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RIFA TOP BAR - Premium Design
+     ═══════════════════════════════════════════════════════════════ */
+  .rifa-topbar {
+    background: linear-gradient(90deg, #0a0a0a 0%, #141414 50%, #0a0a0a 100%);
+    border-bottom: 2px solid rgba(255, 107, 0, 0.4);
+    margin-top: 85px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rifa-topbar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 50% 100% at 20% 50%, rgba(255, 107, 0, 0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 100% at 80% 50%, rgba(255, 107, 0, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .rifa-topbar__link {
+    display: block;
+    text-decoration: none;
+    padding: 12px 20px;
+    transition: all 0.3s ease;
+  }
+
+  .rifa-topbar__link:hover {
+    background: rgba(255, 107, 0, 0.06);
+  }
+
+  .rifa-topbar__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .rifa-topbar__prize {
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .rifa-topbar__fox {
+    height: 55px;
+    width: auto;
+    filter: drop-shadow(0 4px 15px rgba(255, 107, 0, 0.5));
+    animation: topbarFoxFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes topbarFoxFloat {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-6px) rotate(3deg); }
+  }
+
+  .rifa-topbar__content {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .rifa-topbar__main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .rifa-topbar__badge {
+    background: rgba(255, 107, 0, 0.15);
+    border: 1px solid rgba(255, 107, 0, 0.4);
+    color: #FF6B00;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 5px 10px;
+    border-radius: 100px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
+
+  .rifa-topbar__title {
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .rifa-topbar__title strong {
+    color: #fff;
+    font-weight: 800;
+  }
+
+  .rifa-topbar__value {
+    background: linear-gradient(135deg, #FF6B00 0%, #FF8C33 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 0.85rem;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  .rifa-topbar__divider {
+    width: 1px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .rifa-topbar__how {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .rifa-topbar__formula {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+  }
+
+  .rifa-topbar__sub {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.5);
+    white-space: nowrap;
+  }
+
+  .rifa-topbar__cta {
+    flex-shrink: 0;
+  }
+
+  .rifa-topbar__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 18px;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+  }
+
+  .rifa-topbar__link:hover .rifa-topbar__btn {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(255, 107, 0, 0.5);
+  }
+
+  @media (max-width: 900px) {
+    .rifa-topbar {
+      margin-top: 70px;
+    }
+
+    .rifa-topbar__container {
+      gap: 16px;
+    }
+
+    .rifa-topbar__fox {
+      height: 45px;
+    }
+
+    .rifa-topbar__content {
+      gap: 16px;
+    }
+
+    .rifa-topbar__main {
+      gap: 8px;
+    }
+
+    .rifa-topbar__title {
+      font-size: 0.85rem;
+    }
+
+    .rifa-topbar__value {
+      display: none;
+    }
+
+    .rifa-topbar__btn {
+      padding: 8px 14px;
+      font-size: 0.65rem;
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     MOBILE PREMIUM DESIGN - With FOX image
+     ═══════════════════════════════════════════════════════════════ */
+  /* Spacer for mobile fixed header + banner */
+  .header-spacer {
+    display: none;
+  }
+
+  @media (max-width: 650px) {
+    .header-spacer {
+      display: block;
+      height: 108px;
+    }
+
+    .rifa-topbar {
+      position: fixed !important;
+      top: 52px !important;
+      left: 0 !important;
+      right: 0 !important;
+      z-index: 999 !important;
+      margin-top: 0 !important;
+      background: #000 !important;
+      border-top: none !important;
+      border-bottom: 2px solid #FF6B00 !important;
+    }
+
+    .rifa-topbar__link {
+      padding: 16px;
+    }
+
+    .rifa-topbar__container {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    /* FOX image on the left - diagonal style */
+    .rifa-topbar__prize {
+      flex-shrink: 0;
+    }
+
+    .rifa-topbar__fox {
+      height: 65px !important;
+      width: auto !important;
+      transform: rotate(-12deg);
+      filter: drop-shadow(0 0 12px rgba(255, 107, 0, 0.6));
+      animation: foxDiagonalFloat 3s ease-in-out infinite;
+    }
+
+    @keyframes foxDiagonalFloat {
+      0%, 100% { transform: rotate(-15deg) translateY(0); }
+      50% { transform: rotate(-12deg) translateY(-4px); }
+    }
+
+    /* Center content */
+    .rifa-topbar__content {
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .rifa-topbar__main {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .rifa-topbar__badge {
+      display: none;
+    }
+
+    .rifa-topbar__title {
+      font-size: 0.8rem;
+      color: #fff;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .rifa-topbar__title strong {
+      color: #FF6B00;
+    }
+
+    .rifa-topbar__value {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 900;
+    }
+
+    .rifa-topbar__divider {
+      display: none;
+    }
+
+    .rifa-topbar__how {
+      display: block;
+    }
+
+    .rifa-topbar__formula {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.5);
+      text-transform: uppercase;
+    }
+
+    .rifa-topbar__sub {
+      display: none;
+    }
+
+    /* CTA button on the right */
+    .rifa-topbar__cta {
+      flex-shrink: 0;
+    }
+
+    .rifa-topbar__btn {
+      padding: 8px 12px;
+      font-size: 0.6rem;
+      box-shadow: 0 0 12px rgba(255, 107, 0, 0.4);
+      animation: mobileCtaPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes mobileCtaPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 107, 0, 0.3); }
+      50% { box-shadow: 0 0 18px rgba(255, 107, 0, 0.5); }
+    }
+  }
+
+  @media (max-width: 400px) {
+    .rifa-topbar__link {
+      padding: 8px 12px;
+    }
+
+    .rifa-topbar__container {
+      gap: 8px;
+    }
+
+    .rifa-topbar__fox {
+      height: 80px;
+    }
+
+    .rifa-topbar__title {
+      font-size: 0.7rem;
+    }
+
+    .rifa-topbar__value {
+      font-size: 0.6rem;
+    }
+
+    .rifa-topbar__formula {
+      font-size: 0.5rem;
+    }
+
+    .rifa-topbar__btn {
+      padding: 6px 10px;
+      font-size: 0.55rem;
+    }
   }
 {% endstylesheet %}
 

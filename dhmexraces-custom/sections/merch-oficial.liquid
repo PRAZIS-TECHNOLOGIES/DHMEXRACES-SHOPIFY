@@ -1,0 +1,990 @@
+{% comment %}
+  MERCH OFICIAL - Premium Aesthetic Section
+  Pagina para mostrar jerseys, gorras y merchandise oficial DHMEXRACES
+{% endcomment %}
+
+<section class="merch-oficial" data-aos="fade-in">
+  <!-- Hero Banner -->
+  <div class="merch-hero">
+    <div class="merch-hero__bg"></div>
+    <div class="merch-hero__content" data-aos="fade-up" data-aos-delay="200">
+      <span class="merch-hero__badge">{{ section.settings.badge_text }}</span>
+      <h1 class="merch-hero__title">{{ section.settings.title }}</h1>
+      <p class="merch-hero__subtitle">{{ section.settings.subtitle }}</p>
+    </div>
+    <div class="merch-hero__scroll-indicator">
+      <span></span>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="merch-container">
+    <!-- Category Tabs -->
+    <div class="merch-tabs" data-aos="fade-up">
+      <button class="merch-tab active" data-category="all">Todo</button>
+      <button class="merch-tab" data-category="jerseys">Jerseys</button>
+      <button class="merch-tab" data-category="gorras">Gorras</button>
+      <button class="merch-tab" data-category="accesorios">Accesorios</button>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="merch-grid">
+      {% for block in section.blocks %}
+        {% if block.type == 'product' %}
+          <article class="merch-card"
+                   data-category="{{ block.settings.category }}"
+                   data-aos="fade-up"
+                   data-aos-delay="{{ forloop.index | times: 100 }}">
+            <div class="merch-card__image-wrapper">
+              {% if block.settings.badge != blank %}
+                <span class="merch-card__badge">{{ block.settings.badge }}</span>
+              {% endif %}
+              {% if block.settings.image != blank %}
+                <img src="{{ block.settings.image | image_url: width: 600 }}"
+                     alt="{{ block.settings.title }}"
+                     class="merch-card__image"
+                     loading="lazy">
+              {% else %}
+                <div class="merch-card__placeholder">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                  </svg>
+                </div>
+              {% endif %}
+              <div class="merch-card__overlay">
+                <span class="merch-card__view">Ver Detalles</span>
+              </div>
+            </div>
+            <div class="merch-card__info">
+              <span class="merch-card__category">{{ block.settings.category }}</span>
+              <h3 class="merch-card__title">{{ block.settings.title }}</h3>
+              <p class="merch-card__description">{{ block.settings.description }}</p>
+              <div class="merch-card__footer">
+                <span class="merch-card__price">
+                  {% if block.settings.price != blank %}
+                    ${{ block.settings.price }} MXN
+                  {% else %}
+                    Proximamente
+                  {% endif %}
+                </span>
+                {% if block.settings.product_url != blank %}
+                  <a href="{{ block.settings.product_url }}" class="merch-card__btn">
+                    Comprar
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                {% else %}
+                  <span class="merch-card__btn merch-card__btn--disabled">
+                    Pronto
+                  </span>
+                {% endif %}
+              </div>
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <!-- Empty State -->
+    <div class="merch-empty" style="display: none;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+      </svg>
+      <p>No hay productos en esta categoria por el momento.</p>
+    </div>
+
+    <!-- Coming Soon Banner -->
+    {% if section.settings.show_coming_soon %}
+      <div class="merch-coming-soon" data-aos="fade-up">
+        <div class="merch-coming-soon__content">
+          <span class="merch-coming-soon__icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+          </span>
+          <h3>{{ section.settings.coming_soon_title }}</h3>
+          <p>{{ section.settings.coming_soon_text }}</p>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Newsletter Section -->
+  {% if section.settings.show_newsletter %}
+    <div class="merch-newsletter" data-aos="fade-up">
+      <div class="merch-newsletter__container">
+        <div class="merch-newsletter__content">
+          <h2>{{ section.settings.newsletter_title }}</h2>
+          <p>{{ section.settings.newsletter_text }}</p>
+        </div>
+        <form class="merch-newsletter__form">
+          <input type="email" placeholder="tu@email.com" required>
+          <button type="submit">Suscribirse</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.merch-tab');
+    const cards = document.querySelectorAll('.merch-card');
+    const emptyState = document.querySelector('.merch-empty');
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+
+        const category = this.dataset.category;
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+          if (category === 'all' || card.dataset.category === category) {
+            card.style.display = 'block';
+            card.style.animation = 'fadeInUp 0.5s ease forwards';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Show empty state if no products
+        if (emptyState) {
+          emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+        }
+      });
+    });
+
+    // Parallax effect on scroll
+    const hero = document.querySelector('.merch-hero');
+    if (hero) {
+      window.addEventListener('scroll', function() {
+        const scrolled = window.pageYOffset;
+        const heroContent = hero.querySelector('.merch-hero__content');
+        if (heroContent && scrolled < 600) {
+          heroContent.style.transform = `translateY(${scrolled * 0.3}px)`;
+          heroContent.style.opacity = 1 - (scrolled / 600);
+        }
+      });
+    }
+  });
+</script>
+
+{% stylesheet %}
+  /* ═══════════════════════════════════════════════════════════════
+     MERCH OFICIAL - Premium Aesthetic Styles
+     ═══════════════════════════════════════════════════════════════ */
+
+  .merch-oficial {
+    --merch-primary: #E42C2C;
+    --merch-bg: #0a0a0a;
+    --merch-surface: #141414;
+    --merch-card: #1a1a1a;
+    --merch-border: rgba(255, 255, 255, 0.08);
+    --merch-text: #ffffff;
+    --merch-text-muted: rgba(255, 255, 255, 0.6);
+    --merch-gradient: linear-gradient(135deg, #E42C2C 0%, #ff4d4d 100%);
+
+    background: var(--merch-bg);
+    min-height: 100vh;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     HERO SECTION
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-hero {
+    position: relative;
+    height: 70vh;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .merch-hero__bg {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(228, 44, 44, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 60% at 70% 100%, rgba(228, 44, 44, 0.1) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+  }
+
+  .merch-hero__bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+  }
+
+  .merch-hero__content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .merch-hero__badge {
+    display: inline-block;
+    background: rgba(228, 44, 44, 0.15);
+    border: 1px solid rgba(228, 44, 44, 0.3);
+    color: var(--merch-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    padding: 0.5rem 1.5rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+
+  .merch-hero__title {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.9;
+    margin: 0 0 1.5rem 0;
+    background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .merch-hero__subtitle {
+    font-size: 1.1rem;
+    color: var(--merch-text-muted);
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .merch-hero__scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 30px;
+    height: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    justify-content: center;
+    padding-top: 8px;
+  }
+
+  .merch-hero__scroll-indicator span {
+    width: 6px;
+    height: 6px;
+    background: var(--merch-primary);
+    border-radius: 50%;
+    animation: scrollBounce 2s infinite;
+  }
+
+  @keyframes scrollBounce {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    50% { transform: translateY(20px); opacity: 0.3; }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     CONTAINER
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 4rem 2rem 6rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     CATEGORY TABS
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 4rem;
+    flex-wrap: wrap;
+  }
+
+  .merch-tab {
+    background: transparent;
+    border: 1px solid var(--merch-border);
+    color: var(--merch-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.875rem 2rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .merch-tab:hover {
+    border-color: rgba(228, 44, 44, 0.5);
+    color: var(--merch-text);
+    background: rgba(228, 44, 44, 0.05);
+  }
+
+  .merch-tab.active {
+    background: var(--merch-gradient);
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(228, 44, 44, 0.4);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PRODUCTS GRID
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     PRODUCT CARD - Glassmorphism Style
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-card {
+    background: var(--merch-card);
+    border: 1px solid var(--merch-border);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .merch-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(228, 44, 44, 0.05) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .merch-card:hover {
+    transform: translateY(-8px);
+    border-color: rgba(228, 44, 44, 0.3);
+    box-shadow:
+      0 20px 40px rgba(0, 0, 0, 0.4),
+      0 0 60px rgba(228, 44, 44, 0.1);
+  }
+
+  .merch-card:hover::before {
+    opacity: 1;
+  }
+
+  /* Image Wrapper */
+  .merch-card__image-wrapper {
+    position: relative;
+    aspect-ratio: 4/5;
+    background: var(--merch-surface);
+    overflow: hidden;
+  }
+
+  .merch-card__badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    z-index: 3;
+    background: var(--merch-gradient);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.5rem 1rem;
+    border-radius: 100px;
+    box-shadow: 0 4px 15px rgba(228, 44, 44, 0.4);
+  }
+
+  .merch-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .merch-card:hover .merch-card__image {
+    transform: scale(1.08);
+  }
+
+  .merch-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+  }
+
+  .merch-card__placeholder svg {
+    width: 80px;
+    height: 80px;
+    color: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Overlay */
+  .merch-card__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.8) 0%,
+      transparent 50%
+    );
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 2rem;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .merch-card:hover .merch-card__overlay {
+    opacity: 1;
+  }
+
+  .merch-card__view {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.875rem 1.5rem;
+    border-radius: 100px;
+    transform: translateY(20px);
+    transition: transform 0.4s ease;
+  }
+
+  .merch-card:hover .merch-card__view {
+    transform: translateY(0);
+  }
+
+  /* Card Info */
+  .merch-card__info {
+    padding: 1.5rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .merch-card__category {
+    display: inline-block;
+    color: var(--merch-primary);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+  }
+
+  .merch-card__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--merch-text);
+    margin: 0 0 0.5rem 0;
+    line-height: 1.3;
+  }
+
+  .merch-card__description {
+    font-size: 0.9rem;
+    color: var(--merch-text-muted);
+    line-height: 1.5;
+    margin: 0 0 1.25rem 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .merch-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .merch-card__price {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--merch-text);
+  }
+
+  .merch-card__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--merch-gradient);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(228, 44, 44, 0.3);
+  }
+
+  .merch-card__btn svg {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .merch-card__btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(228, 44, 44, 0.5);
+  }
+
+  .merch-card__btn:hover svg {
+    transform: translateX(3px);
+  }
+
+  .merch-card__btn--disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--merch-text-muted);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .merch-card__btn--disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     EMPTY STATE
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 6rem 2rem;
+    text-align: center;
+  }
+
+  .merch-empty svg {
+    width: 80px;
+    height: 80px;
+    color: rgba(255, 255, 255, 0.1);
+    margin-bottom: 1.5rem;
+  }
+
+  .merch-empty p {
+    color: var(--merch-text-muted);
+    font-size: 1rem;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     COMING SOON BANNER
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-coming-soon {
+    margin-top: 4rem;
+    background: var(--merch-surface);
+    border: 1px solid var(--merch-border);
+    border-radius: 20px;
+    padding: 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .merch-coming-soon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(228, 44, 44, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .merch-coming-soon__content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .merch-coming-soon__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: rgba(228, 44, 44, 0.1);
+    border: 1px solid rgba(228, 44, 44, 0.2);
+    border-radius: 50%;
+    margin-bottom: 1.5rem;
+  }
+
+  .merch-coming-soon__icon svg {
+    width: 28px;
+    height: 28px;
+    color: var(--merch-primary);
+  }
+
+  .merch-coming-soon h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--merch-text);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .merch-coming-soon p {
+    font-size: 1rem;
+    color: var(--merch-text-muted);
+    margin: 0;
+    max-width: 400px;
+    margin-inline: auto;
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     NEWSLETTER SECTION
+     ═══════════════════════════════════════════════════════════════ */
+  .merch-newsletter {
+    background: var(--merch-surface);
+    border-top: 1px solid var(--merch-border);
+    padding: 5rem 2rem;
+  }
+
+  .merch-newsletter__container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .merch-newsletter__content h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--merch-text);
+    margin: 0 0 0.75rem 0;
+  }
+
+  .merch-newsletter__content p {
+    font-size: 1rem;
+    color: var(--merch-text-muted);
+    margin: 0 0 2rem 0;
+  }
+
+  .merch-newsletter__form {
+    display: flex;
+    gap: 0.75rem;
+    max-width: 450px;
+    margin: 0 auto;
+  }
+
+  .merch-newsletter__form input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--merch-border);
+    color: var(--merch-text);
+    font-size: 0.95rem;
+    padding: 1rem 1.5rem;
+    border-radius: 100px;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+
+  .merch-newsletter__form input:focus {
+    border-color: var(--merch-primary);
+    background: rgba(228, 44, 44, 0.05);
+  }
+
+  .merch-newsletter__form input::placeholder {
+    color: var(--merch-text-muted);
+  }
+
+  .merch-newsletter__form button {
+    background: var(--merch-gradient);
+    border: none;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 1rem 2rem;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(228, 44, 44, 0.3);
+    white-space: nowrap;
+  }
+
+  .merch-newsletter__form button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(228, 44, 44, 0.5);
+  }
+
+  /* ═══════════════════════════════════════════════════════════════
+     RESPONSIVE DESIGN
+     ═══════════════════════════════════════════════════════════════ */
+  @media (max-width: 768px) {
+    .merch-hero {
+      height: 60vh;
+      min-height: 400px;
+    }
+
+    .merch-hero__title {
+      font-size: clamp(2.5rem, 12vw, 4rem);
+    }
+
+    .merch-hero__subtitle {
+      font-size: 1rem;
+    }
+
+    .merch-container {
+      padding: 3rem 1rem 4rem;
+    }
+
+    .merch-tabs {
+      gap: 0.4rem;
+      margin-bottom: 3rem;
+    }
+
+    .merch-tab {
+      padding: 0.75rem 1.25rem;
+      font-size: 0.75rem;
+    }
+
+    .merch-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .merch-card__info {
+      padding: 1.25rem;
+    }
+
+    .merch-card__title {
+      font-size: 1.1rem;
+    }
+
+    .merch-card__footer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+
+    .merch-card__btn {
+      justify-content: center;
+    }
+
+    .merch-newsletter__form {
+      flex-direction: column;
+    }
+
+    .merch-newsletter__form button {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .merch-hero {
+      height: 50vh;
+      min-height: 350px;
+    }
+
+    .merch-hero__badge {
+      font-size: 0.65rem;
+      padding: 0.4rem 1rem;
+    }
+
+    .merch-hero__scroll-indicator {
+      display: none;
+    }
+
+    .merch-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .merch-coming-soon {
+      padding: 2rem 1.5rem;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Merch Oficial",
+  "tag": "section",
+  "class": "merch-oficial-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Hero Section"
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge Text",
+      "default": "Coleccion 2026"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Merch Oficial"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Representa al campeonato de downhill mas grande de Mexico con estilo"
+    },
+    {
+      "type": "header",
+      "content": "Coming Soon Banner"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_coming_soon",
+      "label": "Show Coming Soon Banner",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "coming_soon_title",
+      "label": "Coming Soon Title",
+      "default": "Mas productos proximamente"
+    },
+    {
+      "type": "textarea",
+      "id": "coming_soon_text",
+      "label": "Coming Soon Text",
+      "default": "Estamos preparando mas productos exclusivos para ti. Mantente atento a nuestras redes sociales."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter Section"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_newsletter",
+      "label": "Show Newsletter",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter Title",
+      "default": "Se el primero en enterarte"
+    },
+    {
+      "type": "textarea",
+      "id": "newsletter_text",
+      "label": "Newsletter Text",
+      "default": "Suscribete para recibir notificaciones de nuevos productos y ofertas exclusivas"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Producto",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Product Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Product Title",
+          "default": "Jersey Oficial 2026"
+        },
+        {
+          "type": "textarea",
+          "id": "description",
+          "label": "Product Description",
+          "default": "Jersey oficial del campeonato con diseno exclusivo"
+        },
+        {
+          "type": "select",
+          "id": "category",
+          "label": "Category",
+          "options": [
+            { "value": "jerseys", "label": "Jerseys" },
+            { "value": "gorras", "label": "Gorras" },
+            { "value": "accesorios", "label": "Accesorios" }
+          ],
+          "default": "jerseys"
+        },
+        {
+          "type": "text",
+          "id": "price",
+          "label": "Price (MXN)",
+          "info": "Leave empty to show 'Proximamente'"
+        },
+        {
+          "type": "text",
+          "id": "badge",
+          "label": "Badge Text",
+          "info": "E.g., 'Nuevo', 'Edicion Limitada', 'Agotado'"
+        },
+        {
+          "type": "url",
+          "id": "product_url",
+          "label": "Product Link",
+          "info": "Leave empty if not available yet"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Merch Oficial",
+      "blocks": [
+        {
+          "type": "product",
+          "settings": {
+            "title": "Jersey DHMEXRACES 2026",
+            "description": "Jersey oficial del campeonato con diseno exclusivo y materiales premium",
+            "category": "jerseys",
+            "badge": "Nuevo"
+          }
+        },
+        {
+          "type": "product",
+          "settings": {
+            "title": "Gorra DHMEXRACES Snapback",
+            "description": "Gorra snapback con logo bordado del campeonato",
+            "category": "gorras",
+            "badge": "Popular"
+          }
+        },
+        {
+          "type": "product",
+          "settings": {
+            "title": "Pack Stickers DHMEXRACES",
+            "description": "Set de stickers del campeonato para tu bici, casco y mas",
+            "category": "accesorios"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

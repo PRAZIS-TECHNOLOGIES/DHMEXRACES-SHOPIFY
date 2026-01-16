@@ -1,0 +1,80 @@
+{
+  "sections": {
+    "main": {
+      "type": "merch-oficial",
+      "settings": {
+        "badge_text": "Coleccion 2026",
+        "title": "Merch Oficial",
+        "subtitle": "Representa al campeonato de downhill mas grande de Mexico con estilo",
+        "show_coming_soon": true,
+        "coming_soon_title": "Mas productos proximamente",
+        "coming_soon_text": "Estamos preparando mas productos exclusivos para ti. Mantente atento a nuestras redes sociales.",
+        "show_newsletter": false,
+        "newsletter_title": "Se el primero en enterarte",
+        "newsletter_text": "Suscribete para recibir notificaciones de nuevos productos y ofertas exclusivas"
+      },
+      "blocks": {
+        "product_jersey_1": {
+          "type": "product",
+          "settings": {
+            "title": "Jersey DHMEXRACES 2026",
+            "description": "Jersey oficial del campeonato con diseno exclusivo y materiales premium de alta transpirabilidad",
+            "category": "jerseys",
+            "badge": "Nuevo"
+          }
+        },
+        "product_jersey_2": {
+          "type": "product",
+          "settings": {
+            "title": "Jersey SCOTT x DHMEX",
+            "description": "Colaboracion especial con SCOTT. Edicion limitada del campeonato",
+            "category": "jerseys",
+            "badge": "Edicion Limitada"
+          }
+        },
+        "product_gorra_1": {
+          "type": "product",
+          "settings": {
+            "title": "Gorra DHMEXRACES Snapback",
+            "description": "Gorra snapback con logo bordado del campeonato. Ajuste perfecto",
+            "category": "gorras",
+            "badge": "Popular"
+          }
+        },
+        "product_gorra_2": {
+          "type": "product",
+          "settings": {
+            "title": "Gorra Trucker DHMEX",
+            "description": "Gorra trucker con malla transpirable. Perfecta para el verano",
+            "category": "gorras"
+          }
+        },
+        "product_accesorio_1": {
+          "type": "product",
+          "settings": {
+            "title": "Pack Stickers DHMEXRACES",
+            "description": "Set de stickers del campeonato para tu bici, casco y mas",
+            "category": "accesorios"
+          }
+        },
+        "product_accesorio_2": {
+          "type": "product",
+          "settings": {
+            "title": "Botella Termica DHMEX",
+            "description": "Botella termica de 750ml con aislamiento doble pared",
+            "category": "accesorios"
+          }
+        }
+      },
+      "block_order": [
+        "product_jersey_1",
+        "product_jersey_2",
+        "product_gorra_1",
+        "product_gorra_2",
+        "product_accesorio_1",
+        "product_accesorio_2"
+      ]
+    }
+  },
+  "order": ["main"]
+}
