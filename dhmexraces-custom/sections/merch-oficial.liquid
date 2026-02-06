@@ -19,92 +19,69 @@
 
   <!-- Products Grid -->
   <div class="merch-container">
-    <!-- Category Tabs -->
-    <div class="merch-tabs" data-aos="fade-up">
-      <button class="merch-tab active" data-category="all">Todo</button>
-      <button class="merch-tab" data-category="jerseys">Jerseys</button>
-      <button class="merch-tab" data-category="gorras">Gorras</button>
-      <button class="merch-tab" data-category="accesorios">Accesorios</button>
-    </div>
-
     <!-- Products Grid -->
     <div class="merch-grid">
       {% for block in section.blocks %}
         {% if block.type == 'product' %}
-          <article class="merch-card"
-                   data-category="{{ block.settings.category }}"
-                   data-aos="fade-up"
-                   data-aos-delay="{{ forloop.index | times: 100 }}">
+          {% assign linked_product = all_products[block.settings.product_handle] %}
+          <a href="{{ linked_product.url | default: '#' }}" class="merch-card"
+               data-aos="fade-up"
+               data-aos-delay="{{ forloop.index | times: 100 }}">
             <div class="merch-card__image-wrapper">
               {% if block.settings.badge != blank %}
                 <span class="merch-card__badge">{{ block.settings.badge }}</span>
               {% endif %}
-              {% if block.settings.image != blank %}
+              {% if linked_product.featured_image %}
+                <img src="{{ linked_product.featured_image | image_url: width: 600 }}"
+                     alt="{{ linked_product.title }}"
+                     class="merch-card__image"
+                     loading="lazy">
+              {% elsif block.settings.image != blank %}
                 <img src="{{ block.settings.image | image_url: width: 600 }}"
                      alt="{{ block.settings.title }}"
                      class="merch-card__image"
                      loading="lazy">
-              {% else %}
-                <div class="merch-card__placeholder">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                    <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                  </svg>
-                </div>
               {% endif %}
-              <div class="merch-card__overlay">
-                <span class="merch-card__view">Ver Detalles</span>
-              </div>
             </div>
             <div class="merch-card__info">
-              <span class="merch-card__category">{{ block.settings.category }}</span>
-              <h3 class="merch-card__title">{{ block.settings.title }}</h3>
+              <h3 class="merch-card__title">{{ linked_product.title | default: block.settings.title }}</h3>
               <p class="merch-card__description">{{ block.settings.description }}</p>
-              <div class="merch-card__footer">
+              <div class="merch-card__price-row">
                 <span class="merch-card__price">
-                  {% if block.settings.price != blank %}
+                  {% if linked_product.price %}
+                    {{ linked_product.price | money }}
+                  {% elsif block.settings.price != blank %}
                     ${{ block.settings.price }} MXN
                   {% else %}
                     Proximamente
                   {% endif %}
                 </span>
-                {% if block.settings.product_url != blank %}
-                  <a href="{{ block.settings.product_url }}" class="merch-card__btn">
-                    Comprar
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M5 12h14M12 5l7 7-7 7"/>
-                    </svg>
-                  </a>
-                {% else %}
-                  <span class="merch-card__btn merch-card__btn--disabled">
-                    Pronto
-                  </span>
-                {% endif %}
+              </div>
+              <div class="merch-card__buttons">
+                <span class="merch-card__btn merch-card__btn--primary">
+                  Ver Producto
+                </span>
               </div>
             </div>
-          </article>
+          </a>
         {% endif %}
       {% endfor %}
-    </div>
-
-    <!-- Empty State -->
-    <div class="merch-empty" style="display: none;">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-      </svg>
-      <p>No hay productos en esta categoria por el momento.</p>
     </div>
 
     <!-- Coming Soon Banner -->
     {% if section.settings.show_coming_soon %}
       <div class="merch-coming-soon" data-aos="fade-up">
         <div class="merch-coming-soon__content">
-          <span class="merch-coming-soon__icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-          </span>
           <h3>{{ section.settings.coming_soon_title }}</h3>
           <p>{{ section.settings.coming_soon_text }}</p>
+          {% if section.settings.instagram_url != blank %}
+            <a href="{{ section.settings.instagram_url }}" target="_blank" class="merch-coming-soon__btn">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+              </svg>
+              Seguir en Instagram
+            </a>
+          {% endif %}
         </div>
       </div>
     {% endif %}
@@ -129,36 +106,6 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('.merch-tab');
-    const cards = document.querySelectorAll('.merch-card');
-    const emptyState = document.querySelector('.merch-empty');
-
-    tabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        // Update active tab
-        tabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-
-        const category = this.dataset.category;
-        let visibleCount = 0;
-
-        cards.forEach(card => {
-          if (category === 'all' || card.dataset.category === category) {
-            card.style.display = 'block';
-            card.style.animation = 'fadeInUp 0.5s ease forwards';
-            visibleCount++;
-          } else {
-            card.style.display = 'none';
-          }
-        });
-
-        // Show empty state if no products
-        if (emptyState) {
-          emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
-        }
-      });
-    });
-
     // Parallax effect on scroll
     const hero = document.querySelector('.merch-hero');
     if (hero) {
@@ -194,149 +141,85 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-     HERO SECTION
+     HERO SECTION - Compact Premium
      ═══════════════════════════════════════════════════════════════ */
   .merch-hero {
     position: relative;
-    height: 70vh;
-    min-height: 500px;
+    padding: 4rem 2rem 2.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-bottom: 1px solid rgba(34, 197, 94, 0.2);
   }
 
   .merch-hero__bg {
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(228, 44, 44, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 60% at 70% 100%, rgba(228, 44, 44, 0.1) 0%, transparent 50%),
-      linear-gradient(180deg, #0a0a0a 0%, #111 100%);
+    background: linear-gradient(180deg, #0a0a0a 0%, #0f0f0f 100%);
   }
 
   .merch-hero__bg::before {
     content: '';
     position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    opacity: 0.5;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
+    pointer-events: none;
   }
 
   .merch-hero__content {
     position: relative;
     z-index: 2;
     text-align: center;
-    padding: 2rem;
   }
 
   .merch-hero__badge {
     display: inline-block;
-    background: rgba(228, 44, 44, 0.15);
-    border: 1px solid rgba(228, 44, 44, 0.3);
-    color: var(--merch-primary);
-    font-size: 0.75rem;
-    font-weight: 700;
+    background: transparent;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    color: #22C55E;
+    font-size: 0.65rem;
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    padding: 0.5rem 1.5rem;
-    border-radius: 100px;
-    margin-bottom: 1.5rem;
+    letter-spacing: 0.25em;
+    padding: 0.4rem 1.2rem;
+    border-radius: 2px;
+    margin-bottom: 1rem;
   }
 
   .merch-hero__title {
-    font-size: clamp(3rem, 10vw, 6rem);
-    font-weight: 900;
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+    font-weight: 800;
     text-transform: uppercase;
-    letter-spacing: -0.02em;
-    line-height: 0.9;
-    margin: 0 0 1.5rem 0;
-    background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    letter-spacing: 0.1em;
+    line-height: 1;
+    margin: 0 0 0.5rem 0;
+    color: #fff;
   }
 
   .merch-hero__subtitle {
-    font-size: 1.1rem;
+    font-size: 0.85rem;
     color: var(--merch-text-muted);
-    max-width: 500px;
+    max-width: 350px;
     margin: 0 auto;
-    line-height: 1.6;
+    line-height: 1.4;
   }
 
   .merch-hero__scroll-indicator {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 30px;
-    height: 50px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    padding-top: 8px;
-  }
-
-  .merch-hero__scroll-indicator span {
-    width: 6px;
-    height: 6px;
-    background: var(--merch-primary);
-    border-radius: 50%;
-    animation: scrollBounce 2s infinite;
-  }
-
-  @keyframes scrollBounce {
-    0%, 100% { transform: translateY(0); opacity: 1; }
-    50% { transform: translateY(20px); opacity: 0.3; }
+    display: none;
   }
 
   /* ═══════════════════════════════════════════════════════════════
      CONTAINER
      ═══════════════════════════════════════════════════════════════ */
   .merch-container {
-    max-width: 1400px;
+    max-width: 900px;
     margin: 0 auto;
-    padding: 4rem 2rem 6rem;
-  }
-
-  /* ═══════════════════════════════════════════════════════════════
-     CATEGORY TABS
-     ═══════════════════════════════════════════════════════════════ */
-  .merch-tabs {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 4rem;
-    flex-wrap: wrap;
-  }
-
-  .merch-tab {
-    background: transparent;
-    border: 1px solid var(--merch-border);
-    color: var(--merch-text-muted);
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.875rem 2rem;
-    border-radius: 100px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .merch-tab:hover {
-    border-color: rgba(228, 44, 44, 0.5);
-    color: var(--merch-text);
-    background: rgba(228, 44, 44, 0.05);
-  }
-
-  .merch-tab.active {
-    background: var(--merch-gradient);
-    border-color: transparent;
-    color: #fff;
-    box-shadow: 0 4px 20px rgba(228, 44, 44, 0.4);
+    padding: 3rem 2rem 5rem;
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -344,7 +227,7 @@
      ═══════════════════════════════════════════════════════════════ */
   .merch-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: 1fr;
     gap: 2rem;
   }
 
@@ -360,46 +243,33 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════
-     PRODUCT CARD - Glassmorphism Style
+     PRODUCT CARD - Premium Horizontal Style
      ═══════════════════════════════════════════════════════════════ */
   .merch-card {
-    background: var(--merch-card);
-    border: 1px solid var(--merch-border);
-    border-radius: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    text-decoration: none;
+    background: linear-gradient(135deg, #141414 0%, #0f0f0f 100%);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-  }
-
-  .merch-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(228, 44, 44, 0.05) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-    z-index: 1;
+    cursor: pointer;
   }
 
   .merch-card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(228, 44, 44, 0.3);
-    box-shadow:
-      0 20px 40px rgba(0, 0, 0, 0.4),
-      0 0 60px rgba(228, 44, 44, 0.1);
-  }
-
-  .merch-card:hover::before {
-    opacity: 1;
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    transform: translateY(-4px);
   }
 
   /* Image Wrapper */
   .merch-card__image-wrapper {
     position: relative;
-    aspect-ratio: 4/5;
-    background: var(--merch-surface);
+    background: linear-gradient(180deg, #1a1a1a 0%, #111 100%);
     overflow: hidden;
+    min-height: 350px;
   }
 
   .merch-card__badge {
@@ -407,18 +277,19 @@
     top: 1rem;
     left: 1rem;
     z-index: 3;
-    background: var(--merch-gradient);
+    background: #22C55E;
     color: #fff;
-    font-size: 0.7rem;
+    font-size: 0.6rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 0.5rem 1rem;
-    border-radius: 100px;
-    box-shadow: 0 4px 15px rgba(228, 44, 44, 0.4);
+    letter-spacing: 0.1em;
+    padding: 0.4rem 0.8rem;
+    border-radius: 2px;
   }
 
   .merch-card__image {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -426,143 +297,109 @@
   }
 
   .merch-card:hover .merch-card__image {
-    transform: scale(1.08);
-  }
-
-  .merch-card__placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
-  }
-
-  .merch-card__placeholder svg {
-    width: 80px;
-    height: 80px;
-    color: rgba(255, 255, 255, 0.1);
-  }
-
-  /* Overlay */
-  .merch-card__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.8) 0%,
-      transparent 50%
-    );
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 2rem;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-
-  .merch-card:hover .merch-card__overlay {
-    opacity: 1;
-  }
-
-  .merch-card__view {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: #fff;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    padding: 0.875rem 1.5rem;
-    border-radius: 100px;
-    transform: translateY(20px);
-    transition: transform 0.4s ease;
-  }
-
-  .merch-card:hover .merch-card__view {
-    transform: translateY(0);
+    transform: scale(1.05);
   }
 
   /* Card Info */
   .merch-card__info {
-    padding: 1.5rem;
+    padding: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
     z-index: 2;
   }
 
-  .merch-card__category {
-    display: inline-block;
-    color: var(--merch-primary);
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 0.5rem;
-  }
-
   .merch-card__title {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--merch-text);
-    margin: 0 0 0.5rem 0;
-    line-height: 1.3;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
   }
 
   .merch-card__description {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     color: var(--merch-text-muted);
-    line-height: 1.5;
-    margin: 0 0 1.25rem 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    line-height: 1.6;
+    margin: 0 0 2rem 0;
   }
 
-  .merch-card__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+  .merch-card__price-row {
+    margin-bottom: 1.5rem;
   }
 
   .merch-card__price {
-    font-size: 1.1rem;
+    font-size: 1.75rem;
     font-weight: 800;
     color: var(--merch-text);
+  }
+
+  .merch-card__buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: auto;
   }
 
   .merch-card__btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
-    background: var(--merch-gradient);
-    color: #fff;
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     text-decoration: none;
-    padding: 0.75rem 1.25rem;
-    border-radius: 100px;
+    padding: 1rem 1.5rem;
+    border-radius: 6px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(228, 44, 44, 0.3);
+    flex: 1;
   }
 
-  .merch-card__btn svg {
-    width: 16px;
-    height: 16px;
-    transition: transform 0.3s ease;
+  .merch-card__btn--primary {
+    background: #22C55E;
+    color: #fff;
   }
 
-  .merch-card__btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(228, 44, 44, 0.5);
+  .merch-card__btn--primary:hover {
+    background: #16A34A;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(34, 197, 94, 0.4);
   }
 
-  .merch-card__btn:hover svg {
-    transform: translateX(3px);
+  .merch-card__btn--secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--merch-text);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .merch-card__btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-2px);
+  }
+
+  /* Mobile: Stack vertically */
+  @media (max-width: 700px) {
+    .merch-card {
+      grid-template-columns: 1fr;
+    }
+    .merch-card__image-wrapper {
+      min-height: 280px;
+    }
+    .merch-card__info {
+      padding: 1.5rem;
+    }
+    .merch-card__title {
+      font-size: 1.25rem;
+    }
+    .merch-card__price {
+      font-size: 1.5rem;
+    }
+    .merch-card__buttons {
+      flex-direction: column;
+    }
   }
 
   .merch-card__btn--disabled {
@@ -619,7 +456,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(228, 44, 44, 0.08) 0%, transparent 70%);
+    background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
     pointer-events: none;
   }
 
@@ -654,11 +491,35 @@
   }
 
   .merch-coming-soon p {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: var(--merch-text-muted);
-    margin: 0;
+    margin: 0 0 1.5rem 0;
     max-width: 400px;
     margin-inline: auto;
+  }
+
+  .merch-coming-soon__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, #E1306C 0%, #C13584 50%, #833AB4 100%);
+    color: #fff;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .merch-coming-soon__btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .merch-coming-soon__btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(193, 53, 132, 0.4);
   }
 
   /* ═══════════════════════════════════════════════════════════════
@@ -743,35 +604,36 @@
      ═══════════════════════════════════════════════════════════════ */
   @media (max-width: 768px) {
     .merch-hero {
-      height: 60vh;
-      min-height: 400px;
+      padding: 3rem 1.5rem 2rem;
+      height: auto;
+      min-height: auto;
     }
 
     .merch-hero__title {
-      font-size: clamp(2.5rem, 12vw, 4rem);
+      font-size: 1.5rem;
     }
 
     .merch-hero__subtitle {
-      font-size: 1rem;
+      font-size: 0.8rem;
+    }
+
+    .merch-hero__badge {
+      font-size: 0.55rem;
+      padding: 0.3rem 0.8rem;
+      margin-bottom: 0.75rem;
     }
 
     .merch-container {
-      padding: 3rem 1rem 4rem;
-    }
-
-    .merch-tabs {
-      gap: 0.4rem;
-      margin-bottom: 3rem;
-    }
-
-    .merch-tab {
-      padding: 0.75rem 1.25rem;
-      font-size: 0.75rem;
+      padding: 2rem 1rem 3rem;
     }
 
     .merch-grid {
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      grid-template-columns: 1fr;
       gap: 1.5rem;
+    }
+
+    .merch-card__image-wrapper {
+      min-height: 320px;
     }
 
     .merch-card__info {
@@ -782,14 +644,15 @@
       font-size: 1.1rem;
     }
 
-    .merch-card__footer {
+    .merch-card__buttons {
       flex-direction: column;
-      align-items: stretch;
       gap: 0.75rem;
     }
 
     .merch-card__btn {
       justify-content: center;
+      padding: 0.875rem 1.25rem;
+      font-size: 0.75rem;
     }
 
     .merch-newsletter__form {
@@ -803,13 +666,21 @@
 
   @media (max-width: 480px) {
     .merch-hero {
-      height: 50vh;
-      min-height: 350px;
+      padding: 2.5rem 1rem 1.5rem;
+    }
+
+    .merch-hero__title {
+      font-size: 1.25rem;
+    }
+
+    .merch-hero__subtitle {
+      font-size: 0.75rem;
+      max-width: 280px;
     }
 
     .merch-hero__badge {
-      font-size: 0.65rem;
-      padding: 0.4rem 1rem;
+      font-size: 0.5rem;
+      padding: 0.25rem 0.6rem;
     }
 
     .merch-hero__scroll-indicator {
@@ -820,8 +691,38 @@
       grid-template-columns: 1fr;
     }
 
+    .merch-card__image-wrapper {
+      min-height: 340px;
+    }
+
+    .merch-card__info {
+      padding: 1rem;
+    }
+
+    .merch-card__description {
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .merch-card__price {
+      font-size: 1.25rem;
+    }
+
+    .merch-card__price-row {
+      margin-bottom: 1rem;
+    }
+
     .merch-coming-soon {
-      padding: 2rem 1.5rem;
+      padding: 1.5rem 1rem;
+      margin-top: 2rem;
+    }
+
+    .merch-coming-soon h3 {
+      font-size: 1.1rem;
+    }
+
+    .merch-coming-soon p {
+      font-size: 0.8rem;
     }
   }
 {% endstylesheet %}
@@ -877,6 +778,12 @@
       "default": "Estamos preparando mas productos exclusivos para ti. Mantente atento a nuestras redes sociales."
     },
     {
+      "type": "url",
+      "id": "instagram_url",
+      "label": "Instagram URL",
+      "info": "Link a tu perfil de Instagram"
+    },
+    {
       "type": "header",
       "content": "Newsletter Section"
     },
@@ -905,9 +812,10 @@
       "name": "Producto",
       "settings": [
         {
-          "type": "image_picker",
-          "id": "image",
-          "label": "Product Image"
+          "type": "text",
+          "id": "product_handle",
+          "label": "Handle del producto",
+          "info": "Escribe el handle del producto (ej: jersey-oficial-guanajuato-2026)"
         },
         {
           "type": "text",

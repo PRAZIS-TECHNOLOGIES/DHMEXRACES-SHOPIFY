@@ -171,3 +171,28 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Responsive scaling for different screen resolutions */
+@media screen and (min-width: 1920px) {
+  html {
+    font-size: 100%;
+  }
+}
+
+@media screen and (min-width: 2560px) {
+  html {
+    font-size: 112.5%;
+  }
+}
+
+@media screen and (max-width: 1366px) {
+  html {
+    font-size: 93.75%;
+  }
+}
+
+@media screen and (max-width: 1280px) {
+  html {
+    font-size: 87.5%;
+  }
+}

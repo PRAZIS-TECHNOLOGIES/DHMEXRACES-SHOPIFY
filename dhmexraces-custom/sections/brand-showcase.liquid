@@ -10,6 +10,12 @@
       </h2>
     {% endif %}
 
+    {% if section.settings.title_line_2 != blank %}
+      <h2 class="brand-showcase__title" data-aos="fade-up" data-aos-delay="50">
+        {{ section.settings.title_line_2 }}
+      </h2>
+    {% endif %}
+
     {% if section.settings.subtitle != blank %}
       <p class="brand-showcase__subtitle" data-aos="fade-up" data-aos-delay="100">
         {{ section.settings.subtitle }}
@@ -201,8 +207,14 @@
     {
       "type": "text",
       "id": "title",
-      "label": "Título",
-      "default": "El Campeonato Nacional de Downhill"
+      "label": "Título Línea 1",
+      "default": "Copa Scott DHMEXRACES"
+    },
+    {
+      "type": "text",
+      "id": "title_line_2",
+      "label": "Título Línea 2",
+      "default": "Nacional de Downhill"
     },
     {
       "type": "text",

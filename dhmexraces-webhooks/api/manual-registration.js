@@ -1,45 +1,24 @@
 /**
- * ═══════════════════════════════════════════════════════════════════════════════
- * DHMEXRACES - Webhook de Órdenes
- * ═══════════════════════════════════════════════════════════════════════════════
- *
- * Este webhook procesa las órdenes de inscripción de Shopify y:
- * 1. Genera códigos únicos de check-in (QR)
- * 2. Asigna boletos de rifa FOX 40
- * 3. Guarda los datos en Google Sheets
- * 4. Envía emails de confirmación personalizados
- *
- * @author DHMEXRACES
- * @version 2.0.0
- * @lastUpdated 2026-01-13
+ * DHMEXRACES - Manual Registration API
+ * Endpoint para inscripciones manuales (pagos por depósito/transferencia)
  */
 
-const { Resend } = require('resend');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const { Resend } = require('resend');
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// CONFIGURACIÓN Y CONSTANTES
-// ═══════════════════════════════════════════════════════════════════════════════
+// Configuración
+const SPREADSHEET_ID = '1XGe4vuVxsPQAE10deD-bYUVxKjUbeclyDx3m1CqpFBg';
+const ADMIN_PASSWORD = '15211521Gg';
 
-/** Cliente de Resend para envío de emails */
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-/** ID del Google Spreadsheet principal */
-const SPREADSHEET_ID = '1XGe4vuVxsPQAE10deD-bYUVxKjUbeclyDx3m1CqpFBg';
-
-/** Mapeo de sedes a códigos cortos para QR */
-const SEDE_CODES = {
-  'GUANAJUATO': 'GTO',
-  'PUEBLA': 'PUE',
-  'GUADALAJARA': 'GDL',
-  'IXTAPAN': 'IXT',
-  'TAXCO': 'TAX'
+// Configuración de email
+const EMAIL_CONFIG = {
+  from: 'DHMEXRACES <noreply@endhurorace.com>',
+  subjectPrefix: '✅ Inscripción Confirmada'
 };
 
-/** Caracteres permitidos para códigos (sin caracteres confusos: I, O, 0, 1) */
-const ALLOWED_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-
-/** Configuración de la rifa */
+// Configuración de la rifa
 const RAFFLE_CONFIG = {
   sheetName: 'RIFA',
   prize: 'FOX 40 Factory GRIP 2',
@@ -47,13 +26,7 @@ const RAFFLE_CONFIG = {
   drawDate: 'Sede Puebla - 22 Marzo 2026'
 };
 
-/** Configuración del email */
-const EMAIL_CONFIG = {
-  from: 'DHMEXRACES <noreply@endhurorace.com>',
-  subjectPrefix: '✅ Inscripción Confirmada'
-};
-
-/** URLs de recursos */
+// URLs de recursos
 const ASSETS = {
   logo: 'https://endhurorace.com/cdn/shop/files/dhmexscottshimanologo.png?v=1763690918&width=600',
   foxLogo: 'https://endhurorace.com/cdn/shop/files/FOXLOGO.png?v=1763606761&width=400',
@@ -61,256 +34,137 @@ const ASSETS = {
   qrApiBase: 'https://api.qrserver.com/v1/create-qr-code/'
 };
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FUNCIONES UTILITARIAS
-// ═══════════════════════════════════════════════════════════════════════════════
+// Mapeo de sedes
+const SEDE_TO_SHEET = {
+  'guanajuato': 'GUANAJUATO',
+  'puebla': 'PUEBLA',
+  'guadalajara': 'GUADALAJARA',
+  'ixtapan': 'IXTAPAN',
+  'taxco': 'TAXCO'
+};
 
-/**
- * Conecta a Google Sheets y retorna el documento autenticado
- * @returns {Promise<GoogleSpreadsheet>} Documento de Google Sheets autenticado
- * @throws {Error} Si las credenciales no están configuradas
- */
+const SEDE_CODES = {
+  'guanajuato': 'GTO',
+  'puebla': 'PUE',
+  'guadalajara': 'GDL',
+  'ixtapan': 'IXT',
+  'taxco': 'TAX'
+};
+
+// Funciones utilitarias
 async function connectToGoogleSheets() {
-  if (!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !process.env.GOOGLE_PRIVATE_KEY) {
-    throw new Error('Credenciales de Google no configuradas');
-  }
-
-  const privateKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
   const doc = new GoogleSpreadsheet(SPREADSHEET_ID);
-
+  const privateKey = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
   await doc.useServiceAccountAuth({
     client_email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
     private_key: privateKey,
   });
-
   await doc.loadInfo();
   return doc;
 }
 
-/**
- * Genera un código alfanumérico aleatorio
- * @param {number} length - Longitud del código
- * @returns {string} Código generado
- */
 function generateRandomCode(length = 8) {
-  let code = '';
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let result = '';
   for (let i = 0; i < length; i++) {
-    code += ALLOWED_CHARS.charAt(Math.floor(Math.random() * ALLOWED_CHARS.length));
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
-  return code;
+  return result;
 }
 
-/**
- * Determina el nombre de la hoja según el título del producto
- * @param {string} productTitle - Título del producto
- * @returns {string} Nombre de la hoja de la sede
- */
-function getSheetNameFromProduct(productTitle) {
-  const title = (productTitle || '').toLowerCase();
-
-  if (title.includes('guanajuato')) return 'GUANAJUATO';
-  if (title.includes('puebla')) return 'PUEBLA';
-  if (title.includes('guadalajara')) return 'GUADALAJARA';
-  if (title.includes('ixtapan')) return 'IXTAPAN';
-  if (title.includes('taxco')) return 'TAXCO';
-
-  return 'GUANAJUATO'; // Default
-}
-
-/**
- * Formatea una fecha al formato mexicano (dd/mm/yyyy)
- * @param {string|Date} date - Fecha a formatear
- * @returns {string} Fecha formateada
- */
-function formatDateMX(date) {
-  return new Date(date).toLocaleDateString('es-MX');
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// FUNCIONES DE CHECK-IN
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Genera un código único de check-in para un corredor
- * Formato: DHMEX-{SEDE}-{CODIGO_ALEATORIO}
- *
- * @param {string} sede - Nombre de la sede
- * @returns {string} Código de check-in único
- *
- * @example
- * generateCheckInCode('GUANAJUATO') // 'DHMEX-GTO-A3B7C9D2'
- */
 function generateCheckInCode(sede) {
-  const sedeCode = SEDE_CODES[sede] || 'DHM';
-  const uniqueId = generateRandomCode(8);
-  return `DHMEX-${sedeCode}-${uniqueId}`;
+  const sedeCode = SEDE_CODES[sede.toLowerCase()] || 'DHM';
+  const randomCode = generateRandomCode(8);
+  return `DHMEX-${sedeCode}-${randomCode}`;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FUNCIONES DE RIFA
-// ═══════════════════════════════════════════════════════════════════════════════
+function formatDateMX(date) {
+  const d = new Date(date);
+  const day = d.getDate().toString().padStart(2, '0');
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const year = d.getFullYear();
+  return `${day}/${month}/${year}`;
+}
 
-/**
- * Asigna un boleto de rifa a un corredor
- *
- * Proceso:
- * 1. Conecta a la hoja RIFA
- * 2. VERIFICA si ya tiene boleto asignado (por OrderID + Email)
- * 3. Si no tiene, busca el primer boleto disponible (Ocupado = 0)
- * 4. Lo marca como ocupado y guarda los datos del comprador
- * 5. Retorna el número asignado
- *
- * @param {Object} corredor - Datos del corredor
- * @param {string} corredor.nombre - Nombre completo
- * @param {string} corredor.email - Email del corredor
- * @param {string} orderNumber - Número de orden de Shopify
- * @param {string} orderDate - Fecha de la orden
- * @returns {Promise<{success: boolean, numero: string|null, error?: string, skipped?: boolean}>}
- */
-async function assignRaffleTicket(corredor, orderNumber, orderDate) {
-  try {
-    console.log(`🎫 Asignando boleto de rifa a ${corredor.nombre}...`);
-
-    const doc = await connectToGoogleSheets();
-    const sheet = doc.sheetsByTitle[RAFFLE_CONFIG.sheetName];
-
-    if (!sheet) {
-      console.error(`❌ Hoja "${RAFFLE_CONFIG.sheetName}" no encontrada`);
-      return { success: false, numero: null, error: 'Hoja RIFA no encontrada' };
+async function getNextManualOrderNumber(doc) {
+  let maxNumber = 0;
+  for (const sheetName of Object.values(SEDE_TO_SHEET)) {
+    const sheet = doc.sheetsByTitle[sheetName];
+    if (sheet) {
+      const rows = await sheet.getRows();
+      for (const row of rows) {
+        const orden = row.ORDEN || '';
+        if (orden.startsWith('MANUAL-')) {
+          const num = parseInt(orden.replace('MANUAL-', ''), 10);
+          if (num > maxNumber) maxNumber = num;
+        }
+      }
     }
+  }
+  return `MANUAL-${String(maxNumber + 1).padStart(3, '0')}`;
+}
 
-    // Obtener todas las filas
+async function assignRaffleTicket(doc, corredor, orderNumber, orderDate) {
+  try {
+    const sheet = doc.sheetsByTitle[RAFFLE_CONFIG.sheetName];
+    if (!sheet) return { success: false, numero: null };
+
     const rows = await sheet.getRows();
 
-    // VERIFICAR DUPLICADO: Buscar si ya tiene boleto asignado con esta orden + email
     const existingTicket = rows.find(row =>
       row.OrderID === String(orderNumber) &&
-      row.Email &&
-      row.Email.toLowerCase() === (corredor.email || '').toLowerCase()
+      row.Email?.toLowerCase() === corredor.email?.toLowerCase()
     );
 
     if (existingTicket) {
-      console.log(`⚠️ DUPLICADO RIFA: Orden ${orderNumber}, Email ${corredor.email} ya tiene boleto #${existingTicket.Numero}`);
-      return {
-        success: true,
-        numero: existingTicket.Numero,
-        skipped: true
-      };
+      return { success: true, numero: existingTicket.Numero, skipped: true };
     }
 
-    // Buscar el primer boleto disponible (secuencial ya que están randomizados)
     const availableTicket = rows.find(row => row.Ocupado === '0' || row.Ocupado === 0);
 
     if (!availableTicket) {
-      console.error('❌ No hay boletos de rifa disponibles');
       return { success: false, numero: null, error: 'No hay boletos disponibles' };
     }
 
-    // Asignar el boleto
     const ticketNumber = availableTicket.Numero;
     availableTicket.Ocupado = '1';
-    availableTicket.OrderID = orderNumber || '';
+    availableTicket.OrderID = orderNumber;
     availableTicket.Email = corredor.email || '';
     availableTicket.Nombre = corredor.nombre || '';
     availableTicket.Fecha = formatDateMX(orderDate);
 
     await availableTicket.save();
 
-    console.log(`✅ Boleto #${ticketNumber} asignado exitosamente`);
     return { success: true, numero: ticketNumber };
-
   } catch (error) {
-    console.error('❌ Error asignando boleto de rifa:', error.message);
+    console.error('Error asignando rifa:', error);
     return { success: false, numero: null, error: error.message };
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// FUNCIONES DE GOOGLE SHEETS
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Verifica si un corredor ya existe en Google Sheets (para evitar duplicados)
- *
- * @param {string} orderNumber - Número de orden
- * @param {string} email - Email del corredor
- * @param {string} sheetName - Nombre de la hoja de la sede
- * @returns {Promise<{exists: boolean, existingCode?: string}>}
- */
-async function checkIfCorredorExists(orderNumber, email, sheetName) {
+async function saveToGoogleSheets(doc, corredor, orderNumber, orderDate, checkInCode, sheetName) {
   try {
-    const doc = await connectToGoogleSheets();
     const sheet = doc.sheetsByTitle[sheetName];
-
     if (!sheet) {
-      return { exists: false };
+      return { success: false, error: `Hoja ${sheetName} no encontrada` };
     }
 
     const rows = await sheet.getRows();
     const existingRow = rows.find(row =>
       row.ORDEN === String(orderNumber) &&
-      row.EMAIL &&
-      row.EMAIL.toLowerCase() === email.toLowerCase()
+      row.EMAIL?.toLowerCase() === corredor.email?.toLowerCase()
     );
 
     if (existingRow) {
-      return {
-        exists: true,
-        existingCode: existingRow.QR_CODE || null
-      };
+      return { success: true, skipped: true, existingCode: existingRow.QR_CODE };
     }
 
-    return { exists: false };
-  } catch (error) {
-    console.error('Error verificando duplicado:', error.message);
-    return { exists: false }; // En caso de error, permitir continuar
-  }
-}
-
-/**
- * Guarda los datos de un corredor en Google Sheets
- *
- * @param {Object} corredor - Datos del corredor
- * @param {string} orderNumber - Número de orden
- * @param {string} orderDate - Fecha de la orden
- * @param {string} checkInCode - Código de check-in generado
- * @returns {Promise<{success: boolean, sheet?: string, error?: string, skipped?: boolean}>}
- */
-async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode) {
-  try {
-    console.log(`📊 Guardando corredor ${corredor.nombre} en Sheets...`);
-
-    const doc = await connectToGoogleSheets();
-    const sheetName = getSheetNameFromProduct(corredor.product_title);
-    const sheet = doc.sheetsByTitle[sheetName];
-
-    if (!sheet) {
-      console.error(`❌ Hoja "${sheetName}" no encontrada`);
-      return { success: false, error: `Hoja "${sheetName}" no encontrada` };
-    }
-
-    // VERIFICAR DUPLICADO: Buscar si ya existe un registro con misma orden + email
-    const rows = await sheet.getRows();
-    const existingRow = rows.find(row =>
-      row.ORDEN === String(orderNumber) &&
-      row.EMAIL &&
-      row.EMAIL.toLowerCase() === (corredor.email || '').toLowerCase()
-    );
-
-    if (existingRow) {
-      console.log(`⚠️ DUPLICADO DETECTADO: Orden ${orderNumber}, Email ${corredor.email} ya existe con QR: ${existingRow.QR_CODE}`);
-      return {
-        success: true,
-        sheet: sheetName,
-        skipped: true,
-        existingCode: existingRow.QR_CODE
-      };
-    }
-
-    // Determinar talla de jersey (si el corredor alcanzó playera)
     const jerseyTalla = corredor.talla_playera ? `Talla ${corredor.talla_playera}` : '';
+    const sedeName = corredor.sede.charAt(0).toUpperCase() + corredor.sede.slice(1);
 
-    // Agregar fila con los datos del corredor
+    // Determinar valor de PAGO según tipo_pago
+    const pagoValue = corredor.tipo_pago === 'patrocinado' ? 'patrocinado' : 'deposito 1500';
+
     await sheet.addRow({
       'FECHA': formatDateMX(orderDate),
       'ORDEN': orderNumber,
@@ -319,56 +173,31 @@ async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode)
       'TELEFONO': corredor.telefono || '',
       'FECHA DE NACIMIENTO': corredor.fecha_nacimiento || '',
       'EQUIPO': corredor.equipo || 'Independiente',
-      'CATEGORIA': corredor.categoria || corredor.variant_title || '',
-      'SEDE': corredor.product_title || '',
+      'CATEGORIA': corredor.categoria || '',
+      'SEDE': `Inscripción Sede - ${sedeName}`,
       'EMERGENCIA NOMBRE': corredor.emergencia_nombre || '',
       'EMERGENCIA TEL': corredor.emergencia_telefono || '',
       'QR_CODE': checkInCode,
       'CHECK_IN': 'NO',
       'CHECK_IN_TIME': '',
       'JERSEY': jerseyTalla,
-      'PAGO': 'shopify'
+      'PAGO': pagoValue
     });
 
-    console.log(`✅ Guardado en hoja ${sheetName}`);
     return { success: true, sheet: sheetName };
-
   } catch (error) {
-    console.error('❌ Error guardando en Sheets:', error.message);
+    console.error('Error guardando en Sheets:', error);
     return { success: false, error: error.message };
   }
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// GENERADOR DE EMAIL HTML
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Genera el HTML del email de confirmación
- *
- * Incluye:
- * - Header con logo
- * - Datos del corredor
- * - Código QR de check-in
- * - Boleto de rifa FOX 40
- * - Información del evento
- * - Patrocinadores
- *
- * @param {Object} corredor - Datos del corredor
- * @param {string} orderNumber - Número de orden
- * @param {string} sede - Nombre de la sede
- * @param {string} checkInCode - Código de check-in
- * @param {string} raffleNumber - Número de boleto de rifa
- * @returns {string} HTML del email
- */
 function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumber) {
-  // Datos del corredor
   const nombre = corredor.nombre || 'Corredor';
   const primerNombre = nombre.split(' ')[0];
-  const categoria = corredor.categoria || corredor.variant_title || 'N/A';
-  const sedeNombre = sede || corredor.product_title || 'DHMEXRACES 2026';
+  const categoria = corredor.categoria || 'N/A';
+  const sedeName = sede.charAt(0).toUpperCase() + sede.slice(1);
+  const sedeNombre = `Inscripción Sede - ${sedeName}`;
 
-  // URL del QR
   const qrUrl = `${ASSETS.qrApiBase}?size=200x200&data=${encodeURIComponent(checkInCode)}&bgcolor=FFFFFF&color=000000`;
 
   return `
@@ -377,9 +206,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="x-apple-disable-message-reformatting">
-  <meta name="color-scheme" content="light dark">
-  <meta name="supported-color-schemes" content="light dark">
   <style>
     @media only screen and (max-width: 620px) {
       .mobile-full { width: 100% !important; }
@@ -392,15 +218,13 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
     }
   </style>
 </head>
-<body style="margin: 0; padding: 0; background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%;">
+<body style="margin: 0; padding: 0; background-color: #000000; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #000000;">
     <tr>
       <td align="center" style="padding: 40px 16px;">
         <table role="presentation" class="mobile-full" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; width: 100%;">
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- HEADER CON LOGO -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td align="center" style="padding-bottom: 40px; border-bottom: 2px solid #E42C2C;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#FFFFFF" style="background-color: #FFFFFF !important; border-radius: 12px;">
@@ -415,9 +239,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <tr><td style="height: 40px;"></td></tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- MENSAJE PRINCIPAL -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td align="center" style="padding-bottom: 32px; text-align: center;">
               <h2 class="mobile-title" style="font-size: 36px; font-weight: 700; color: #FFFFFF; margin: 0 0 16px 0; letter-spacing: -0.02em; text-align: center;">
@@ -429,12 +251,9 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
             </td>
           </tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- CARD DE CATEGORÍA Y DATOS -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 32px;">
-              <!-- Badge de categoría -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom: 24px;">
@@ -445,7 +264,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                 </tr>
               </table>
 
-              <!-- Sede -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08);">
@@ -455,7 +273,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                 </tr>
               </table>
 
-              <!-- Datos del corredor -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
                 <tr>
                   <td style="padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
@@ -537,9 +354,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <tr><td style="height: 32px;"></td></tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- QR CODE CHECK-IN -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td style="background: linear-gradient(135deg, rgba(228,44,44,0.1) 0%, rgba(0,0,0,0.3) 100%); border: 2px solid #E42C2C; border-radius: 16px; padding: 32px; text-align: center;">
               <h3 style="color: #E42C2C; font-size: 14px; font-weight: 700; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.15em;">
@@ -568,13 +383,10 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <tr><td style="height: 32px;"></td></tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- BOLETO DE RIFA FOX 40 -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-radius: 16px; overflow: hidden; border: 2px solid #FF6B00;">
-                <!-- Header del ticket -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%); padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
@@ -596,11 +408,9 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     </table>
                   </td>
                 </tr>
-                <!-- Línea decorativa -->
                 <tr>
                   <td style="padding: 0; height: 4px; background: repeating-linear-gradient(90deg, #FF6B00 0px, #FF6B00 10px, transparent 10px, transparent 20px);"></td>
                 </tr>
-                <!-- Cuerpo del ticket -->
                 <tr>
                   <td style="padding: 20px 20px 20px 12px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
@@ -659,7 +469,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     </table>
                   </td>
                 </tr>
-                <!-- Footer del ticket -->
                 <tr>
                   <td style="background: rgba(255,107,0,0.05); border-top: 1px solid rgba(255,107,0,0.2); padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
@@ -684,9 +493,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <tr><td style="height: 32px;"></td></tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- TU INSCRIPCIÓN INCLUYE -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td style="padding: 24px 0;">
               <h3 style="color: #FFFFFF; font-size: 14px; font-weight: 700; margin: 0 0 20px 0; text-transform: uppercase; letter-spacing: 0.1em; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 12px;">
@@ -727,9 +534,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
             </td>
           </tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- MECÁNICA NEUTRAL SHIMANO -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td style="background: linear-gradient(135deg, rgba(0,102,179,0.15) 0%, rgba(0,102,179,0.05) 100%); border: 1px solid rgba(0,102,179,0.3); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
               <h3 style="color: #0066B3; font-size: 14px; font-weight: 700; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.1em;">
@@ -805,9 +610,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
             </td>
           </tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
           <!-- PATROCINADORES -->
-          <!-- ═══════════════════════════════════════════════ -->
           <tr>
             <td style="padding: 32px 0; border-top: 1px solid rgba(255,255,255,0.08);">
               <h3 style="color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 600; margin: 0 0 24px 0; text-transform: uppercase; letter-spacing: 0.15em; text-align: center;">
@@ -877,249 +680,96 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
   `;
 }
 
-// ═══════════════════════════════════════════════════════════════════════════════
-// PROCESADOR DE CORREDORES
-// ═══════════════════════════════════════════════════════════════════════════════
+// Handler principal
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
-/**
- * Procesa un corredor individual: genera códigos, asigna rifa, guarda y envía email
- * INCLUYE PROTECCIÓN CONTRA DUPLICADOS
- *
- * @param {Object} corredor - Datos del corredor
- * @param {Object} order - Datos de la orden de Shopify
- * @param {string} orderDate - Fecha de la orden
- * @returns {Promise<Object>} Resultado del procesamiento
- */
-async function processCorredor(corredor, order, orderDate) {
-  const orderNumber = order.order_number || order.name;
-  const result = {
-    nombre: corredor.nombre,
-    email: corredor.email,
-    checkInCode: null,
-    raffleNumber: null,
-    sheetResult: null,
-    emailResult: null,
-    skipped: false
-  };
-
-  try {
-    // 1. Determinar la hoja/sede
-    const sheetName = getSheetNameFromProduct(corredor.product_title);
-
-    // 2. VERIFICAR SI YA EXISTE (protección contra webhooks duplicados)
-    const existsCheck = await checkIfCorredorExists(orderNumber, corredor.email, sheetName);
-
-    if (existsCheck.exists) {
-      console.log(`⚠️ DUPLICADO: Corredor ${corredor.nombre} (Orden ${orderNumber}) ya existe. QR: ${existsCheck.existingCode}`);
-      result.skipped = true;
-      result.checkInCode = existsCheck.existingCode;
-      result.sheetResult = { success: true, skipped: true };
-      result.emailResult = { status: 'skipped', reason: 'Duplicate - already processed' };
-
-      // Buscar el boleto de rifa existente
-      const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
-      result.raffleNumber = raffleResult.numero || '---';
-
-      return result;
-    }
-
-    // 3. Generar código de check-in (NUEVO)
-    result.checkInCode = generateCheckInCode(sheetName);
-    console.log(`🎫 Check-in: ${result.checkInCode}`);
-
-    // 4. Asignar boleto de rifa
-    const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
-    result.raffleNumber = raffleResult.numero || '---';
-    console.log(`🎰 Rifa: ${result.raffleNumber}`);
-
-    // 5. Guardar en Google Sheets
-    result.sheetResult = await saveToGoogleSheets(corredor, orderNumber, orderDate, result.checkInCode);
-
-    // Si fue skipped en el guardado (duplicado detectado ahí también), no enviar email
-    if (result.sheetResult.skipped) {
-      console.log(`⚠️ Corredor ${corredor.nombre} fue detectado como duplicado durante el guardado`);
-      result.skipped = true;
-      result.emailResult = { status: 'skipped', reason: 'Duplicate detected during save' };
-      return result;
-    }
-
-    // 6. Enviar email (si tiene email y no es duplicado)
-    if (!corredor.email) {
-      console.log(`⚠️ Corredor sin email: ${corredor.nombre}`);
-      result.emailResult = { status: 'skipped', reason: 'No email provided' };
-      return result;
-    }
-
-    const { data, error } = await resend.emails.send({
-      from: EMAIL_CONFIG.from,
-      to: corredor.email,
-      subject: `${EMAIL_CONFIG.subjectPrefix} - ${corredor.categoria || corredor.variant_title} | DHMEXRACES 2026`,
-      html: generateEmailHTML(corredor, orderNumber, corredor.product_title, result.checkInCode, result.raffleNumber),
-    });
-
-    if (error) {
-      console.error(`❌ Error enviando email a ${corredor.email}:`, error);
-      result.emailResult = { status: 'error', error: error.message };
-    } else {
-      console.log(`✅ Email enviado a ${corredor.email}`);
-      result.emailResult = { status: 'sent', id: data.id };
-    }
-
-  } catch (error) {
-    console.error(`❌ Error procesando corredor ${corredor.nombre}:`, error);
-    result.emailResult = { status: 'error', error: error.message };
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
 
-  return result;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════════
-// HANDLER PRINCIPAL DEL WEBHOOK
-// ═══════════════════════════════════════════════════════════════════════════════
-
-/**
- * Handler principal del webhook de Shopify
- *
- * Recibe órdenes de Shopify y procesa las inscripciones:
- * - Valida la request
- * - Extrae los datos de registration_data
- * - Procesa cada corredor
- * - Retorna el resultado
- *
- * @param {Object} req - Request de Vercel
- * @param {Object} res - Response de Vercel
- */
-module.exports = async function handler(req, res) {
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🚀 WEBHOOK DHMEXRACES - ORDEN RECIBIDA');
-  console.log('═══════════════════════════════════════════════════════════════');
-  console.log(`📅 Timestamp: ${new Date().toISOString()}`);
-  console.log(`📨 Method: ${req.method}`);
-
-  // Validar método
   if (req.method !== 'POST') {
-    console.log('❌ Método no permitido');
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const order = req.body;
+    const { password, corredor } = req.body;
 
-    // Log de la orden
-    console.log('───────────────────────────────────────────────────────────────');
-    console.log('📦 DATOS DE LA ORDEN');
-    console.log('───────────────────────────────────────────────────────────────');
-    console.log(`   ID: ${order.id}`);
-    console.log(`   Número: ${order.order_number || order.name}`);
-    console.log(`   Email: ${order.email || order.customer?.email || 'N/A'}`);
-    console.log(`   Items: ${order.line_items?.length || 0}`);
-
-    // Log de line items
-    if (order.line_items) {
-      order.line_items.forEach((item, i) => {
-        console.log(`   └─ ${i + 1}. ${item.title} (x${item.quantity}) - ${item.variant_title || 'N/A'}`);
-      });
+    if (password !== ADMIN_PASSWORD) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
     }
 
-    // Buscar registration_data
-    const noteAttributes = order.note_attributes || [];
-    const registrationAttr = noteAttributes.find(attr => attr.name === 'registration_data');
-
-    if (!registrationAttr || !registrationAttr.value) {
-      console.log('ℹ️ Orden sin datos de inscripción (orden estándar)');
-      return res.status(200).json({
-        success: true,
-        message: 'Orden estándar sin inscripciones',
-        orderNumber: order.order_number
-      });
+    if (!corredor || !corredor.nombre || !corredor.email || !corredor.sede || !corredor.categoria) {
+      return res.status(400).json({ error: 'Faltan datos requeridos' });
     }
 
-    // Parsear registration_data
-    console.log('───────────────────────────────────────────────────────────────');
-    console.log('📋 DATOS DE INSCRIPCIÓN');
-    console.log('───────────────────────────────────────────────────────────────');
+    console.log('=== INSCRIPCIÓN MANUAL ===');
+    console.log(`Corredor: ${corredor.nombre}`);
+    console.log(`Sede: ${corredor.sede}`);
+    console.log(`Categoría: ${corredor.categoria}`);
 
-    let registrationData;
-    try {
-      registrationData = JSON.parse(registrationAttr.value);
-    } catch (parseError) {
-      console.error('❌ Error parseando registration_data:', parseError);
-      return res.status(400).json({
-        error: 'Invalid registration_data JSON',
-        details: parseError.message
-      });
+    const doc = await connectToGoogleSheets();
+    const orderNumber = await getNextManualOrderNumber(doc);
+    const orderDate = new Date().toISOString();
+    const sheetName = SEDE_TO_SHEET[corredor.sede.toLowerCase()];
+    const checkInCode = generateCheckInCode(corredor.sede);
+
+    console.log(`Orden: ${orderNumber}`);
+    console.log(`QR: ${checkInCode}`);
+
+    const raffleResult = await assignRaffleTicket(doc, corredor, orderNumber, orderDate);
+    const raffleNumber = raffleResult.numero;
+    console.log(`Rifa: #${raffleNumber || 'N/A'}`);
+
+    const saveResult = await saveToGoogleSheets(doc, corredor, orderNumber, orderDate, checkInCode, sheetName);
+
+    if (!saveResult.success) {
+      return res.status(500).json({ error: saveResult.error || 'Error guardando en Sheets' });
     }
 
-    const corredores = registrationData.registrations || [];
-    console.log(`   Total corredores: ${corredores.length}`);
+    // Enviar email
+    let emailResult = { status: 'not_sent' };
+    if (corredor.email) {
+      try {
+        const { data, error } = await resend.emails.send({
+          from: EMAIL_CONFIG.from,
+          to: corredor.email,
+          subject: `${EMAIL_CONFIG.subjectPrefix} - ${corredor.categoria} | DHMEXRACES 2026`,
+          html: generateEmailHTML(corredor, orderNumber, corredor.sede, checkInCode, raffleNumber),
+        });
 
-    if (corredores.length === 0) {
-      console.log('ℹ️ No hay corredores en registration_data');
-      return res.status(200).json({
-        success: true,
-        message: 'No hay corredores en la inscripción'
-      });
+        if (error) {
+          console.error('Error email:', error);
+          emailResult = { status: 'error', error: error.message };
+        } else {
+          console.log('✅ Email enviado');
+          emailResult = { status: 'sent', id: data.id };
+        }
+      } catch (emailError) {
+        emailResult = { status: 'error', error: emailError.message };
+      }
     }
 
-    // Procesar cada corredor
-    console.log('───────────────────────────────────────────────────────────────');
-    console.log('⚙️ PROCESANDO CORREDORES');
-    console.log('───────────────────────────────────────────────────────────────');
-
-    const orderDate = order.created_at || new Date().toISOString();
-    const results = [];
-
-    for (let i = 0; i < corredores.length; i++) {
-      const corredor = corredores[i];
-      console.log(`\n👤 Corredor ${i + 1}/${corredores.length}: ${corredor.nombre}`);
-      console.log(`   Categoría: ${corredor.categoria}`);
-      console.log(`   Email: ${corredor.email || 'N/A'}`);
-      console.log(`   Talla Playera: ${corredor.talla_playera || 'NO ESPECIFICADA'}`);
-      console.log(`   Producto: ${corredor.product_title || 'N/A'}`);
-
-      const result = await processCorredor(corredor, order, orderDate);
-      results.push(result);
-    }
-
-    // Resumen
-    console.log('\n═══════════════════════════════════════════════════════════════');
-    console.log('📊 RESUMEN');
-    console.log('═══════════════════════════════════════════════════════════════');
-
-    const emailsSent = results.filter(r => r.emailResult?.status === 'sent').length;
-    const emailsSkipped = results.filter(r => r.emailResult?.status === 'skipped').length;
-    const emailsError = results.filter(r => r.emailResult?.status === 'error').length;
-    const sheetsSuccess = results.filter(r => r.sheetResult?.success && !r.sheetResult?.skipped).length;
-    const duplicatesDetected = results.filter(r => r.skipped).length;
-
-    console.log(`   ✅ Emails enviados: ${emailsSent}/${corredores.length}`);
-    console.log(`   ⏭️ Emails omitidos: ${emailsSkipped}`);
-    console.log(`   ❌ Emails con error: ${emailsError}`);
-    console.log(`   📊 Guardados en Sheets: ${sheetsSuccess}/${corredores.length}`);
-    console.log(`   ⚠️ Duplicados detectados: ${duplicatesDetected}`);
-    console.log('═══════════════════════════════════════════════════════════════\n');
+    console.log('=== INSCRIPCIÓN COMPLETADA ===\n');
 
     return res.status(200).json({
       success: true,
-      orderNumber: order.order_number || order.name,
-      totalRunners: corredores.length,
-      emailsSent,
-      emailsSkipped,
-      emailsError,
-      savedToSheets: sheetsSuccess,
-      duplicatesDetected,
-      results
+      orderNumber,
+      checkInCode,
+      raffleNumber,
+      email: emailResult,
+      corredor: {
+        nombre: corredor.nombre,
+        email: corredor.email,
+        categoria: corredor.categoria,
+        sede: corredor.sede
+      }
     });
 
   } catch (error) {
-    console.error('═══════════════════════════════════════════════════════════════');
-    console.error('❌ ERROR GENERAL EN WEBHOOK');
-    console.error('═══════════════════════════════════════════════════════════════');
-    console.error(error);
-
-    return res.status(500).json({
-      error: 'Internal server error',
-      details: error.message
-    });
+    console.error('Error:', error);
+    return res.status(500).json({ error: error.message });
   }
 };

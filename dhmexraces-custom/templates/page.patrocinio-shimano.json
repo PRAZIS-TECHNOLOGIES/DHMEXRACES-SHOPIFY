@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "patrocinio-shimano",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

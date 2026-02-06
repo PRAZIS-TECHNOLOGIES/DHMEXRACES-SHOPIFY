@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Carta Responsiva - DHMEXRACES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: letter;
+      margin: 0.6in;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fafafa;
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #1a1a1a;
+      line-height: 1.6;
+    }
+
+    .document {
+      max-width: 720px;
+      margin: 0 auto;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 8px 30px rgba(0,0,0,0.06);
+      border-radius: 2px;
+    }
+
+    /* === HEADER === */
+    .header {
+      padding: 40px 50px 35px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .logo {
+      height: 60px;
+      width: auto;
+    }
+
+    .header-info {
+      text-align: right;
+    }
+
+    .doc-type {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .doc-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: -0.5px;
+    }
+
+    /* === EVENT BAR === */
+    .event-bar {
+      background: #0d0d0d;
+      padding: 18px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .event-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .event-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .event-value.highlight {
+      color: #FF6B00;
+    }
+
+    .event-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.3);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      padding: 4px 0;
+      width: 180px;
+      transition: border-color 0.2s;
+    }
+
+    .event-input:focus {
+      outline: none;
+      border-bottom-color: #FF6B00;
+    }
+
+    .event-input::placeholder {
+      color: rgba(255,255,255,0.4);
+      font-weight: 400;
+    }
+
+    .event-input--small {
+      width: 100px;
+    }
+
+    /* === CONTENT === */
+    .content {
+      padding: 45px 50px;
+    }
+
+    /* Legal text */
+    .legal {
+      font-size: 14px;
+      color: #333;
+      line-height: 1.85;
+      text-align: justify;
+    }
+
+    .legal p {
+      margin-bottom: 20px;
+    }
+
+    .legal strong {
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .inline-field {
+      display: inline;
+      border-bottom: 1.5px solid #FF6B00;
+      padding-bottom: 1px;
+      min-width: 200px;
+      font-weight: 500;
+      color: #1a1a1a;
+    }
+
+    .inline-field:empty::before {
+      content: attr(data-placeholder);
+      color: #ccc;
+      font-weight: 400;
+    }
+
+    .org-name {
+      font-weight: 600;
+      border-bottom: 1.5px solid #FF6B00;
+      padding-bottom: 1px;
+    }
+
+    .dynamic-field {
+      border-bottom: 1.5px solid #FF6B00;
+      padding-bottom: 1px;
+    }
+
+    /* === FORM === */
+    .form-section {
+      margin-top: 40px;
+      padding-top: 35px;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .section-title {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 25px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 25px;
+      margin-bottom: 20px;
+    }
+
+    .form-row.triple {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    .field-label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 8px;
+    }
+
+    .field-input {
+      padding: 12px 0;
+      border: none;
+      border-bottom: 1.5px solid #e5e5e5;
+      font-size: 14px;
+      font-family: inherit;
+      color: #1a1a1a;
+      background: transparent;
+      transition: border-color 0.2s ease;
+    }
+
+    .field-input:focus {
+      outline: none;
+      border-bottom-color: #FF6B00;
+    }
+
+    .field-input::placeholder {
+      color: #ccc;
+      font-weight: 400;
+    }
+
+    select.field-input {
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0 center;
+    }
+
+    /* Emergency section */
+    .emergency {
+      margin-top: 30px;
+      padding: 25px;
+      background: #fafafa;
+      border-radius: 4px;
+      border-left: 3px solid #dc3545;
+    }
+
+    .emergency .section-title {
+      color: #dc3545;
+      margin-bottom: 20px;
+    }
+
+    /* === SIGNATURES === */
+    .signatures {
+      margin-top: 50px;
+      padding-top: 40px;
+      border-top: 1px solid #f0f0f0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+    }
+
+    .signature-block {
+      text-align: center;
+    }
+
+    .signature-area {
+      height: 100px;
+      border-bottom: 1.5px solid #1a1a1a;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .signature-area::before {
+      content: 'Firma';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 12px;
+      color: #e0e0e0;
+      font-weight: 500;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .signature-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 4px;
+    }
+
+    .signature-note {
+      font-size: 11px;
+      color: #999;
+    }
+
+    /* === FOOTER === */
+    .footer {
+      padding: 25px 50px;
+      background: #fafafa;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .footer-text {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .footer-link {
+      font-size: 11px;
+      color: #FF6B00;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* === ACTIONS (no print) === */
+    .actions {
+      max-width: 720px;
+      margin: 30px auto 0;
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-radius: 4px;
+    }
+
+    .btn-primary {
+      background: #0d0d0d;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #333;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      color: #666;
+      border: 1.5px solid #e0e0e0;
+    }
+
+    .btn-secondary:hover {
+      border-color: #ccc;
+      color: #333;
+    }
+
+    /* === PRINT === */
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .document {
+        box-shadow: none;
+      }
+
+      .actions {
+        display: none;
+      }
+
+      .field-input {
+        border-bottom-style: dotted;
+      }
+
+      .event-bar {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .event-input {
+        border-bottom-style: dotted;
+        border-bottom-color: rgba(255,255,255,0.5);
+      }
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 600px) {
+      body {
+        padding: 20px 15px;
+      }
+
+      .header, .content, .footer {
+        padding-left: 30px;
+        padding-right: 30px;
+      }
+
+      .event-bar {
+        padding: 15px 30px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+
+      .event-input,
+      .event-input--small {
+        width: 100%;
+      }
+
+      .form-row, .form-row.triple {
+        grid-template-columns: 1fr;
+      }
+
+      .signatures {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .header {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .header-info {
+        text-align: left;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="document">
+    <!-- Header -->
+    <header class="header">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0691/9556/3244/files/dhmexraces-logo.png"
+        alt="DHMEXRACES"
+        class="logo"
+      >
+      <div class="header-info">
+        <div class="doc-type">Documento Legal</div>
+        <div class="doc-title">Carta Responsiva</div>
+      </div>
+    </header>
+
+    <!-- Event Bar -->
+    <div class="event-bar">
+      <div class="event-item">
+        <span class="event-label">Sede</span>
+        <input type="text" class="event-input" id="sedeInput" placeholder="Nombre de la sede" oninput="updateSede()">
+      </div>
+      <div class="event-item">
+        <span class="event-label">No. Fecha</span>
+        <input type="text" class="event-input event-input--small" id="numeroFechaInput" placeholder="1ra, 2da..." oninput="updateNumeroFecha()">
+      </div>
+      <div class="event-item">
+        <span class="event-label">Fecha del Evento</span>
+        <input type="text" class="event-input" id="fechaEventoInput" placeholder="12 y 13 de Julio 2025" oninput="updateFechaEvento()">
+      </div>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+      <!-- Legal Text -->
+      <div class="legal">
+        <p>
+          Yo, <span class="inline-field" id="nombreInline" data-placeholder="nombre completo"></span>, reconozco que al firmar este documento libero de toda responsabilidad a <span class="org-name">DHMEXRACES</span>, <span class="org-name" id="sedeLegal">_______________</span> y a cualquier miembro del equipo de trabajo, por cualquier accidente que me pueda ocurrir. Entiendo que este deporte es de <strong>alto riesgo</strong> y puedo incurrir en un accidente e incluso la muerte.
+        </p>
+
+        <p>
+          Afirmo que me encuentro en perfecto estado de salud y en pleno uso de mis facultades mentales y físicas para inscribirme y participar en este evento. De igual manera deslindo totalmente a los organizadores del evento de Ciclismo MTB <span class="dynamic-field" id="numeroFechaLegal">___ Fecha</span> Copa DHMEXRACES en <span class="org-name" id="sedeLegal2">_______________</span>.
+        </p>
+
+        <p>
+          Con fecha del <strong class="dynamic-field" id="fechaEventoLegal">_______________</strong>, libero de cualquier responsabilidad de carácter legal o compensación monetaria en caso de algún suceso, de sufrir algún accidente o lesión, por lo que no son responsables de ningún gasto médico que este pudiera ocasionar.
+        </p>
+      </div>
+
+      <!-- Form -->
+      <div class="form-section">
+        <div class="section-title">Datos del Competidor</div>
+
+        <div class="form-row">
+          <div class="field">
+            <label class="field-label">Nombre Completo</label>
+            <input type="text" class="field-input" id="nombre" placeholder="Ingresa tu nombre" oninput="updateNombre()">
+          </div>
+          <div class="field">
+            <label class="field-label">Edad (cumplida 2025)</label>
+            <input type="number" class="field-input" id="edad" placeholder="25">
+          </div>
+        </div>
+
+        <div class="form-row triple">
+          <div class="field">
+            <label class="field-label">Teléfono</label>
+            <input type="tel" class="field-input" id="telefono" placeholder="55 1234 5678">
+          </div>
+          <div class="field">
+            <label class="field-label">Tipo de Sangre</label>
+            <select class="field-input" id="tipoSangre">
+              <option value="">Seleccionar</option>
+              <option value="A+">A+</option>
+              <option value="A-">A-</option>
+              <option value="B+">B+</option>
+              <option value="B-">B-</option>
+              <option value="AB+">AB+</option>
+              <option value="AB-">AB-</option>
+              <option value="O+">O+</option>
+              <option value="O-">O-</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label">Alergias</label>
+            <input type="text" class="field-input" id="alergias" placeholder="Ninguna">
+          </div>
+        </div>
+
+        <!-- Emergency -->
+        <div class="emergency">
+          <div class="section-title">Contacto de Emergencia</div>
+          <div class="form-row">
+            <div class="field">
+              <label class="field-label">Nombre del Contacto</label>
+              <input type="text" class="field-input" id="contactoEmergencia" placeholder="En caso de accidente avisar a">
+            </div>
+            <div class="field">
+              <label class="field-label">Teléfono</label>
+              <input type="tel" class="field-input" id="telefonoEmergencia" placeholder="Teléfono de emergencia">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Signatures -->
+      <div class="signatures">
+        <div class="signature-block">
+          <div class="signature-area"></div>
+          <div class="signature-name">Firma del Competidor</div>
+          <div class="signature-note">Nombre completo y firma</div>
+        </div>
+        <div class="signature-block">
+          <div class="signature-area"></div>
+          <div class="signature-name">Padre o Tutor</div>
+          <div class="signature-note">En caso de ser menor de edad</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span class="footer-text">Copa Nacional de Descenso MTB 2026</span>
+      <a href="https://endhurorace.com" class="footer-link">endhurorace.com</a>
+    </footer>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+    <button class="btn btn-secondary" onclick="limpiar()">Limpiar Formulario</button>
+  </div>
+
+  <script>
+    function updateSede() {
+      const sede = document.getElementById('sedeInput').value || '_______________';
+      document.getElementById('sedeLegal').textContent = sede;
+      document.getElementById('sedeLegal2').textContent = sede;
+    }
+
+    function updateNumeroFecha() {
+      const numero = document.getElementById('numeroFechaInput').value || '___';
+      document.getElementById('numeroFechaLegal').textContent = numero + ' Fecha';
+    }
+
+    function updateFechaEvento() {
+      const fecha = document.getElementById('fechaEventoInput').value || '_______________';
+      document.getElementById('fechaEventoLegal').textContent = fecha;
+    }
+
+    function updateNombre() {
+      const nombre = document.getElementById('nombre').value;
+      document.getElementById('nombreInline').textContent = nombre;
+    }
+
+    function limpiar() {
+      // Limpiar campos del evento
+      document.getElementById('sedeInput').value = '';
+      document.getElementById('numeroFechaInput').value = '';
+      document.getElementById('fechaEventoInput').value = '';
+
+      // Limpiar campos del competidor
+      document.querySelectorAll('.field-input').forEach(input => {
+        if (input.tagName === 'SELECT') {
+          input.selectedIndex = 0;
+        } else {
+          input.value = '';
+        }
+      });
+
+      // Actualizar textos
+      document.getElementById('nombreInline').textContent = '';
+      updateSede();
+      updateNumeroFecha();
+      updateFechaEvento();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      updateSede();
+      updateNumeroFecha();
+      updateFechaEvento();
+    });
+  </script>
+
+</body>
+</html>

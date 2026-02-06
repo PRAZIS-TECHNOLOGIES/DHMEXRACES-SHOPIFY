@@ -5,12 +5,14 @@
 
 {%- comment -%} Burbuja de Ayuda Flotante {%- endcomment -%}
 <div class="help-bubble" id="helpBubble">
+  <!-- Tooltip emergente - click abre el menú -->
+  <div class="help-bubble__tooltip" id="helpTooltip" onclick="abrirDesdeTooltip()">
+    <span>¿Necesitas ayuda?</span>
+    <button class="help-bubble__tooltip-close" onclick="cerrarTooltipAyuda(event)" aria-label="Cerrar">×</button>
+  </div>
+
   <button class="help-bubble__btn" onclick="toggleHelpMenu()" aria-label="Ayuda">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <circle cx="12" cy="12" r="10"/>
-      <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-      <line x1="12" y1="17" x2="12.01" y2="17"/>
-    </svg>
+    <span class="help-bubble__icon">?</span>
   </button>
 
   <div class="help-bubble__menu" id="helpMenu">
@@ -30,12 +32,6 @@
         </svg>
         <span>No entendí cómo inscribirme</span>
       </button>
-      <a href="https://wa.me/524421234567" target="_blank" class="help-bubble__option">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-        </svg>
-        <span>Contactar por WhatsApp</span>
-      </a>
     </div>
   </div>
 </div>
@@ -137,6 +133,14 @@
             {% endif %}
           {% endfor %}
 
+          {% assign variant_lower = variant.title | downcase %}
+          {% assign sponsor_text = "" %}
+          {% if variant_lower contains "elite" or variant_lower contains "junior" %}
+            {% assign sponsor_text = "by Motul Official Care Partner" %}
+          {% elsif variant_lower contains "ebike" %}
+            {% assign sponsor_text = "by Megamo Reason" %}
+          {% endif %}
+
           <button
             type="button"
             class="inscripcion__categoria-row {% if variant == current_variant %}selected{% endif %} {% unless variant.available %}agotado{% endunless %}"
@@ -149,12 +153,17 @@
               {{ variant.title }}
               <span class="inscripcion__categoria-cart-badge" data-cart-badge="{{ variant.id }}" style="display: none;">0</span>
             </span>
-            <span class="inscripcion__categoria-age">
-              {% if variant.available %}
-                {{ age_info | default: "—" }}
-              {% else %}
-                AGOTADO
+            <span class="inscripcion__categoria-info">
+              {% if sponsor_text != "" %}
+                <span class="inscripcion__categoria-sponsor">{{ sponsor_text }}</span>
               {% endif %}
+              <span class="inscripcion__categoria-age">
+                {% if variant.available %}
+                  {{ age_info | default: "—" }}
+                {% else %}
+                  AGOTADO
+                {% endif %}
+              </span>
             </span>
             <span class="inscripcion__categoria-check">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
@@ -173,7 +182,14 @@
         "apiUrl": "https://dhmexraces-webhooks.vercel.app/api/inventory",
         "eventDate": "{{ product.metafields.custom.event_date | date: '%Y-%m-%dT%H:%M:%S' }}",
         "eventDateLabel": {{ product.metafields.custom.event_date_label | default: "" | json }},
-        "closeDate": "{{ product.metafields.custom.close_date | date: '%Y-%m-%dT%H:%M:%S' }}"
+        "closeDate": "{{ product.metafields.custom.close_date | date: '%Y-%m-%dT%H:%M:%S' }}",
+        "jerseyHandles": {
+          "guanajuato": "jersey-oficial-guanajuato-2026-promo",
+          "puebla": "jersey-oficial-puebla-2026-promo",
+          "guadalajara": "jersey-oficial-guadalajara-2026-promo",
+          "ixtapan": "jersey-oficial-ixtapan-2026-promo",
+          "taxco": "jersey-oficial-taxco-2026-promo"
+        }
       }
     </script>
 
@@ -314,8 +330,8 @@
           </div>
         </div>
 
-        {%- comment -%} Carrito actual {%- endcomment -%}
-        <div class="inscripcion__carrito-resumen" id="carritoResumen" style="display: none;">
+        {%- comment -%} Carrito actual - Siempre visible {%- endcomment -%}
+        <div class="inscripcion__carrito-resumen" id="carritoResumen">
           <div class="inscripcion__carrito-header">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
@@ -324,9 +340,9 @@
             <span>En tu carrito:</span>
           </div>
           <div class="inscripcion__carrito-items" id="carritoItems">
-            <!-- Se llena dinamicamente -->
+            <span class="inscripcion__carrito-empty" id="carritoEmpty">Aún no has agregado inscripciones</span>
           </div>
-          <a href="/cart" class="inscripcion__carrito-link">Ver carrito completo →</a>
+          <a href="/cart" class="inscripcion__carrito-link" id="carritoLink" style="display: none;">Ver carrito completo →</a>
         </div>
 
         {%- comment -%} 7. CANTIDAD {%- endcomment -%}
@@ -409,6 +425,26 @@
 
   </div>
 </section>
+
+{%- comment -%} DISCOUNT FLOATING NOTIFICATION {%- endcomment -%}
+<div class="discount-float" id="discountFloat">
+  <div class="discount-float__card">
+    <div class="discount-float__shimmer"></div>
+    <div class="discount-float__content">
+      <div class="discount-float__badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>
+        </svg>
+        <span>DESCUENTO</span>
+      </div>
+      <div class="discount-float__code" id="discountCodeText">14% OFF: CHILILOVE</div>
+      <button type="button" class="discount-float__btn" id="copyDiscountBtn">
+        <span class="discount-float__btn-default">Copiar</span>
+        <span class="discount-float__btn-copied">✓</span>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
   function changeMainImage(button) {
@@ -493,22 +529,23 @@
         }
       });
 
-      // Actualizar resumen del carrito
-      const carritoResumen = document.getElementById('carritoResumen');
+      // Actualizar resumen del carrito (siempre visible)
       const carritoItems = document.getElementById('carritoItems');
+      const carritoEmpty = document.getElementById('carritoEmpty');
+      const carritoLink = document.getElementById('carritoLink');
 
       if (productItems.length > 0) {
-        // Mostrar el resumen
-        carritoResumen.style.display = 'block';
-
         // Crear lista de items
         const itemsHTML = productItems.map(item => {
           return `<span class="inscripcion__carrito-item">${item.quantity}x ${item.variant_title}</span>`;
         }).join('');
 
         carritoItems.innerHTML = itemsHTML;
+        if (carritoLink) carritoLink.style.display = 'block';
       } else {
-        carritoResumen.style.display = 'none';
+        // Mostrar mensaje de vacío
+        carritoItems.innerHTML = '<span class="inscripcion__carrito-empty">Aún no has agregado inscripciones</span>';
+        if (carritoLink) carritoLink.style.display = 'none';
       }
 
       // Actualizar contador global del carrito
@@ -520,6 +557,9 @@
       console.error('Error actualizando badges:', error);
     }
   }
+
+  // Store jersey availability globally
+  let jerseyData = null;
 
   async function agregarAlCarrito() {
     const variantId = document.getElementById('selectedVariantId').value;
@@ -533,6 +573,7 @@
     btn.innerHTML = '<span class="loading-spinner"></span> Agregando...';
 
     try {
+      // Add inscription to cart
       const response = await fetch('/cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -543,6 +584,65 @@
       });
 
       if (response.ok) {
+        // Check if jerseys are available and handle them properly
+        if (jerseyData && jerseyData.disponible && jerseyData.jerseyVariantId) {
+          try {
+            // IMPORTANT: Check if a promo jersey already exists in the cart
+            const cartResponse = await fetch('/cart.js');
+            const cart = await cartResponse.json();
+
+            // Count total inscriptions in cart (including the one we just added)
+            const totalInscriptions = cart.items
+              .filter(item => {
+                const title = (item.product_title || '').toLowerCase();
+                return title.includes('inscripcion') || title.includes('inscripción');
+              })
+              .reduce((total, item) => total + item.quantity, 0);
+
+            // Find existing promo jersey
+            const existingPromoJersey = cart.items.find(item => {
+              const title = (item.product_title || '').toLowerCase();
+              const isJersey = title.includes('jersey') || title.includes('playera oficial');
+              const props = item.properties || {};
+              return isJersey && props['_promo_jersey'] === 'true';
+            });
+
+            if (existingPromoJersey) {
+              // Promo jersey exists - update its quantity to match total inscriptions
+              const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
+              await fetch('/cart/change.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  line: jerseyLine,
+                  quantity: totalInscriptions
+                })
+              });
+            } else {
+              // No promo jersey exists - add one with quantity matching inscriptions
+              await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id: jerseyData.jerseyVariantId,
+                  quantity: totalInscriptions,
+                  properties: {
+                    '_promo_jersey': 'true'
+                  }
+                })
+              });
+            }
+
+            // Store jersey info in sessionStorage for registration form
+            sessionStorage.setItem('jerseyDisponible', JSON.stringify({
+              disponible: true,
+              sede: jerseyData.sede
+            }));
+          } catch (jerseyError) {
+            console.error('Error handling jersey:', jerseyError);
+          }
+        }
+
         // Mostrar toast
         mostrarToast(quantity, categoriaName);
 
@@ -576,91 +676,203 @@
       element: '.inscripcion__precio-card',
       title: '2. Revisa el precio',
       text: 'Aquí ves el precio actual de inscripción. Puede cambiar según la fase de venta.',
-      position: 'top'
+      position: 'bottom'
+    },
+    {
+      element: '.inscripcion__carrito-resumen',
+      title: '3. Tu carrito',
+      text: 'Aquí verás todas las inscripciones que has agregado. Puedes inscribir personas en diferentes categorías.',
+      position: 'bottom'
     },
     {
       element: '.inscripcion__quantity',
-      title: '3. Elige la cantidad',
-      text: '¿Inscribes a más personas? Ajusta la cantidad aquí.',
-      position: 'top'
+      title: '4. Elige la cantidad',
+      text: '¿Inscribes a más personas en esta categoría? Ajusta la cantidad aquí.',
+      position: 'bottom'
     },
     {
       element: '.inscripcion__actions',
-      title: '4. Agrega al carrito o paga',
-      text: 'Puedes agregar varias inscripciones al carrito o pagar directo. ¡Después llenarás los datos de cada participante!',
-      position: 'top'
+      title: '5. Agrega al carrito o paga',
+      text: 'Usa "Agregar al carrito" para inscribir en varias categorías, o "Pagar ahora" para ir directo al checkout.',
+      position: 'bottom'
     }
   ];
 
   let currentTourStep = 0;
+  let tourActive = false;
 
   function toggleHelpMenu() {
     const menu = document.getElementById('helpMenu');
     const bubble = document.getElementById('helpBubble');
+    const tooltip = document.getElementById('helpTooltip');
     menu.classList.toggle('show');
     bubble.classList.toggle('active');
+    // Ocultar tooltip cuando se abre el menú
+    if (tooltip) tooltip.style.display = 'none';
+  }
+
+  function cerrarTooltipAyuda(event) {
+    if (event) event.stopPropagation();
+    const tooltip = document.getElementById('helpTooltip');
+    if (tooltip) {
+      tooltip.style.display = 'none';
+      // Guardar solo para esta sesión
+      sessionStorage.setItem('helpTooltipClosed', 'true');
+    }
+  }
+
+  function abrirDesdeTooltip() {
+    const tooltip = document.getElementById('helpTooltip');
+    if (tooltip) tooltip.style.display = 'none';
+    sessionStorage.setItem('helpTooltipClosed', 'true');
+    toggleHelpMenu();
+  }
+
+  function mostrarTooltipAyuda() {
+    // Siempre mostrar el tooltip al entrar a la página (a menos que ya lo haya cerrado en esta carga)
+    const tooltip = document.getElementById('helpTooltip');
+    if (tooltip) {
+      tooltip.style.display = 'flex';
+      // Auto-ocultar después de 10 segundos
+      setTimeout(() => {
+        if (tooltip && tooltip.style.display !== 'none') {
+          tooltip.style.opacity = '0';
+          setTimeout(() => {
+            if (tooltip) {
+              tooltip.style.display = 'none';
+              tooltip.style.opacity = '1';
+            }
+          }, 300);
+        }
+      }, 10000);
+    }
   }
 
   function iniciarTour() {
     toggleHelpMenu();
     currentTourStep = 0;
-    document.getElementById('tourOverlay').classList.add('active');
-    document.body.style.overflow = 'hidden';
+    tourActive = true;
+
+    const overlay = document.getElementById('tourOverlay');
+    const helpBubble = document.getElementById('helpBubble');
+
+    overlay.classList.add('active');
+    // Esconder la burbuja de ayuda durante el tour
+    if (helpBubble) helpBubble.style.display = 'none';
+
+    // Iniciar primer paso
     mostrarPasoTour();
   }
 
   function terminarTour() {
-    document.getElementById('tourOverlay').classList.remove('active');
-    document.body.style.overflow = '';
+    tourActive = false;
+    const overlay = document.getElementById('tourOverlay');
+    const highlight = document.getElementById('tourHighlight');
+    const tooltip = document.getElementById('tourTooltip');
+    const helpBubble = document.getElementById('helpBubble');
+
+    overlay.classList.remove('active');
+    highlight.style.opacity = '0';
+    tooltip.style.opacity = '0';
+
+    // Mostrar la burbuja de ayuda de nuevo
+    if (helpBubble) helpBubble.style.display = 'block';
+
     // Guardar que el usuario ya vio el tour
     localStorage.setItem('tourCompleted', 'true');
   }
 
-  function mostrarPasoTour() {
+  function posicionarHighlight() {
+    if (!tourActive) return;
+
     const step = tourSteps[currentTourStep];
     const element = document.querySelector(step.element);
+    if (!element) return;
 
-    if (!element) {
+    const rect = element.getBoundingClientRect();
+    const highlight = document.getElementById('tourHighlight');
+    const tooltip = document.getElementById('tourTooltip');
+
+    // Posicionar highlight - FIXED usa coordenadas del viewport
+    highlight.style.top = (rect.top - 10) + 'px';
+    highlight.style.left = (rect.left - 10) + 'px';
+    highlight.style.width = (rect.width + 20) + 'px';
+    highlight.style.height = (rect.height + 20) + 'px';
+    highlight.style.opacity = '1';
+
+    // Posicionar tooltip - siempre en la parte inferior de la pantalla en mobile
+    const isMobile = window.innerWidth <= 768;
+
+    if (isMobile) {
+      tooltip.style.top = 'auto';
+      tooltip.style.bottom = '30px';
+      tooltip.style.left = '16px';
+      tooltip.style.right = '16px';
+      tooltip.style.width = 'auto';
+    } else {
+      tooltip.style.bottom = 'auto';
+      tooltip.style.right = 'auto';
+      tooltip.style.width = '320px';
+
+      // Posicionar cerca del elemento
+      const tooltipTop = rect.bottom + 20;
+      tooltip.style.top = Math.min(tooltipTop, window.innerHeight - 250) + 'px';
+      tooltip.style.left = Math.max(16, Math.min(rect.left, window.innerWidth - 340)) + 'px';
+    }
+
+    tooltip.style.opacity = '1';
+  }
+
+  function mostrarPasoTour() {
+    if (!tourActive) return;
+
+    const step = tourSteps[currentTourStep];
+    let element = document.querySelector(step.element);
+
+    // Si el elemento no existe o no es visible, intentar con fallback
+    if (!element || element.offsetParent === null || element.style.display === 'none') {
+      if (step.fallback) {
+        element = document.querySelector(step.fallback);
+      }
+    }
+
+    // Si aún no hay elemento, saltar al siguiente paso
+    if (!element || element.offsetParent === null) {
+      console.log('Elemento no encontrado:', step.element);
       siguientePasoTour();
       return;
     }
 
-    // Scroll al elemento
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Ocultar mientras hacemos scroll
+    const highlight = document.getElementById('tourHighlight');
+    const tooltip = document.getElementById('tourTooltip');
+    highlight.style.opacity = '0';
+    tooltip.style.opacity = '0';
 
+    // Actualizar contenido del tooltip
+    document.getElementById('tourStepNumber').textContent = `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourText').textContent = step.text;
+    document.getElementById('tourProgress').style.width = ((currentTourStep + 1) / tourSteps.length * 100) + '%';
+
+    // Cambiar texto del botón en último paso
+    const nextBtn = document.getElementById('tourNextBtn');
+    nextBtn.textContent = currentTourStep === tourSteps.length - 1 ? '¡Entendido!' : 'Siguiente';
+
+    // Scroll al elemento - mostrar desde arriba con espacio para el header
+    const headerOffset = 120;
+    const elementPosition = element.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      behavior: 'smooth'
+    });
+
+    // Esperar a que termine el scroll y posicionar
     setTimeout(() => {
-      const rect = element.getBoundingClientRect();
-      const highlight = document.getElementById('tourHighlight');
-      const tooltip = document.getElementById('tourTooltip');
-
-      // Posicionar highlight
-      highlight.style.top = (rect.top + window.scrollY - 8) + 'px';
-      highlight.style.left = (rect.left - 8) + 'px';
-      highlight.style.width = (rect.width + 16) + 'px';
-      highlight.style.height = (rect.height + 16) + 'px';
-
-      // Posicionar tooltip
-      if (step.position === 'bottom') {
-        tooltip.style.top = (rect.bottom + window.scrollY + 20) + 'px';
-      } else {
-        tooltip.style.top = (rect.top + window.scrollY - tooltip.offsetHeight - 20) + 'px';
-      }
-      tooltip.style.left = Math.max(16, rect.left + rect.width / 2 - tooltip.offsetWidth / 2) + 'px';
-
-      // Actualizar contenido
-      document.getElementById('tourStepNumber').textContent = `Paso ${currentTourStep + 1} de ${tourSteps.length}`;
-      document.getElementById('tourTitle').textContent = step.title;
-      document.getElementById('tourText').textContent = step.text;
-      document.getElementById('tourProgress').style.width = ((currentTourStep + 1) / tourSteps.length * 100) + '%';
-
-      // Cambiar texto del botón en último paso
-      const nextBtn = document.getElementById('tourNextBtn');
-      if (currentTourStep === tourSteps.length - 1) {
-        nextBtn.textContent = '¡Entendido!';
-      } else {
-        nextBtn.textContent = 'Siguiente';
-      }
-    }, 400);
+      posicionarHighlight();
+    }, 600);
   }
 
   function siguientePasoTour() {
@@ -672,15 +884,138 @@
     }
   }
 
+  // Re-posicionar cuando el usuario hace scroll durante el tour
+  let scrollTimeout;
+  window.addEventListener('scroll', function() {
+    if (tourActive) {
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(posicionarHighlight, 100);
+    }
+  });
+
+  // ============ DISCOUNT BAR - CHILILOVE ============
+  function initPromoBanner() {
+    const copyBtn = document.getElementById('copyDiscountBtn');
+
+    if (!copyBtn) return;
+
+    const discountCode = 'CHILILOVE';
+
+    copyBtn.addEventListener('click', async function() {
+      try {
+        await navigator.clipboard.writeText(discountCode);
+      } catch (err) {
+        // Fallback
+        const textArea = document.createElement('textarea');
+        textArea.value = discountCode;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+
+      // Visual feedback
+      copyBtn.classList.add('copied');
+      localStorage.setItem('discountCode', discountCode);
+
+      setTimeout(() => {
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', function() {
     initDynamicPricing();
     initFomoInventory();
     actualizarBadgesCarrito();
+    initPromoBanner();
+
+    // Mostrar tooltip de ayuda después de 3 segundos
+    setTimeout(mostrarTooltipAyuda, 3000);
 
     // Mostrar tour automáticamente para usuarios nuevos (opcional)
     // if (!localStorage.getItem('tourCompleted')) {
     //   setTimeout(iniciarTour, 2000);
     // }
+
+    // Interceptar el formulario "PAGAR AHORA" para agregar jersey promo
+    const form = document.getElementById('inscripcion-form');
+    if (form) {
+      form.addEventListener('submit', async function(e) {
+        // Verificar si hay jerseys disponibles
+        if (jerseyData && jerseyData.disponible && jerseyData.jerseyVariantId) {
+          e.preventDefault(); // Detener el submit normal
+
+          const btn = form.querySelector('.inscripcion__btn--pay');
+          if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Procesando...';
+          }
+
+          try {
+            // Obtener el carrito actual
+            const cartResponse = await fetch('/cart.js');
+            const cart = await cartResponse.json();
+
+            // Contar inscripciones actuales + la que se va a agregar
+            const currentInscriptions = cart.items
+              .filter(item => {
+                const title = (item.product_title || '').toLowerCase();
+                return title.includes('inscripcion') || title.includes('inscripción');
+              })
+              .reduce((total, item) => total + item.quantity, 0);
+
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const totalInscriptions = currentInscriptions + quantity;
+
+            // Buscar si ya existe jersey promo en el carrito
+            const existingPromoJersey = cart.items.find(item => {
+              const props = item.properties || {};
+              return props['_promo_jersey'] === 'true';
+            });
+
+            if (existingPromoJersey) {
+              // Actualizar cantidad del jersey promo existente
+              const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
+              await fetch('/cart/change.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  line: jerseyLine,
+                  quantity: totalInscriptions
+                })
+              });
+            } else {
+              // Agregar nuevo jersey promo
+              await fetch('/cart/add.js', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  id: jerseyData.jerseyVariantId,
+                  quantity: totalInscriptions,
+                  properties: {
+                    '_promo_jersey': 'true'
+                  }
+                })
+              });
+            }
+
+            // Guardar info de jersey para el formulario de registro
+            sessionStorage.setItem('jerseyDisponible', JSON.stringify({
+              disponible: true,
+              sede: jerseyData.sede
+            }));
+
+          } catch (error) {
+            console.error('Error agregando jersey promo:', error);
+          }
+
+          // Continuar con el submit del formulario
+          form.submit();
+        }
+        // Si no hay jersey disponible, el formulario se envía normalmente
+      });
+    }
   });
 
   function initDynamicPricing() {
@@ -742,6 +1077,39 @@
       const medallasEl = document.getElementById('fomoMedallas');
       const playerasValueEl = document.getElementById('fomoPlayerasValue');
       const medallasValueEl = document.getElementById('fomoMedallasValue');
+
+      // Store jersey availability for cart operations
+      const playerasDisponibles = !data.playeras.agotadas && data.playeras.disponibles > 0;
+
+      if (playerasDisponibles && config.jerseyHandles && config.jerseyHandles[sede]) {
+        // Fetch jersey product info to get variant ID
+        try {
+          const jerseyHandle = config.jerseyHandles[sede];
+          const jerseyResponse = await fetch(`/products/${jerseyHandle}.js`);
+          if (jerseyResponse.ok) {
+            const jerseyProduct = await jerseyResponse.json();
+            // Get first available variant
+            const availableVariant = jerseyProduct.variants.find(v => v.available);
+            if (availableVariant) {
+              jerseyData = {
+                disponible: true,
+                sede: sede,
+                jerseyVariantId: availableVariant.id,
+                jerseyProductTitle: jerseyProduct.title,
+                playerasDisponibles: data.playeras.disponibles
+              };
+            }
+          }
+        } catch (jerseyError) {
+          console.error('Error fetching jersey:', jerseyError);
+        }
+      }
+
+      // Clear jersey availability if no jerseys left
+      if (!playerasDisponibles) {
+        sessionStorage.removeItem('jerseyDisponible');
+      }
+
       if (data.playeras.agotadas) {
         playerasValueEl.textContent = 'Agotadas';
         playerasEl.classList.add('inscripcion__fomo-badge--agotado');
@@ -768,36 +1136,324 @@
 </script>
 
 {% stylesheet %}
-  /* ============ HELP BUBBLE ============ */
-  .help-bubble {
+  /* ============ DISCOUNT FLOATING NOTIFICATION ============ */
+  .discount-float {
     position: fixed;
     bottom: 24px;
-    right: 24px;
-    z-index: 9990;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9998;
+    animation: floatIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 380px;
   }
 
-  .help-bubble__btn {
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-    border: none;
+  @keyframes floatIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(40px) scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
+  .discount-float__card {
+    position: relative;
+    background: linear-gradient(145deg, #111 0%, #1a1a1a 100%);
+    border: 2px solid #22C55E;
+    border-radius: 20px;
+    padding: 12px 18px;
+    box-shadow:
+      0 10px 40px rgba(0, 0, 0, 0.5),
+      0 0 30px rgba(34, 197, 94, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+    animation: wobble 4s ease-in-out infinite;
+    transform-origin: center bottom;
+  }
+
+  @keyframes wobble {
+    0%, 100% {
+      transform: rotate(-2deg) translateY(0);
+    }
+    25% {
+      transform: rotate(2deg) translateY(-3px);
+    }
+    50% {
+      transform: rotate(-1.5deg) translateY(0);
+    }
+    75% {
+      transform: rotate(1.5deg) translateY(-2px);
+    }
+  }
+
+  .discount-float__shimmer {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(34, 197, 94, 0.1) 50%,
+      transparent 100%
+    );
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+  }
+
+  .discount-float__content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 1;
+  }
+
+  .discount-float__badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(34, 197, 94, 0.15);
+    padding: 5px 8px;
+    border-radius: 16px;
+    color: #22C55E;
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .discount-float__badge svg {
+    flex-shrink: 0;
+  }
+
+  .discount-float__code {
+    font-size: 1.1rem;
+    font-weight: 800;
     color: #fff;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+
+  .discount-float__btn {
+    position: relative;
+    background: #22C55E;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    color: #000;
+    font-size: 0.75rem;
+    font-weight: 700;
     cursor: pointer;
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+
+  .discount-float__btn:hover {
+    background: #16a34a;
+    transform: scale(1.08);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+  }
+
+  .discount-float__btn:active {
+    transform: scale(0.95);
+  }
+
+  .discount-float__btn-default,
+  .discount-float__btn-copied {
+    transition: all 0.2s ease;
+  }
+
+  .discount-float__btn-copied {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    font-size: 1rem;
+  }
+
+  .discount-float__btn.copied {
+    background: #16a34a;
+  }
+
+  .discount-float__btn.copied .discount-float__btn-default {
+    opacity: 0;
+  }
+
+  .discount-float__btn.copied .discount-float__btn-copied {
+    opacity: 1;
+  }
+
+  /* Mobile */
+  @media (max-width: 640px) {
+    .discount-float {
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 32px);
+      max-width: 320px;
+    }
+
+    .discount-float__card {
+      padding: 10px 14px;
+      border-radius: 16px;
+    }
+
+    .discount-float__content {
+      gap: 8px;
+      justify-content: space-between;
+    }
+
+    .discount-float__code {
+      font-size: 1rem;
+    }
+
+    .discount-float__btn {
+      padding: 7px 10px;
+      font-size: 0.7rem;
+    }
+
+    .discount-float__badge {
+      padding: 5px 8px;
+      font-size: 0.6rem;
+    }
+
+    .discount-float__badge span {
+      display: none;
+    }
+
+    .discount-float__code {
+      font-size: 1.1rem;
+      flex: 1;
+    }
+
+    .discount-float__btn {
+      padding: 10px 14px;
+    }
+  }
+
+  /* ============ HELP BUBBLE ============ */
+  .help-bubble {
+    position: fixed !important;
+    bottom: 100px !important;
+    left: calc(100vw - 76px) !important;
+    right: auto !important;
+    top: auto !important;
+    z-index: 999999 !important;
+    transform: none !important;
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .help-bubble__tooltip {
+    position: absolute;
+    right: 70px;
+    bottom: 5px;
+    background: #ffffff;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 18px;
+    display: none;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+    animation: tooltipSlide 0.3s ease;
+    transition: opacity 0.3s ease;
+  }
+
+  @keyframes tooltipSlide {
+    from { opacity: 0; transform: translateX(10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .help-bubble__tooltip span {
+    color: #1a1a1a;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .help-bubble__tooltip-close {
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    color: #666;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.4);
+    transition: all 0.2s;
+  }
+
+  .help-bubble__tooltip-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    color: #333;
+  }
+
+  .help-bubble__tooltip::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 10px solid transparent;
+    border-left-color: #ffffff;
+  }
+
+  .help-bubble__btn {
+    width: 56px !important;
+    height: 56px !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+    border-radius: 50% !important;
+    background: #ffffff !important;
+    border: none !important;
+    color: #1a1a1a !important;
+    cursor: pointer;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
     transition: all 0.3s ease;
+    opacity: 1 !important;
+    visibility: visible !important;
+    overflow: visible !important;
+    position: relative !important;
   }
 
   .help-bubble__btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 28px rgba(39, 174, 96, 0.5);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.3);
   }
 
+  .help-bubble__icon {
+    font-size: 28px;
+    font-weight: 800;
+    font-family: Arial, sans-serif;
+    color: #1a1a1a;
+    line-height: 1;
+  }
+
+
   .help-bubble.active .help-bubble__btn {
-    background: #1a1a1a;
+    background: #f0f0f0 !important;
+  }
+
+  .help-bubble__tooltip {
+    cursor: pointer;
   }
 
   .help-bubble__menu {
@@ -874,7 +1530,8 @@
   }
 
   .help-bubble__option svg {
-    color: #27ae60;
+    color: #ffffff !important;
+    stroke: #ffffff !important;
     flex-shrink: 0;
   }
 
@@ -885,38 +1542,44 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
     z-index: 10000;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    pointer-events: none;
+    overflow-y: auto;
   }
 
   .tour-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
   }
 
   .tour-highlight {
-    position: absolute;
+    position: fixed !important;
     border-radius: 16px;
     box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
-    background: transparent;
-    transition: all 0.4s ease;
+    background: rgba(255, 255, 255, 0.05);
+    border: 3px solid #27ae60;
+    transition: top 0.5s ease, left 0.5s ease, width 0.5s ease, height 0.5s ease;
     pointer-events: none;
+    opacity: 0;
+    z-index: 10000;
   }
 
   .tour-tooltip {
-    position: absolute;
+    position: fixed !important;
     width: 320px;
     max-width: calc(100vw - 32px);
     background: #1a1a1a;
-    border: 1px solid rgba(39, 174, 96, 0.3);
+    border: 2px solid #27ae60;
     border-radius: 16px;
     overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    transition: all 0.4s ease;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(39, 174, 96, 0.3);
+    transition: top 0.5s ease, left 0.5s ease, bottom 0.5s ease;
     z-index: 10001;
+    opacity: 0;
   }
 
   .tour-tooltip__content {
@@ -996,26 +1659,61 @@
     transition: width 0.4s ease;
   }
 
-  @media (max-width: 500px) {
+  @media (max-width: 768px) {
     .help-bubble {
-      bottom: 16px;
-      right: 16px;
+      bottom: 100px !important;
+      left: calc(100vw - 66px) !important;
+      right: auto !important;
+      width: 50px !important;
+      height: 50px !important;
     }
 
     .help-bubble__btn {
-      width: 50px;
-      height: 50px;
+      width: 50px !important;
+      height: 50px !important;
+      min-width: 50px !important;
+      min-height: 50px !important;
+    }
+
+    .help-bubble__icon {
+      font-size: 22px;
+    }
+
+    .help-bubble__tooltip {
+      right: 60px;
+      bottom: 3px;
+      padding: 10px 14px;
+      border-radius: 20px;
+    }
+
+    .help-bubble__tooltip span {
+      font-size: 0.85rem;
     }
 
     .help-bubble__menu {
       width: 260px;
-      right: -8px;
+      right: 0 !important;
+      left: auto !important;
+      bottom: 60px;
     }
 
     .tour-tooltip {
-      left: 16px !important;
-      right: 16px;
-      width: auto;
+      position: fixed !important;
+      left: 12px !important;
+      right: 12px !important;
+      width: auto !important;
+      bottom: 20px !important;
+      top: auto !important;
+      max-height: 45vh;
+      overflow-y: auto;
+    }
+
+    .tour-tooltip__content {
+      padding: 16px;
+    }
+
+    .tour-tooltip__actions {
+      padding: 0 16px 12px;
     }
   }
 
@@ -1325,12 +2023,27 @@
     flex-shrink: 0;
   }
 
-  .inscripcion__categoria-age {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.6);
+  .inscripcion__categoria-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
     flex: 1;
     text-align: right;
     padding: 0 12px;
+    gap: 2px;
+  }
+
+  .inscripcion__categoria-sponsor {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.6);
+    font-style: italic;
+    letter-spacing: 0.02em;
+  }
+
+
+  .inscripcion__categoria-age {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.75);
   }
 
   .inscripcion__categoria-row.agotado .inscripcion__categoria-age {
@@ -1452,6 +2165,12 @@
   .inscripcion__carrito-link:hover {
     text-decoration: underline;
     color: #2ecc71;
+  }
+
+  .inscripcion__carrito-empty {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+    font-style: italic;
   }
 
   /* INFO DEL PROCESO */

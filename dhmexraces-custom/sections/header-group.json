@@ -14,9 +14,14 @@
     "header": {
       "type": "header",
       "settings": {}
+    },
+    "rifa-banner": {
+      "type": "rifa-promo-banner",
+      "settings": {}
     }
   },
   "order": [
-    "header"
+    "header",
+    "rifa-banner"
   ]
 }

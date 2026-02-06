@@ -12,9 +12,29 @@
         <div class="cart-custom__items" data-aos="fade-up" data-aos-delay="100">
           <h2 class="cart-custom__section-title">Resumen de Inscripciones</h2>
 
+          {%- comment -%} First, count total inscriptions in cart {%- endcomment -%}
+          {% assign total_inscriptions = 0 %}
+          {% for item in cart.items %}
+            {% assign item_title_check = item.product.title | downcase %}
+            {% if item_title_check contains 'inscripcion' or item_title_check contains 'inscripción' %}
+              {% assign total_inscriptions = total_inscriptions | plus: item.quantity %}
+            {% endif %}
+          {% endfor %}
+
           <div class="cart-custom__list">
             {% for item in cart.items %}
-              <div class="cart-item" data-cart-item data-line="{{ forloop.index }}">
+              {% assign item_title_lower = item.product.title | downcase %}
+              {% assign is_jersey = false %}
+              {% assign is_promo_jersey = false %}
+              {% if item_title_lower contains 'jersey' or item_title_lower contains 'playera oficial' %}
+                {% assign is_jersey = true %}
+                {%- comment -%} Only show as promo if there are inscriptions AND jersey has _promo_jersey property {%- endcomment -%}
+                {% if total_inscriptions > 0 and item.properties['_promo_jersey'] == 'true' %}
+                  {% assign is_promo_jersey = true %}
+                {% endif %}
+              {% endif %}
+
+              <div class="cart-item {% if is_promo_jersey %}cart-item--jersey{% endif %}" data-cart-item data-line="{{ forloop.index }}">
                 <div class="cart-item__image">
                   {% if item.image %}
                     <img src="{{ item.image | image_url: width: 150 }}" alt="{{ item.title }}" width="150" height="100">
@@ -23,14 +43,42 @@
 
                 <div class="cart-item__details">
                   <h3 class="cart-item__title">{{ item.product.title }}</h3>
-                  <p class="cart-item__variant">Categoría: <strong>{{ item.variant.title }}</strong></p>
-                  <p class="cart-item__price">{{ item.final_price | money }} MXN</p>
+                  {% if is_promo_jersey %}
+                    {%- comment -%} PROMO JERSEY - Free with inscription {%- endcomment -%}
+                    <p class="cart-item__variant cart-item__variant--jersey">
+                      Talla: <strong>Por definir en formulario</strong>
+                    </p>
+                    <div class="cart-item__promo">
+                      <span class="cart-item__promo-badge">100% DESCUENTO</span>
+                      <span class="cart-item__promo-reason">Por inscripción</span>
+                    </div>
+                    <p class="cart-item__price cart-item__price--promo">
+                      <span class="cart-item__price-original">{{ item.original_price | money }} MXN</span>
+                      <span class="cart-item__price-free">GRATIS</span>
+                    </p>
+                    <p class="cart-item__delivery">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      Se entrega en carrera
+                    </p>
+                  {% elsif is_jersey %}
+                    {%- comment -%} REGULAR JERSEY - Purchased separately {%- endcomment -%}
+                    <p class="cart-item__variant">Talla: <strong>{{ item.variant.title }}</strong></p>
+                    <p class="cart-item__price">{{ item.original_price | money }} MXN</p>
+                  {% else %}
+                    {%- comment -%} INSCRIPTION {%- endcomment -%}
+                    <p class="cart-item__variant">Categoría: <strong>{{ item.variant.title }}</strong></p>
+                    <p class="cart-item__price">{{ item.final_price | money }} MXN</p>
+                  {% endif %}
                 </div>
 
                 <div class="cart-item__quantity">
                   <label for="quantity-{{ forloop.index }}">Cantidad:</label>
                   <div class="cart-item__qty-controls">
-                    <button type="button" class="cart-item__qty-btn cart-item__qty-btn--minus" onclick="updateQuantity({{ forloop.index }}, -1)">−</button>
+                    {% unless is_promo_jersey %}
+                      <button type="button" class="cart-item__qty-btn cart-item__qty-btn--minus" onclick="updateQuantity({{ forloop.index }}, -1)">−</button>
+                    {% endunless %}
                     <input type="number"
                            id="quantity-{{ forloop.index }}"
                            value="{{ item.quantity }}"
@@ -38,38 +86,91 @@
                            max="10"
                            readonly
                            class="cart-item__qty-input">
-                    <button type="button" class="cart-item__qty-btn cart-item__qty-btn--plus" onclick="updateQuantity({{ forloop.index }}, 1)">+</button>
+                    {% unless is_promo_jersey %}
+                      <button type="button" class="cart-item__qty-btn cart-item__qty-btn--plus" onclick="updateQuantity({{ forloop.index }}, 1)">+</button>
+                    {% endunless %}
                   </div>
+                  {% if is_promo_jersey %}
+                    <span class="cart-item__qty-note">Sincronizado con inscripciones</span>
+                  {% endif %}
                 </div>
 
                 <div class="cart-item__subtotal">
                   <span class="cart-item__subtotal-label">Subtotal:</span>
-                  <span class="cart-item__subtotal-price">{{ item.final_line_price | money }} MXN</span>
+                  {% if is_promo_jersey %}
+                    <span class="cart-item__subtotal-price cart-item__subtotal-price--free">$0.00 MXN</span>
+                  {% elsif is_jersey %}
+                    <span class="cart-item__subtotal-price">{{ item.original_line_price | money }} MXN</span>
+                  {% else %}
+                    <span class="cart-item__subtotal-price">{{ item.final_line_price | money }} MXN</span>
+                  {% endif %}
                 </div>
 
-                <button type="button" class="cart-item__remove" onclick="removeItem({{ forloop.index }})">
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                    <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                  </svg>
-                </button>
+                {% unless is_promo_jersey %}
+                  <button type="button" class="cart-item__remove" onclick="removeItem({{ forloop.index }})">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                      <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                {% endunless %}
               </div>
             {% endfor %}
           </div>
         </div>
 
         {%- comment -%} Summary {%- endcomment -%}
+        {%- comment -%} Calculate correct total excluding promo jerseys {%- endcomment -%}
+        {% assign promo_jersey_total = 0 %}
+        {% assign inscription_count = 0 %}
+        {% for item in cart.items %}
+          {% assign item_title_calc = item.product.title | downcase %}
+          {% if item_title_calc contains 'inscripcion' or item_title_calc contains 'inscripción' %}
+            {% assign inscription_count = inscription_count | plus: item.quantity %}
+          {% endif %}
+          {% if item.properties['_promo_jersey'] == 'true' %}
+            {% assign promo_jersey_total = promo_jersey_total | plus: item.final_line_price %}
+          {% endif %}
+        {% endfor %}
+        {% assign correct_total = cart.total_price | minus: promo_jersey_total %}
+
         <div class="cart-custom__summary" data-aos="fade-up" data-aos-delay="200">
           <h2 class="cart-custom__section-title">Resumen del Pedido</h2>
 
           <div class="cart-summary">
             <div class="cart-summary__row">
-              <span>Total de inscripciones:</span>
-              <strong id="total-items">{{ cart.item_count }}</strong>
+              <span>Inscripciones:</span>
+              <strong id="total-items">{{ inscription_count }}</strong>
             </div>
+
+            {% if promo_jersey_total > 0 %}
+            <div class="cart-summary__row cart-summary__row--promo">
+              <span>Jersey Oficial (x{{ inscription_count }}):</span>
+              <strong class="cart-summary__promo-value">
+                <span class="cart-summary__original-price">{{ promo_jersey_total | money }}</span>
+                GRATIS
+              </strong>
+            </div>
+            {% endif %}
 
             <div class="cart-summary__row cart-summary__row--total">
               <span>Total a Pagar:</span>
-              <strong id="cart-total">{{ cart.total_price | money }} MXN</strong>
+              <strong id="cart-total">{{ correct_total | money }} MXN</strong>
+            </div>
+
+            <!-- Discount Code Input -->
+            <div class="cart-discount">
+              <label class="cart-discount__label">¿Tienes código de descuento?</label>
+              <div class="cart-discount__input-wrap" id="discountInputWrap">
+                <input type="text" id="discountCode" class="cart-discount__input" placeholder="Ingresa tu código">
+                <button type="button" id="applyDiscountBtn" class="cart-discount__btn">Aplicar</button>
+              </div>
+              <div class="cart-discount__confirmed" id="discountConfirmed" style="display: none;">
+                <span class="cart-discount__confirmed-icon">✓</span>
+                <span class="cart-discount__confirmed-code" id="confirmedCode"></span>
+                <button type="button" id="changeDiscountBtn" class="cart-discount__change-btn">Cambiar</button>
+              </div>
+              <p class="cart-discount__hint" id="discountHint">Se verificará en el checkout</p>
+              <p class="cart-discount__note-small">Si ya aplicaste un código en checkout y se ve reflejado, no necesitas ponerlo de nuevo</p>
             </div>
 
             <div class="cart-summary__info">
@@ -108,9 +209,82 @@
 </section>
 
 <script>
+  // ============================================================
+  // CART PROTECTION SYSTEM - DHMEXRACES
+  // Handles all cart operations with full error protection
+  // ============================================================
+
+  // State management to prevent race conditions
+  let isProcessing = false;
+  const JERSEY_KEYWORDS = ['jersey', 'playera oficial'];
+
+  // ============ ITEM TYPE DETECTION ============
+  function isJerseyItem(item) {
+    const title = (item.product_title || item.title || '').toLowerCase();
+    return JERSEY_KEYWORDS.some(keyword => title.includes(keyword));
+  }
+
+  function isPromoJersey(item) {
+    // Only jerseys with _promo_jersey property are promo jerseys
+    if (!isJerseyItem(item)) return false;
+    const props = item.properties || {};
+    return props['_promo_jersey'] === 'true';
+  }
+
+  function isNormalJersey(item) {
+    // Normal jerseys are jerseys WITHOUT _promo_jersey property
+    if (!isJerseyItem(item)) return false;
+    const props = item.properties || {};
+    return props['_promo_jersey'] !== 'true';
+  }
+
+  function isInscriptionItem(item) {
+    const title = (item.product_title || item.title || '').toLowerCase();
+    return title.includes('inscripcion') || title.includes('inscripción');
+  }
+
+  // ============ UI STATE MANAGEMENT ============
+  function setProcessingState(processing) {
+    isProcessing = processing;
+
+    // Disable/enable all cart buttons
+    const buttons = document.querySelectorAll('.cart-item__qty-btn, .cart-item__remove, .cart-summary__button');
+    buttons.forEach(btn => {
+      btn.disabled = processing;
+      if (processing) {
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'wait';
+      } else {
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+      }
+    });
+
+    // Show/hide loading indicator
+    let loader = document.getElementById('cartLoader');
+    if (processing) {
+      if (!loader) {
+        loader = document.createElement('div');
+        loader.id = 'cartLoader';
+        loader.innerHTML = '<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;"><div style="background:#111;border:2px solid #22C55E;border-radius:12px;padding:24px 32px;color:#fff;font-weight:600;">Actualizando carrito...</div></div>';
+        document.body.appendChild(loader);
+      }
+    } else if (loader) {
+      loader.remove();
+    }
+  }
+
+  // ============ CART OPERATIONS ============
   function updateQuantity(line, change) {
+    if (isProcessing) return; // Prevent double-clicks
+
     const input = document.getElementById(`quantity-${line}`);
-    const currentQty = parseInt(input.value);
+    if (!input) {
+      console.error('Input not found for line:', line);
+      return;
+    }
+
+    const currentQty = parseInt(input.value) || 1;
     const newQty = Math.max(1, Math.min(10, currentQty + change));
 
     if (newQty !== currentQty) {
@@ -119,34 +293,175 @@
   }
 
   function removeItem(line) {
-    if (confirm('¿Eliminar esta inscripción del carrito?')) {
+    if (isProcessing) return; // Prevent double-clicks
+
+    if (confirm('¿Eliminar este artículo del carrito?')) {
       updateCart(line, 0);
     }
   }
 
-  function updateCart(line, quantity) {
-    fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ line: line, quantity: quantity })
-    })
-    .then(response => response.json())
-    .then(() => {
+  async function updateCart(line, quantity) {
+    if (isProcessing) return; // Prevent concurrent operations
+
+    setProcessingState(true);
+
+    try {
+      // Step 1: Get current cart state
+      const cartResponse = await fetch('/cart.js');
+      if (!cartResponse.ok) throw new Error('No se pudo obtener el carrito');
+
+      const cart = await cartResponse.json();
+
+      // Validate line number
+      if (line < 1 || line > cart.items.length) {
+        throw new Error('Línea de carrito inválida');
+      }
+
+      const itemBeingChanged = cart.items[line - 1];
+      const isInscription = isInscriptionItem(itemBeingChanged);
+      const isPromo = isPromoJersey(itemBeingChanged);
+
+      // Step 2: Perform the update
+      const updateResponse = await fetch('/cart/change.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ line: line, quantity: quantity })
+      });
+
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json().catch(() => ({}));
+        throw new Error(errorData.description || 'Error al actualizar cantidad');
+      }
+
+      // Step 3: If it's an inscription, sync promo jerseys
+      if (isInscription) {
+        await syncPromoJerseysWithInscriptions();
+      }
+
+      // Step 4: Reload page to show updated cart
       window.location.reload();
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      alert('Error al actualizar el carrito');
-    });
+
+    } catch (error) {
+      console.error('Error updating cart:', error);
+      setProcessingState(false);
+      alert('Error al actualizar el carrito: ' + error.message + '\n\nPor favor recarga la página e intenta de nuevo.');
+    }
+  }
+
+  async function syncPromoJerseysWithInscriptions() {
+    // ROBUST SYNC: Force inscriptions count = promo jerseys count
+    // Strategy: Remove ALL promo jerseys, then add ONE with correct quantity
+    try {
+      // Step 1: Get cart and count inscriptions
+      let cartResponse = await fetch('/cart.js');
+      if (!cartResponse.ok) return;
+      let cart = await cartResponse.json();
+
+      const totalInscriptions = cart.items
+        .filter(item => isInscriptionItem(item))
+        .reduce((total, item) => total + item.quantity, 0);
+
+      // Step 2: Find all promo jerseys
+      let promoJerseys = cart.items.filter(item => isPromoJersey(item));
+
+      // Calculate total promo jerseys quantity
+      const totalPromoJerseys = promoJerseys.reduce((total, item) => total + item.quantity, 0);
+
+      // Step 3: If quantities match and there's only 1 promo jersey line, we're good
+      if (promoJerseys.length === 1 && totalPromoJerseys === totalInscriptions) {
+        console.log('Promo jerseys already synced correctly');
+        return;
+      }
+
+      // Step 4: If no inscriptions, remove ALL promo jerseys
+      if (totalInscriptions === 0) {
+        for (let i = promoJerseys.length - 1; i >= 0; i--) {
+          const jersey = promoJerseys[i];
+          const jerseyLine = cart.items.indexOf(jersey) + 1;
+          await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ line: jerseyLine, quantity: 0 })
+          });
+          await new Promise(r => setTimeout(r, 150));
+          // Re-fetch cart because line numbers changed
+          cartResponse = await fetch('/cart.js');
+          cart = await cartResponse.json();
+          promoJerseys = cart.items.filter(item => isPromoJersey(item));
+        }
+        return;
+      }
+
+      // Step 5: Get the jersey variant ID from existing promo jersey (we'll need it to re-add)
+      let jerseyVariantId = null;
+      if (promoJerseys.length > 0) {
+        jerseyVariantId = promoJerseys[0].variant_id;
+      }
+
+      // Step 6: Remove ALL promo jerseys (one by one, re-fetching cart each time)
+      while (promoJerseys.length > 0) {
+        const jersey = promoJerseys[0];
+        const jerseyLine = cart.items.indexOf(jersey) + 1;
+
+        await fetch('/cart/change.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ line: jerseyLine, quantity: 0 })
+        });
+
+        await new Promise(r => setTimeout(r, 150));
+
+        // Re-fetch cart
+        cartResponse = await fetch('/cart.js');
+        cart = await cartResponse.json();
+        promoJerseys = cart.items.filter(item => isPromoJersey(item));
+      }
+
+      // Step 7: Add ONE promo jersey with the correct quantity
+      if (jerseyVariantId && totalInscriptions > 0) {
+        await fetch('/cart/add.js', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: jerseyVariantId,
+            quantity: totalInscriptions,
+            properties: {
+              '_promo_jersey': 'true'
+            }
+          })
+        });
+      }
+
+      console.log(`Synced: ${totalInscriptions} inscriptions = ${totalInscriptions} promo jerseys`);
+
+    } catch (error) {
+      console.error('Error syncing promo jerseys:', error);
+    }
   }
 
   function proceedToRegistration() {
-    // Get cart data
+    if (isProcessing) return;
+
+    setProcessingState(true);
+
     fetch('/cart.js')
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) throw new Error('No se pudo obtener el carrito');
+        return response.json();
+      })
       .then(cart => {
+        // Filter only inscription items (not jerseys)
+        const inscriptionItems = cart.items.filter(item => isInscriptionItem(item));
+
+        if (inscriptionItems.length === 0) {
+          throw new Error('No hay inscripciones en el carrito');
+        }
+
+        // Check if there are promo jerseys (for size selection)
+        const hasPromoJersey = cart.items.some(item => isPromoJersey(item));
+
         // Store cart items in sessionStorage for the registration form
-        const cartData = cart.items.map(item => ({
+        const cartData = inscriptionItems.map(item => ({
           variant_id: item.variant_id,
           variant_title: item.variant_title,
           product_title: item.product_title,
@@ -157,14 +472,123 @@
 
         sessionStorage.setItem('registrationCartData', JSON.stringify(cartData));
 
+        // Store jersey availability for registration form
+        if (hasPromoJersey) {
+          sessionStorage.setItem('jerseyDisponible', JSON.stringify({ disponible: true }));
+        } else {
+          sessionStorage.removeItem('jerseyDisponible');
+        }
+
+        // Get discount code - check localStorage first, then confirmed display, then input
+        let discountCode = localStorage.getItem('discountCode') || '';
+
+        if (!discountCode) {
+          const confirmedCodeEl = document.getElementById('confirmedCode');
+          const discountInput = document.getElementById('discountCode');
+
+          if (confirmedCodeEl && confirmedCodeEl.textContent.trim()) {
+            discountCode = confirmedCodeEl.textContent.trim().toUpperCase();
+          } else if (discountInput && discountInput.value.trim()) {
+            discountCode = discountInput.value.trim().toUpperCase();
+          }
+        }
+
+        if (discountCode) {
+          sessionStorage.setItem('discountCode', discountCode);
+        } else {
+          sessionStorage.removeItem('discountCode');
+        }
+
         // Redirect to registration form page
         window.location.href = '/pages/formulario-de-inscripcion';
       })
       .catch(error => {
         console.error('Error:', error);
-        alert('Error al procesar. Intenta de nuevo.');
+        setProcessingState(false);
+        alert('Error al procesar: ' + error.message + '\n\nPor favor intenta de nuevo.');
       });
   }
+
+  // ============ DISCOUNT CODE HANDLING ============
+  function setupDiscountCode() {
+    const input = document.getElementById('discountCode');
+    const applyBtn = document.getElementById('applyDiscountBtn');
+    const inputWrap = document.getElementById('discountInputWrap');
+    const confirmed = document.getElementById('discountConfirmed');
+    const confirmedCode = document.getElementById('confirmedCode');
+    const changeBtn = document.getElementById('changeDiscountBtn');
+    const hint = document.getElementById('discountHint');
+
+    if (!input || !applyBtn) return;
+
+    // Show confirmed state
+    function showConfirmed(code) {
+      inputWrap.style.display = 'none';
+      confirmed.style.display = 'flex';
+      confirmedCode.textContent = code;
+      hint.textContent = 'Se verificará en el checkout';
+      hint.style.color = '#22C55E';
+    }
+
+    // Show input state
+    function showInput() {
+      inputWrap.style.display = 'flex';
+      confirmed.style.display = 'none';
+      input.value = '';
+      hint.textContent = 'Se verificará en el checkout';
+      hint.style.color = '';
+    }
+
+    // Check for saved discount code on page load
+    const savedCode = localStorage.getItem('discountCode');
+    if (savedCode) {
+      showConfirmed(savedCode);
+    }
+
+    // Auto-uppercase
+    input.addEventListener('input', function() {
+      this.value = this.value.toUpperCase();
+    });
+
+    // Apply button
+    applyBtn.addEventListener('click', function() {
+      const code = input.value.trim().toUpperCase();
+      if (code) {
+        localStorage.setItem('discountCode', code);
+        showConfirmed(code);
+      } else {
+        input.focus();
+        input.style.borderColor = '#E42C2C';
+        setTimeout(() => { input.style.borderColor = ''; }, 2000);
+      }
+    });
+
+    // Enter key
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        applyBtn.click();
+      }
+    });
+
+    // Change button
+    changeBtn.addEventListener('click', function() {
+      localStorage.removeItem('discountCode');
+      showInput();
+      input.focus();
+    });
+  }
+
+  // ============ PAGE LOAD INITIALIZATION ============
+  document.addEventListener('DOMContentLoaded', function() {
+    // Setup discount code
+    setupDiscountCode();
+
+    // Only sync promo jerseys on page load (not normal jerseys)
+    // This ensures promo jerseys stay in sync if user refreshes mid-operation
+    syncPromoJerseysWithInscriptions().catch(err => {
+      console.error('Error in initial sync:', err);
+    });
+  });
 </script>
 
 {% stylesheet %}
@@ -360,6 +784,88 @@
     border-color: #ff4444;
   }
 
+  /* Jersey Item Styles */
+  .cart-item--jersey {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.08) 0%, rgba(34, 197, 94, 0.02) 100%);
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+
+  .cart-item__variant--jersey strong {
+    color: #22C55E;
+  }
+
+  .cart-item__promo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+  }
+
+  .cart-item__promo-badge {
+    background: #22C55E;
+    color: #000;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cart-item__promo-reason {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.75rem;
+  }
+
+  .cart-item__price--promo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cart-item__price-original {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+  }
+
+  .cart-item__price-free {
+    color: #22C55E;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .cart-item__qty-note {
+    display: block;
+    font-size: 0.7rem;
+    color: rgba(34, 197, 94, 0.8);
+    margin-top: 6px;
+    font-style: italic;
+  }
+
+  .cart-item__subtotal-price--free {
+    color: #22C55E !important;
+  }
+
+  .cart-item__delivery {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: rgba(0, 102, 179, 0.15);
+    border: 1px solid rgba(0, 102, 179, 0.3);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #4DA6FF;
+  }
+
+  .cart-item__delivery svg {
+    flex-shrink: 0;
+    color: #4DA6FF;
+  }
+
   /* Summary */
   .cart-custom__summary {
     background: rgba(255, 255, 255, 0.02);
@@ -380,6 +886,28 @@
     font-size: 0.95rem;
   }
 
+  .cart-summary__row--promo {
+    background: rgba(34, 197, 94, 0.08);
+    margin: 0 -16px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border-bottom: none;
+  }
+
+  .cart-summary__promo-value {
+    color: #22C55E;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .cart-summary__original-price {
+    text-decoration: line-through;
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.85rem;
+    font-weight: 400;
+  }
+
   .cart-summary__row--total {
     border-bottom: none;
     padding-top: 20px;
@@ -390,6 +918,120 @@
   .cart-summary__row--total strong {
     color: #27ae60;
     font-size: 1.5rem;
+  }
+
+  /* Discount Code */
+  .cart-discount {
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin-top: 16px;
+  }
+
+  .cart-discount__label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 10px;
+  }
+
+  .cart-discount__input-wrap {
+    display: flex;
+    gap: 10px;
+  }
+
+  .cart-discount__input {
+    flex: 1;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+  }
+
+  .cart-discount__input:focus {
+    outline: none;
+    border-color: #27ae60;
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .cart-discount__input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    text-transform: none;
+  }
+
+  .cart-discount__btn {
+    padding: 12px 20px;
+    background: rgba(39, 174, 96, 0.15);
+    border: 1px solid rgba(39, 174, 96, 0.4);
+    border-radius: 8px;
+    color: #27ae60;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .cart-discount__btn:hover {
+    background: rgba(39, 174, 96, 0.25);
+    border-color: #27ae60;
+  }
+
+  .cart-discount__confirmed {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid rgba(34, 197, 94, 0.5);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+
+  .cart-discount__confirmed-icon {
+    color: #22C55E;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+  .cart-discount__confirmed-code {
+    color: #22C55E;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: 0.05em;
+    flex: 1;
+  }
+
+  .cart-discount__change-btn {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.8rem;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.2s ease;
+  }
+
+  .cart-discount__change-btn:hover {
+    color: #fff;
+  }
+
+  .cart-discount__hint {
+    margin-top: 10px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic;
+    transition: color 0.3s ease;
+  }
+
+  .cart-discount__note-small {
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.4);
+    line-height: 1.4;
   }
 
   .cart-summary__info {

@@ -55,8 +55,9 @@
   let cartData = [];
   let currentFormIndex = 0;
   let formsData = [];
+  window.jerseyDisponible = false;
 
-  document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('DOMContentLoaded', async function() {
     // Get cart data from sessionStorage
     const storedCartData = sessionStorage.getItem('registrationCartData');
 
@@ -67,6 +68,13 @@
     }
 
     cartData = JSON.parse(storedCartData);
+
+    // Check jersey availability from cart
+    const jerseyInfo = sessionStorage.getItem('jerseyDisponible');
+    if (jerseyInfo) {
+      const info = JSON.parse(jerseyInfo);
+      window.jerseyDisponible = info.disponible;
+    }
 
     // Calculate total number of forms needed
     const totalForms = cartData.reduce((total, item) => total + item.quantity, 0);
@@ -188,6 +196,39 @@
                 </div>
               </div>
 
+              <div class="reg-form__field-row">
+                <div class="reg-form__field-group">
+                  <label for="tipo_sangre-${formIndex}" class="reg-form__label">
+                    Tipo de Sangre *
+                  </label>
+                  <select
+                    id="tipo_sangre-${formIndex}"
+                    class="reg-form__input"
+                    required>
+                    <option value="">Selecciona...</option>
+                    <option value="A+">A+</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B-">B-</option>
+                    <option value="AB+">AB+</option>
+                    <option value="AB-">AB-</option>
+                    <option value="O+">O+</option>
+                    <option value="O-">O-</option>
+                  </select>
+                </div>
+
+                <div class="reg-form__field-group">
+                  <label for="alergias-${formIndex}" class="reg-form__label">
+                    Alergias
+                  </label>
+                  <input
+                    type="text"
+                    id="alergias-${formIndex}"
+                    class="reg-form__input"
+                    placeholder="Ej: Penicilina, polen (o dejar vacío)">
+                </div>
+              </div>
+
               <div class="reg-form__field-group">
                 <label class="reg-form__label">
                   Categoría
@@ -197,6 +238,25 @@
                 </div>
                 <input type="hidden" id="categoria-${formIndex}" value="${item.variant_title}">
               </div>
+
+              ${window.jerseyDisponible ? `
+              <div class="reg-form__field-group reg-form__jersey-field">
+                <label for="talla_playera-${formIndex}" class="reg-form__label">
+                  <span class="reg-form__jersey-icon">👕</span> Talla de Playera Oficial *
+                </label>
+                <p class="reg-form__jersey-info">¡Felicidades! Alcanzaste playera gratis por ser de los primeros 50 inscritos</p>
+                <select
+                  id="talla_playera-${formIndex}"
+                  class="reg-form__input reg-form__input--jersey"
+                  required>
+                  <option value="">Selecciona tu talla...</option>
+                  <option value="S">S - Chica</option>
+                  <option value="M">M - Mediana</option>
+                  <option value="L">L - Grande</option>
+                  <option value="XL">XL - Extra Grande</option>
+                </select>
+              </div>
+              ` : ''}
             </div>
           </div>
         `;
@@ -215,7 +275,10 @@
           telefono: '',
           emergencia_nombre: '',
           emergencia_telefono: '',
-          categoria: item.variant_title
+          tipo_sangre: '',
+          alergias: '',
+          categoria: item.variant_title,
+          talla_playera: ''
         });
 
         formIndex++;
@@ -261,6 +324,14 @@
       document.getElementById(`telefono-${index}`).value = data.telefono;
       document.getElementById(`emergencia_nombre-${index}`).value = data.emergencia_nombre;
       document.getElementById(`emergencia_telefono-${index}`).value = data.emergencia_telefono;
+      document.getElementById(`tipo_sangre-${index}`).value = data.tipo_sangre;
+      document.getElementById(`alergias-${index}`).value = data.alergias;
+
+      // Restore jersey size if available
+      const tallaEl = document.getElementById(`talla_playera-${index}`);
+      if (tallaEl && data.talla_playera) {
+        tallaEl.value = data.talla_playera;
+      }
     }
   }
 
@@ -273,10 +344,26 @@
     const telefono = document.getElementById(`telefono-${index}`).value.trim();
     const emergencia_nombre = document.getElementById(`emergencia_nombre-${index}`).value.trim();
     const emergencia_telefono = document.getElementById(`emergencia_telefono-${index}`).value.trim();
+    const tipo_sangre = document.getElementById(`tipo_sangre-${index}`).value;
+    const alergias = document.getElementById(`alergias-${index}`).value.trim();
+
+    // Get jersey size if available
+    const tallaEl = document.getElementById(`talla_playera-${index}`);
+    const talla_playera = tallaEl ? tallaEl.value : '';
+
+    // DEBUG
+    console.log(`[Form ${index}] Campo talla encontrado:`, tallaEl ? 'SÍ' : 'NO');
+    console.log(`[Form ${index}] Valor talla:`, talla_playera || '(vacío)');
 
     // Validation
-    if (!nombre || !fecha || !email || !telefono || !emergencia_nombre || !emergencia_telefono) {
+    if (!nombre || !fecha || !email || !telefono || !emergencia_nombre || !emergencia_telefono || !tipo_sangre) {
       alert('Por favor completa todos los campos obligatorios (*)');
+      return false;
+    }
+
+    // Validate jersey size if field exists
+    if (window.jerseyDisponible && tallaEl && !talla_playera) {
+      alert('Por favor selecciona tu talla de playera');
       return false;
     }
 
@@ -308,6 +395,9 @@
     formsData[index].telefono = telefono;
     formsData[index].emergencia_nombre = emergencia_nombre;
     formsData[index].emergencia_telefono = emergencia_telefono;
+    formsData[index].tipo_sangre = tipo_sangre;
+    formsData[index].alergias = alergias || 'Ninguna';
+    formsData[index].talla_playera = talla_playera;
 
     return true;
   }
@@ -335,6 +425,14 @@
       timestamp: new Date().toISOString()
     };
 
+    // DEBUG: Log what we're sending
+    console.log('=== REGISTRATION DATA DEBUG ===');
+    console.log('formsData:', JSON.stringify(formsData, null, 2));
+    formsData.forEach((f, i) => {
+      console.log(`Corredor ${i + 1}: ${f.nombre}, Talla: "${f.talla_playera}"`);
+    });
+    console.log('================================');
+
     // Store in cart attributes
     fetch('/cart/update.js', {
       method: 'POST',
@@ -347,11 +445,19 @@
     })
     .then(response => response.json())
     .then(() => {
+      // Get discount code if exists
+      const discountCode = sessionStorage.getItem('discountCode');
+
       // Clear sessionStorage
       sessionStorage.removeItem('registrationCartData');
+      sessionStorage.removeItem('discountCode');
 
-      // Redirect to checkout
-      window.location.href = '/checkout';
+      // Redirect to checkout with discount code if exists
+      let checkoutUrl = '/checkout';
+      if (discountCode) {
+        checkoutUrl += '?discount=' + encodeURIComponent(discountCode);
+      }
+      window.location.href = checkoutUrl;
     })
     .catch(error => {
       console.error('Error:', error);
@@ -504,6 +610,19 @@
     color: rgba(255, 255, 255, 0.4);
   }
 
+  select.reg-form__input {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+  }
+
+  select.reg-form__input option {
+    background: #1a1a1a;
+    color: #fff;
+  }
+
   .reg-form__category-display {
     padding: 14px 16px;
     background: rgba(228, 44, 44, 0.1);
@@ -511,6 +630,42 @@
     border-radius: 8px;
     color: var(--color-primary);
     font-weight: 600;
+  }
+
+  /* Jersey Field Styles */
+  .reg-form__jersey-field {
+    background: linear-gradient(135deg, rgba(39, 174, 96, 0.1) 0%, rgba(39, 174, 96, 0.05) 100%);
+    border: 1px solid rgba(39, 174, 96, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 8px;
+  }
+
+  .reg-form__jersey-field .reg-form__label {
+    color: #22C55E;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .reg-form__jersey-icon {
+    font-size: 1.2rem;
+  }
+
+  .reg-form__jersey-info {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin: 8px 0 16px 0;
+    line-height: 1.4;
+  }
+
+  .reg-form__input--jersey {
+    border-color: rgba(39, 174, 96, 0.4) !important;
+  }
+
+  .reg-form__input--jersey:focus {
+    border-color: #22C55E !important;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
   }
 
   /* Actions */

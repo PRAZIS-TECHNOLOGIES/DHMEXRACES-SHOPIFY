@@ -353,39 +353,43 @@
           </div>
         </div>
 
-        {%- comment -%} Submit Button {%- endcomment -%}
-        <button
-          type="submit"
-          class="product__submit"
-          {% unless current_variant.available %}disabled{% endunless %}>
-          {% if current_variant.available %}
-            Inscribirse Ahora
-          {% else %}
-            Agotado
-          {% endif %}
-        </button>
+        {%- comment -%} Submit Button - Different for Merch vs Inscriptions {%- endcomment -%}
+        {% assign product_title_lower = product.title | downcase %}
+        {% assign is_merch = false %}
+        {% if product_title_lower contains 'jersey' or product_title_lower contains 'playera' or product_title_lower contains 'gorra' or product_title_lower contains 'sticker' %}
+          {% assign is_merch = true %}
+        {% endif %}
 
-        {%- comment -%} Benefits {%- endcomment -%}
-        <div class="product__benefits">
-          <div class="product__benefit">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Mecánica Neutral Shimano</span>
-          </div>
-          <div class="product__benefit">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Puntos campeonato nacional</span>
-          </div>
-          <div class="product__benefit">
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M16.6667 5L7.50004 14.1667L3.33337 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <span>Premios en efectivo</span>
-          </div>
-        </div>
+        {% if is_merch %}
+          <button
+            type="button"
+            class="product__submit"
+            id="merchAddToCart"
+            onclick="agregarMerchAlCarrito()"
+            {% unless current_variant.available %}disabled{% endunless %}>
+            {% if current_variant.available %}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: inline; vertical-align: middle; margin-right: 8px;">
+                <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+              </svg>
+              Agregar al Carrito
+            {% else %}
+              Agotado
+            {% endif %}
+          </button>
+        {% else %}
+          <button
+            type="submit"
+            class="product__submit"
+            {% unless current_variant.available %}disabled{% endunless %}>
+            {% if current_variant.available %}
+              Inscribirse Ahora
+            {% else %}
+              Agotado
+            {% endif %}
+          </button>
+        {% endif %}
+
       {% endform %}
       {% endif %}
     </div>
@@ -432,6 +436,106 @@
     if (parseInt(input.value) > 1) {
       input.value = parseInt(input.value) - 1;
     }
+  }
+
+  // ============ MERCH TOAST FUNCTIONS ============
+  function mostrarProductToast(cantidad, talla) {
+    // Remove existing toast if any
+    const existingToast = document.getElementById('dhmexToastOverlay');
+    if (existingToast) existingToast.remove();
+
+    // Create toast dynamically and append to body
+    const toast = document.createElement('div');
+    toast.id = 'dhmexToastOverlay';
+    toast.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;background:#111;border:2px solid #22C55E;border-radius:12px;padding:16px 20px;box-shadow:0 10px 40px rgba(0,0,0,0.7);max-width:380px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2" style="flex-shrink:0;">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <span style="font-size:1rem;font-weight:700;color:#fff;">¡Agregado al carrito!</span>
+          <span style="font-size:0.85rem;color:rgba(255,255,255,0.7);">${cantidad}x Talla ${talla}</span>
+        </div>
+        <a href="/cart" style="background:#22C55E;color:#000;font-size:0.8rem;font-weight:700;text-decoration:none;padding:10px 16px;border-radius:8px;margin-left:8px;white-space:nowrap;">Ver carrito</a>
+        <button onclick="cerrarProductToast()" style="background:none;border:none;color:rgba(255,255,255,0.5);cursor:pointer;padding:4px;margin-left:4px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    `;
+
+    // Apply styles directly to the element
+    toast.style.cssText = 'position:fixed;top:100px;right:20px;z-index:2147483647;opacity:0;transform:translateY(-10px);transition:opacity 0.3s ease,transform 0.3s ease;';
+
+    // Append to body
+    document.body.appendChild(toast);
+
+    // Trigger animation after append
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Auto close after 4 seconds
+    setTimeout(() => {
+      cerrarProductToast();
+    }, 4000);
+  }
+
+  function cerrarProductToast() {
+    const toast = document.getElementById('dhmexToastOverlay');
+    if (toast) {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(-10px)';
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }
+  }
+
+  async function agregarMerchAlCarrito() {
+    const variantIdEl = document.getElementById('selectedVariantId');
+    const variantId = variantIdEl ? variantIdEl.value : null;
+    const quantity = document.getElementById('quantity').value;
+    const btn = document.getElementById('merchAddToCart');
+
+    // Get selected variant title (talla)
+    const activeCategory = document.querySelector('.product__category.active');
+    const talla = activeCategory ? activeCategory.textContent.trim().split('\n')[0].trim() : 'Única';
+
+    // Deshabilitar botón
+    btn.disabled = true;
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="loading-spinner"></span> Agregando...';
+
+    try {
+      const response = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: parseInt(quantity)
+        })
+      });
+
+      if (response.ok) {
+        // Mostrar toast
+        mostrarProductToast(quantity, talla);
+      } else {
+        alert('Error al agregar al carrito. Intenta de nuevo.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error al agregar al carrito. Intenta de nuevo.');
+    }
+
+    // Restaurar botón
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
   }
 
   // Auto-select category if coming from registration page
@@ -663,6 +767,12 @@
     try {
       const config = JSON.parse(configEl.textContent);
       const productTitle = config.productTitle.toLowerCase();
+
+      // Only show FOMO for inscription products (not merchandise)
+      if (!productTitle.includes('inscripcion') && !productTitle.includes('inscripción')) {
+        console.log('FOMO: Not an inscription product, skipping');
+        return;
+      }
 
       // Detect sede from product title
       let sede = null;
@@ -946,7 +1056,7 @@
   /* Price Card */
   .product__price-card {
     background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(228, 44, 44, 0.2);
+    border: 1px solid rgba(34, 197, 94, 0.3);
     border-radius: 8px;
     padding: 18px 24px;
     margin-bottom: 28px;
@@ -966,7 +1076,7 @@
   .product__price {
     font-size: 1.75rem;
     font-weight: 700;
-    color: var(--color-primary);
+    color: #22C55E;
     line-height: 1;
     letter-spacing: -0.01em;
   }
@@ -1159,16 +1269,16 @@
   }
 
   .product__category:hover:not(.disabled) {
-    border-color: rgba(228, 44, 44, 0.5);
-    background: rgba(255, 77, 0, 0.08);
+    border-color: rgba(34, 197, 94, 0.5);
+    background: rgba(34, 197, 94, 0.08);
     transform: translateY(-1px);
   }
 
   .product__category.active {
-    background: var(--color-primary);
-    border-color: var(--color-primary);
+    background: #22C55E;
+    border-color: #22C55E;
     color: #000000;
-    box-shadow: 0 4px 12px var(--color-border-accent);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
   }
 
   .product__category.disabled {
@@ -1193,10 +1303,10 @@
   .product__qty-btn {
     width: 48px;
     height: 48px;
-    background: rgba(228, 44, 44, 0.1);
-    border: 1px solid var(--color-border-accent);
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
     border-radius: 12px;
-    color: var(--color-primary);
+    color: #22C55E;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
@@ -1205,8 +1315,8 @@
   }
 
   .product__qty-btn:hover {
-    background: rgba(228, 44, 44, 0.2);
-    border-color: var(--color-primary);
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22C55E;
     transform: scale(1.05);
   }
 
@@ -1236,7 +1346,7 @@
   .product__submit {
     width: 100%;
     padding: 18px 32px;
-    background: var(--color-primary);
+    background: #22C55E;
     border: none;
     border-radius: 12px;
     color: #000000;
@@ -1250,9 +1360,9 @@
   }
 
   .product__submit:hover:not(:disabled) {
-    background: #E85050;
+    background: #16A34A;
     transform: translateY(-2px);
-    box-shadow: 0 12px 24px var(--color-border-accent);
+    box-shadow: 0 12px 24px rgba(34, 197, 94, 0.3);
   }
 
   .product__submit:active:not(:disabled) {
@@ -1262,6 +1372,169 @@
   .product__submit:disabled {
     opacity: 0.4;
     cursor: not-allowed;
+  }
+
+  /* Toast Notification Styles */
+  .product__toast {
+    position: fixed !important;
+    top: 100px !important;
+    right: 20px !important;
+    left: auto !important;
+    bottom: auto !important;
+    z-index: 99999 !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-20px);
+    transition: all 0.3s ease;
+    width: auto;
+    max-width: 380px;
+  }
+
+  .product__toast.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .product__toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #111;
+    border: 1px solid #22C55E;
+    border-radius: 12px;
+    padding: 14px 18px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  }
+
+  .product__toast-icon {
+    width: 32px;
+    height: 32px;
+    color: #22C55E;
+    flex-shrink: 0;
+  }
+
+  .product__toast-text {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .product__toast-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .product__toast-subtitle {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .product__toast-btn {
+    background: #22C55E;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .product__toast-btn:hover {
+    background: #16A34A;
+    transform: scale(1.05);
+  }
+
+  .product__toast-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    padding: 4px;
+    transition: color 0.3s ease;
+  }
+
+  .product__toast-close:hover {
+    color: #fff;
+  }
+
+  @media (max-width: 480px) {
+    .product__toast {
+      top: 80px;
+      right: 10px;
+      left: 10px;
+    }
+    .product__toast-content {
+      max-width: 100%;
+      padding: 12px 14px;
+      gap: 10px;
+    }
+    .product__toast-icon {
+      width: 24px;
+      height: 24px;
+    }
+    .product__toast-title {
+      font-size: 0.9rem;
+    }
+    .product__toast-subtitle {
+      font-size: 0.75rem;
+    }
+    .product__toast-btn {
+      padding: 8px 12px;
+      font-size: 0.7rem;
+    }
+  }
+
+  /* Merch Buttons - Two columns */
+  .product__buttons-merch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .product__buttons-merch .product__submit {
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.9rem;
+    padding: 16px 20px;
+    text-decoration: none;
+  }
+
+  .product__submit--secondary {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .product__submit--secondary:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.12) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .product__submit--primary {
+    background: #22C55E !important;
+    color: #000 !important;
+  }
+
+  .product__submit--primary:hover {
+    background: #16A34A !important;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(34, 197, 94, 0.4) !important;
+  }
+
+  @media (max-width: 480px) {
+    .product__buttons-merch {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* Status Messages - PRÓXIMAMENTE / CERRADO */

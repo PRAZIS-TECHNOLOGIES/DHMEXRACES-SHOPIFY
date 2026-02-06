@@ -1,0 +1,220 @@
+{% comment %}
+  Banner Promocional Rifa FOX 40 - Top Bar para todas las páginas
+{% endcomment %}
+
+<div class="rifa-topbar">
+  <a href="/pages/bases-del-sorteo" class="rifa-topbar__link">
+    <div class="rifa-topbar__container">
+      <div class="rifa-topbar__left">
+        <span class="rifa-topbar__gift">🎁</span>
+        <span class="rifa-topbar__text">
+          <strong>SORTEO:</strong> Gana una <span class="rifa-topbar__highlight">FOX 40</span> valuada en $50,000 MXN
+        </span>
+      </div>
+
+      <div class="rifa-topbar__center">
+        <img
+          src="https://cdn.shopify.com/s/files/1/0691/9556/3244/files/910_21_280_40_MY25_F_Orange_GripX2_Front.webp?v=1768319279"
+          alt="FOX 40"
+          class="rifa-topbar__fox"
+        >
+      </div>
+
+      <div class="rifa-topbar__right">
+        <span class="rifa-topbar__btn">Ver Bases</span>
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none">
+          <path d="M4 10H16M16 10L11 5M16 10L11 15" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </a>
+</div>
+
+{% stylesheet %}
+  .rifa-topbar {
+    background: linear-gradient(90deg, #0d0d0d 0%, #1a1a1a 50%, #0d0d0d 100%);
+    border-bottom: 1px solid rgba(255, 107, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rifa-topbar::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 100%;
+    background: radial-gradient(ellipse, rgba(255, 107, 0, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .rifa-topbar__link {
+    display: block;
+    text-decoration: none;
+    padding: 10px 20px;
+    transition: all 0.3s ease;
+  }
+
+  .rifa-topbar__link:hover {
+    background: rgba(255, 107, 0, 0.05);
+  }
+
+  .rifa-topbar__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .rifa-topbar__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .rifa-topbar__gift {
+    font-size: 1.2rem;
+    animation: giftShake 1.5s ease-in-out infinite;
+  }
+
+  @keyframes giftShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+  }
+
+  .rifa-topbar__text {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .rifa-topbar__text strong {
+    color: #FF6B00;
+    font-weight: 700;
+  }
+
+  .rifa-topbar__highlight {
+    color: #fff;
+    font-weight: 800;
+  }
+
+  .rifa-topbar__center {
+    flex-shrink: 0;
+  }
+
+  .rifa-topbar__fox {
+    height: 45px;
+    width: auto;
+    filter: drop-shadow(0 3px 10px rgba(255, 107, 0, 0.4));
+    animation: foxFloat 3s ease-in-out infinite;
+  }
+
+  @keyframes foxFloat {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50% { transform: translateY(-4px) rotate(2deg); }
+  }
+
+  .rifa-topbar__right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rifa-topbar__btn {
+    background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%);
+    color: #000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 8px 14px;
+    border-radius: 100px;
+    transition: all 0.3s ease;
+  }
+
+  .rifa-topbar__link:hover .rifa-topbar__btn {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.4);
+  }
+
+  .rifa-topbar__right svg {
+    color: #FF6B00;
+    transition: transform 0.3s ease;
+  }
+
+  .rifa-topbar__link:hover .rifa-topbar__right svg {
+    transform: translateX(3px);
+  }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    .rifa-topbar__link {
+      padding: 8px 12px;
+    }
+
+    .rifa-topbar__container {
+      gap: 12px;
+    }
+
+    .rifa-topbar__text {
+      font-size: 0.75rem;
+    }
+
+    .rifa-topbar__fox {
+      height: 35px;
+    }
+
+    .rifa-topbar__btn {
+      font-size: 0.65rem;
+      padding: 6px 10px;
+    }
+
+    .rifa-topbar__right svg {
+      display: none;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .rifa-topbar__container {
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .rifa-topbar__left {
+      order: 1;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .rifa-topbar__center {
+      display: none;
+    }
+
+    .rifa-topbar__right {
+      order: 2;
+    }
+
+    .rifa-topbar__text {
+      font-size: 0.7rem;
+      text-align: center;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Rifa Promo Banner",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Rifa Promo Banner",
+      "category": "DHMEXRACES"
+    }
+  ]
+}
+{% endschema %}
