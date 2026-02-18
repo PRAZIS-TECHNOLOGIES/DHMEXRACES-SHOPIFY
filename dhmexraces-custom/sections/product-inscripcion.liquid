@@ -193,7 +193,7 @@
       }
     </script>
 
-    {%- comment -%} 3. FOMO BADGES - Playeras y Medallas {%- endcomment -%}
+    {%- comment -%} 3. FOMO BADGES - Playeras y Medallas - DESHABILITADO TEMPORALMENTE
     <div class="inscripcion__fomo" id="fomoContainer" style="display: none;">
       <div class="inscripcion__fomo-badge inscripcion__fomo-badge--playeras" id="fomoPlayeras">
         <div class="inscripcion__fomo-icon">
@@ -219,6 +219,7 @@
         </div>
       </div>
     </div>
+    {%- endcomment -%}
 
     {%- comment -%} 4. PRECIO - Verde con texto Naranja {%- endcomment -%}
     {% assign pricing_enabled = product.metafields.custom.pricing_enabled %}
@@ -426,7 +427,7 @@
   </div>
 </section>
 
-{%- comment -%} DISCOUNT FLOATING NOTIFICATION {%- endcomment -%}
+{%- comment -%} DISCOUNT FLOATING NOTIFICATION - DESHABILITADO (CHILILOVE)
 <div class="discount-float" id="discountFloat">
   <div class="discount-float__card">
     <div class="discount-float__shimmer"></div>
@@ -445,6 +446,7 @@
     </div>
   </div>
 </div>
+{%- endcomment -%}
 
 <script>
   function changeMainImage(button) {
@@ -599,6 +601,18 @@
               })
               .reduce((total, item) => total + item.quantity, 0);
 
+            // Fetch available jerseys from inventory API to cap quantity
+            let jerseyQty = totalInscriptions;
+            try {
+              const invResponse = await fetch('https://dhmexraces-webhooks.vercel.app/api/inventory');
+              const invData = await invResponse.json();
+              const sede = (jerseyData.sede || 'guanajuato').toLowerCase();
+              const disponibles = invData.sedes?.[sede]?.playeras?.disponibles ?? 50;
+              jerseyQty = Math.min(totalInscriptions, disponibles);
+            } catch (invErr) {
+              console.error('Error fetching inventory, using totalInscriptions:', invErr);
+            }
+
             // Find existing promo jersey
             const existingPromoJersey = cart.items.find(item => {
               const title = (item.product_title || '').toLowerCase();
@@ -607,25 +621,35 @@
               return isJersey && props['_promo_jersey'] === 'true';
             });
 
-            if (existingPromoJersey) {
-              // Promo jersey exists - update its quantity to match total inscriptions
+            if (jerseyQty <= 0) {
+              // No jerseys available - remove promo jersey if exists
+              if (existingPromoJersey) {
+                const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
+                await fetch('/cart/change.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ line: jerseyLine, quantity: 0 })
+                });
+              }
+            } else if (existingPromoJersey) {
+              // Promo jersey exists - update its quantity capped to available
               const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
               await fetch('/cart/change.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   line: jerseyLine,
-                  quantity: totalInscriptions
+                  quantity: jerseyQty
                 })
               });
             } else {
-              // No promo jersey exists - add one with quantity matching inscriptions
+              // No promo jersey exists - add one with capped quantity
               await fetch('/cart/add.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   id: jerseyData.jerseyVariantId,
-                  quantity: totalInscriptions,
+                  quantity: jerseyQty,
                   properties: {
                     '_promo_jersey': 'true'
                   }
@@ -636,7 +660,8 @@
             // Store jersey info in sessionStorage for registration form
             sessionStorage.setItem('jerseyDisponible', JSON.stringify({
               disponible: true,
-              sede: jerseyData.sede
+              sede: jerseyData.sede,
+              count: jerseyQty
             }));
           } catch (jerseyError) {
             console.error('Error handling jersey:', jerseyError);
@@ -968,31 +993,53 @@
             const quantity = parseInt(document.getElementById('quantity').value) || 1;
             const totalInscriptions = currentInscriptions + quantity;
 
+            // Fetch available jerseys from inventory API to cap quantity
+            let jerseyQty = totalInscriptions;
+            try {
+              const invResponse = await fetch('https://dhmexraces-webhooks.vercel.app/api/inventory');
+              const invData = await invResponse.json();
+              const sede = (jerseyData.sede || 'guanajuato').toLowerCase();
+              const disponibles = invData.sedes?.[sede]?.playeras?.disponibles ?? 50;
+              jerseyQty = Math.min(totalInscriptions, disponibles);
+            } catch (invErr) {
+              console.error('Error fetching inventory:', invErr);
+            }
+
             // Buscar si ya existe jersey promo en el carrito
             const existingPromoJersey = cart.items.find(item => {
               const props = item.properties || {};
               return props['_promo_jersey'] === 'true';
             });
 
-            if (existingPromoJersey) {
-              // Actualizar cantidad del jersey promo existente
+            if (jerseyQty <= 0) {
+              // No jerseys available - remove if exists
+              if (existingPromoJersey) {
+                const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
+                await fetch('/cart/change.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ line: jerseyLine, quantity: 0 })
+                });
+              }
+            } else if (existingPromoJersey) {
+              // Actualizar cantidad del jersey promo existente (capped)
               const jerseyLine = cart.items.indexOf(existingPromoJersey) + 1;
               await fetch('/cart/change.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   line: jerseyLine,
-                  quantity: totalInscriptions
+                  quantity: jerseyQty
                 })
               });
             } else {
-              // Agregar nuevo jersey promo
+              // Agregar nuevo jersey promo (capped)
               await fetch('/cart/add.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                   id: jerseyData.jerseyVariantId,
-                  quantity: totalInscriptions,
+                  quantity: jerseyQty,
                   properties: {
                     '_promo_jersey': 'true'
                   }
@@ -1003,7 +1050,8 @@
             // Guardar info de jersey para el formulario de registro
             sessionStorage.setItem('jerseyDisponible', JSON.stringify({
               disponible: true,
-              sede: jerseyData.sede
+              sede: jerseyData.sede,
+              count: jerseyQty
             }));
 
           } catch (error) {

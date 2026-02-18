@@ -1,3 +1,16 @@
 {
-  "version": 2
+  "version": 2,
+  "functions": {
+    "api/sync-finanzas.js": { "maxDuration": 60 },
+    "api/order-created.js": { "maxDuration": 30 },
+    "api/manual-registration.js": { "maxDuration": 30 },
+    "api/format-sheets.js": { "maxDuration": 30 },
+    "api/update-discount.js": { "maxDuration": 15 }
+  },
+  "crons": [
+    {
+      "path": "/api/sync-finanzas",
+      "schedule": "0 8 * * *"
+    }
+  ]
 }

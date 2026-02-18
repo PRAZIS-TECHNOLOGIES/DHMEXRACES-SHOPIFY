@@ -1,6 +1,21 @@
 node_modules/
 .env
+.env.*
 .env.local
+.env.production
+.env.vercel
 .vercel
 google-credentials.json
-.env*.local
+
+# Local utility/debug scripts (contain tokens/secrets)
+get-token.js
+get-shopify-token.js
+check-discount.js
+check-jersey-count.js
+check-orders.js
+check-payouts.js
+debug-txn.js
+resend-emails.js
+
+# OS artifacts
+nul

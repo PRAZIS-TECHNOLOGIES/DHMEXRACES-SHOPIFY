@@ -1,0 +1,152 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "bases": {
+      "type": "bases-sorteo",
+      "blocks": {
+        "titulo_1": {
+          "type": "section_title",
+          "settings": {
+            "title": "1. Organizador"
+          }
+        },
+        "parrafo_1": {
+          "type": "paragraph",
+          "settings": {
+            "content": "<p>El presente sorteo es organizado por DHMEXRACES (ENDHURO RACE) con domicilio en México, en colaboración con FOX FACTORY MEXICO.</p>"
+          }
+        },
+        "titulo_2": {
+          "type": "section_title",
+          "settings": {
+            "title": "2. Vigencia"
+          }
+        },
+        "fechas": {
+          "type": "date_info",
+          "settings": {
+            "label_1": "Periodo de Participacion",
+            "value_1": "Enero - Marzo 2026",
+            "label_2": "Fecha del Sorteo",
+            "value_2": "22 de Marzo 2026 - Sede Puebla"
+          }
+        },
+        "titulo_3": {
+          "type": "section_title",
+          "settings": {
+            "title": "3. Participantes"
+          }
+        },
+        "parrafo_2": {
+          "type": "paragraph",
+          "settings": {
+            "content": "<p>Podran participar todas las personas que cumplan con los siguientes requisitos:</p>"
+          }
+        },
+        "lista_1": {
+          "type": "list",
+          "settings": {
+            "items": "Estar inscrito oficialmente en cualquier sede de la Copa Scott DHMEXRACES 2026 (Guanajuato o Puebla)|Haber completado el pago de su inscripcion|Contar con un boleto de rifa asignado automaticamente al momento de su inscripcion|Ser mayor de edad o contar con autorizacion de tutor legal"
+          }
+        },
+        "titulo_4": {
+          "type": "section_title",
+          "settings": {
+            "title": "4. Mecanica del Sorteo"
+          }
+        },
+        "lista_2": {
+          "type": "list",
+          "settings": {
+            "items": "Por cada inscripcion pagada, el participante recibe automaticamente UN (1) boleto de rifa|El numero de boleto es asignado de forma aleatoria y se envia por correo electronico junto con la confirmacion de inscripcion|El sorteo se realizara EN VIVO al finalizar la carrera de la Sede Puebla el 22 de Marzo de 2026|El ganador sera seleccionado mediante sistema aleatorio verificable"
+          }
+        },
+        "titulo_5": {
+          "type": "section_title",
+          "settings": {
+            "title": "5. Premio"
+          }
+        },
+        "parrafo_3": {
+          "type": "paragraph",
+          "settings": {
+            "content": "<p>El premio consiste en UNA (1) suspension delantera FOX 40 Factory GRIP 2 con un valor comercial de $50,000 MXN (Cincuenta mil pesos mexicanos).</p>"
+          }
+        },
+        "importante_1": {
+          "type": "important",
+          "settings": {
+            "content": "El premio no es transferible ni canjeable por dinero en efectivo. Se entregara en las condiciones en que se encuentra (nuevo, en caja)."
+          }
+        },
+        "titulo_6": {
+          "type": "section_title",
+          "settings": {
+            "title": "6. Entrega del Premio"
+          }
+        },
+        "lista_3": {
+          "type": "list",
+          "settings": {
+            "items": "El ganador debera estar presente en el evento para recibir el premio|En caso de no estar presente, se le contactara via correo electronico y telefono|El ganador tendra 30 dias naturales para reclamar su premio|Si no se reclama en el tiempo establecido, el premio quedara a disposicion del organizador"
+          }
+        },
+        "titulo_7": {
+          "type": "section_title",
+          "settings": {
+            "title": "7. Condiciones Generales"
+          }
+        },
+        "lista_4": {
+          "type": "list",
+          "settings": {
+            "items": "La participacion en este sorteo implica la aceptacion total de estas bases|El organizador se reserva el derecho de modificar o cancelar el sorteo por causas de fuerza mayor|Los datos personales seran tratados conforme a nuestra politica de privacidad|Cualquier controversia sera resuelta por el organizador, cuya decision sera inapelable"
+          }
+        },
+        "importante_2": {
+          "type": "important",
+          "settings": {
+            "content": "Al inscribirte en la Copa Scott DHMEXRACES 2026, aceptas automaticamente estas bases y condiciones del sorteo."
+          }
+        }
+      },
+      "block_order": [
+        "titulo_1",
+        "parrafo_1",
+        "titulo_2",
+        "fechas",
+        "titulo_3",
+        "parrafo_2",
+        "lista_1",
+        "titulo_4",
+        "lista_2",
+        "titulo_5",
+        "parrafo_3",
+        "importante_1",
+        "titulo_6",
+        "lista_3",
+        "titulo_7",
+        "lista_4",
+        "importante_2"
+      ],
+      "settings": {
+        "title": "Bases del Sorteo",
+        "subtitle": "Copa Scott DHMEXRACES 2026",
+        "prize_image": "shopify://shop_images/910_21_280_40_MY25_F_Orange_GripX2_Front.webp",
+        "prize_name": "FOX 40 Factory GRIP 2",
+        "prize_value": "$50,000 MXN"
+      }
+    }
+  },
+  "order": [
+    "bases"
+  ]
+}

@@ -3,336 +3,373 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin - Inscripción Manual | DHMEXRACES</title>
+  <title>DHMEXRACES - Inscripcion Manual</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --white: #FFFFFF;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      --border: #E2E8F0;
+      --border-light: #F1F5F9;
+      --red: #DC2626;
+      --red-hover: #B91C1C;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --green-border: #BBF7D0;
+      --red-bg: #FEF2F2;
+      --red-border: #FECACA;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
     }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #000000;
-      color: #ffffff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
       min-height: 100vh;
     }
 
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 40px 20px;
-    }
-
+    /* Header */
     .header {
-      text-align: center;
-      margin-bottom: 40px;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-
-    .header h1 {
-      color: #E42C2C;
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: 2px;
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo-pill {
+      display: flex;
+      align-items: center;
     }
+    .logo-pill img { height: 90px; display: block; }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-tab {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .nav-tab:hover { color: var(--text); background: var(--bg); }
+    .nav-tab.active {
+      color: var(--white);
+      background: var(--text);
+      font-weight: 600;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .logout-btn-header {
+      font-size: 12px;
+      color: var(--red);
+      background: none;
+      border: 1px solid var(--red-border);
+      border-radius: 6px;
+      padding: 4px 12px;
+      cursor: pointer;
+      font-family: inherit;
+      font-weight: 500;
+    }
+    .logout-btn-header:hover { background: var(--red-bg); }
 
-    .header p {
-      color: rgba(255,255,255,0.7);
-      margin-top: 8px;
+    /* Container */
+    .container {
+      max-width: 640px;
+      margin: 24px auto;
+      padding: 0 20px;
     }
 
     /* Login */
     .login-section {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 40px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 48px 40px;
       text-align: center;
+      box-shadow: var(--shadow-sm);
+      margin-top: 80px;
     }
-
     .login-section h2 {
-      margin-bottom: 20px;
-      font-size: 1.25rem;
-    }
-
-    .login-section input {
-      width: 100%;
-      max-width: 300px;
-      padding: 14px 16px;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      margin-bottom: 16px;
-    }
-
-    .login-section button {
-      padding: 14px 40px;
-      background: #E42C2C;
-      color: #000;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
+      font-size: 18px;
       font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+    .login-section .login-sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 24px;
+    }
+    .login-input {
+      width: 100%;
+      max-width: 280px;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      margin-bottom: 12px;
+    }
+    .login-input:focus { border-color: var(--text); }
+    .login-input::placeholder { color: var(--text-3); }
+    .login-btn {
+      padding: 10px 32px;
+      background: var(--text);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s;
     }
-
-    .login-section button:hover {
-      background: #ff4444;
-      transform: translateY(-2px);
-    }
+    .login-btn:hover { opacity: 0.85; }
 
     /* Form */
-    .form-section {
-      display: none;
-    }
+    .form-section { display: none; }
+    .form-section.active { display: block; }
 
-    .form-section.active {
-      display: block;
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      padding: 24px;
+      margin-bottom: 16px;
     }
-
-    .form-card {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 30px;
+    .card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
       margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border-light);
     }
-
-    .form-card h3 {
-      color: #E42C2C;
-      margin-bottom: 20px;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 16px;
     }
-
+    @media (max-width: 600px) {
+      .form-row { grid-template-columns: 1fr; }
+    }
+    .form-group { margin-bottom: 16px; }
+    .form-group:last-child { margin-bottom: 0; }
     label {
       display: block;
-      color: rgba(255,255,255,0.8);
-      font-size: 0.85rem;
+      font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
+      color: var(--text-2);
+      margin-bottom: 6px;
     }
-
     input, select {
       width: 100%;
-      padding: 14px 16px;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px;
-      color: #fff;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-
-    input:focus, select:focus {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
       outline: none;
-      border-color: #E42C2C;
-      box-shadow: 0 0 0 3px rgba(228,44,44,0.1);
+      background: var(--white);
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus { border-color: var(--text); }
+    input::placeholder { color: var(--text-3); }
+    select { cursor: pointer; }
+
+    /* Jersey */
+    .jersey-available {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .jersey-available label { color: var(--green); }
+    .jersey-available .jersey-info { font-size: 12px; color: var(--text-2); margin-bottom: 10px; }
+    .jersey-sold-out {
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius-sm);
+      padding: 16px;
+      margin-top: 8px;
+    }
+    .jersey-sold-out label { color: var(--red); }
+    .jersey-sold-out .jersey-info { font-size: 12px; color: var(--text-2); }
+    .jersey-pending {
+      font-size: 13px;
+      color: var(--text-3);
+      padding: 8px 0;
     }
 
-    select {
-      cursor: pointer;
-    }
-
-    select option {
-      background: #1a1a1a;
-      color: #fff;
-    }
-
-    /* Jersey section */
-    .jersey-section {
-      background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%);
-      border: 1px solid rgba(34,197,94,0.3);
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 10px;
-    }
-
-    .jersey-section.no-disponible {
-      background: linear-gradient(135deg, rgba(239,68,68,0.1) 0%, rgba(239,68,68,0.05) 100%);
-      border-color: rgba(239,68,68,0.3);
-    }
-
-    .jersey-section label {
-      color: #22C55E;
-    }
-
-    .jersey-section.no-disponible label {
-      color: #EF4444;
-    }
-
-    .jersey-info {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 12px;
-    }
-
-    /* Submit button */
+    /* Submit */
     .submit-btn {
       width: 100%;
-      padding: 18px;
-      background: #E42C2C;
-      color: #000;
+      padding: 14px;
+      background: var(--red);
+      color: var(--white);
       border: none;
-      border-radius: 12px;
-      font-size: 1.1rem;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 15px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: all 0.3s;
+      transition: background 0.15s;
     }
-
-    .submit-btn:hover {
-      background: #ff4444;
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(228,44,44,0.3);
-    }
-
+    .submit-btn:hover { background: var(--red-hover); }
     .submit-btn:disabled {
-      background: #555;
+      background: var(--border);
+      color: var(--text-3);
       cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
     }
 
     /* Result */
-    .result {
-      margin-top: 20px;
-      padding: 20px;
-      border-radius: 12px;
-      display: none;
-    }
-
+    .result { display: none; margin-top: 16px; }
     .result.success {
       display: block;
-      background: rgba(34,197,94,0.1);
-      border: 1px solid rgba(34,197,94,0.3);
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius);
+      padding: 24px;
     }
-
     .result.error {
       display: block;
-      background: rgba(239,68,68,0.1);
-      border: 1px solid rgba(239,68,68,0.3);
+      background: var(--red-bg);
+      border: 1px solid var(--red-border);
+      border-radius: var(--radius);
+      padding: 24px;
     }
-
-    .result h4 {
-      margin-bottom: 10px;
-    }
-
-    .result.success h4 {
-      color: #22C55E;
-    }
-
-    .result.error h4 {
-      color: #EF4444;
-    }
-
-    .result p {
-      color: rgba(255,255,255,0.8);
-      margin: 5px 0;
-    }
-
+    .result h4 { font-size: 15px; margin-bottom: 12px; }
+    .result.success h4 { color: var(--green); }
+    .result.error h4 { color: var(--red); }
+    .result p { font-size: 14px; color: var(--text-2); margin: 6px 0; }
     .result .code {
-      font-family: monospace;
-      font-size: 1.2rem;
-      color: #fff;
-      background: rgba(0,0,0,0.3);
-      padding: 8px 12px;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
       border-radius: 6px;
       display: inline-block;
-      margin-top: 5px;
     }
-
-    /* Logout */
-    .logout-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      padding: 10px 20px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      color: #fff;
-      cursor: pointer;
-      font-size: 0.9rem;
-    }
-
-    .logout-btn:hover {
-      background: rgba(255,255,255,0.2);
-    }
-
-    /* New registration button */
     .new-btn {
-      margin-top: 15px;
-      padding: 12px 24px;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      color: #fff;
+      margin-top: 16px;
+      padding: 10px 20px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
       cursor: pointer;
-      font-size: 0.9rem;
     }
+    .new-btn:hover { background: var(--bg); }
 
-    .new-btn:hover {
-      background: rgba(255,255,255,0.2);
+    .hidden { display: none !important; }
+
+    /* Chip buttons */
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
-
-    /* Responsive */
-    @media (max-width: 600px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-
-      .container {
-        padding: 20px 16px;
-      }
+    .chip-btn {
+      flex: 1;
+      min-width: 80px;
+      padding: 12px 16px;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+    }
+    .chip-btn:hover {
+      border-color: var(--text-3);
+      color: var(--text);
+    }
+    .chip-btn.active {
+      border-color: var(--text);
+      background: var(--text);
+      color: var(--white);
+    }
+    .chip-btn.chip-green.active {
+      border-color: var(--green);
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .chip-btn.chip-precio.active {
+      border-color: var(--red);
+      background: var(--red-bg);
+      color: var(--red);
+    }
+    #montoGroup.monto-hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
 
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-pill">
+        <img src="https://endhurorace.com/cdn/shop/files/LOGO_OFICIAL_26_DHMEX_1.png?v=1769553497&width=600" alt="DHMEXRACES">
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/check-in-pro.html" class="nav-tab">Check-in</a>
+      <a href="/admin.html" class="nav-tab active">Inscripciones</a>
+      <a href="/gestion.html" class="nav-tab">Gestión</a>
+      <a href="/kits.html" class="nav-tab">Kits</a>
+    </nav>
+    <div class="header-right">
+      <button id="logoutBtn" class="logout-btn-header hidden" onclick="logout()">Cerrar sesión</button>
+    </div>
+  </header>
+
   <div class="container">
-    <div class="header">
-      <h1>DHMEXRACES</h1>
-      <p>Panel de Inscripción Manual</p>
-    </div>
 
-    <!-- Login Section -->
+    <!-- Login -->
     <div class="login-section" id="loginSection">
-      <h2>🔐 Acceso Admin</h2>
-      <input type="password" id="passwordInput" placeholder="Contraseña" onkeypress="if(event.key==='Enter')login()">
+      <h2>Acceso Admin</h2>
+      <p class="login-sub">Ingresa la contraseña para continuar</p>
+      <input type="password" id="passwordInput" class="login-input" placeholder="Contraseña" onkeypress="if(event.key==='Enter')login()">
       <br>
-      <button onclick="login()">Entrar</button>
+      <button class="login-btn" onclick="login()">Entrar</button>
     </div>
 
-    <!-- Form Section -->
+    <!-- Form -->
     <div class="form-section" id="formSection">
-      <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
 
       <form id="registrationForm" onsubmit="submitForm(event)">
 
-        <!-- Sede y Categoría -->
-        <div class="form-card">
-          <h3>📍 Sede y Categoría</h3>
-
+        <!-- Sede y Categoria -->
+        <div class="card">
+          <div class="card-title">Sede y Categoria</div>
           <div class="form-row">
             <div class="form-group">
               <label>Sede *</label>
@@ -345,147 +382,189 @@
                 <option value="taxco">Taxco</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label>Categoría *</label>
+              <label>Categoria *</label>
               <select id="categoria" required>
                 <option value="">Selecciona...</option>
-                <option value="Elite Hombres">Elite Hombres</option>
-                <option value="Elite Mujeres">Elite Mujeres</option>
-                <option value="Master 30+ Hombres">Master 30+ Hombres</option>
-                <option value="Master 30+ Mujeres">Master 30+ Mujeres</option>
-                <option value="Veteranos 40+ Hombres">Veteranos 40+ Hombres</option>
-                <option value="Veteranos 40+ Mujeres">Veteranos 40+ Mujeres</option>
-                <option value="Amateur Hombres">Amateur Hombres</option>
-                <option value="Amateur Mujeres">Amateur Mujeres</option>
-                <option value="Juvenil Hombres">Juvenil Hombres (14-17)</option>
-                <option value="Juvenil Mujeres">Juvenil Mujeres (14-17)</option>
-                <option value="Infantil Hombres">Infantil Hombres (10-13)</option>
-                <option value="Infantil Mujeres">Infantil Mujeres (10-13)</option>
-                <option value="Open Hardtail">Open Hardtail</option>
+                <option value="Minis">Minis</option>
+                <option value="Infantil">Infantil</option>
+                <option value="Cadetes">Cadetes</option>
+                <option value="Junior">Junior</option>
+                <option value="Senior">Senior</option>
+                <option value="Principiantes">Principiantes</option>
+                <option value="Master 30">Master 30</option>
+                <option value="Master 40">Master 40</option>
+                <option value="Master 50">Master 50</option>
+                <option value="Femenil">Femenil</option>
+                <option value="Pro Elite">Pro Elite</option>
+                <option value="Ebike">Ebike</option>
+                <option value="Ebike Full Power">Ebike Full Power</option>
               </select>
             </div>
           </div>
         </div>
 
-        <!-- Datos Personales -->
-        <div class="form-card">
-          <h3>👤 Datos del Corredor</h3>
-
+        <!-- Datos -->
+        <div class="card">
+          <div class="card-title">Datos del Corredor</div>
           <div class="form-group">
             <label>Nombre Completo *</label>
-            <input type="text" id="nombre" required placeholder="Ej: Juan Pérez García">
+            <input type="text" id="nombre" required placeholder="Juan Perez Garcia">
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Email *</label>
               <input type="email" id="email" required placeholder="correo@ejemplo.com">
             </div>
-
             <div class="form-group">
-              <label>Teléfono *</label>
+              <label>Telefono *</label>
               <input type="tel" id="telefono" required placeholder="5512345678">
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Fecha de Nacimiento *</label>
               <input type="date" id="fecha_nacimiento" required>
             </div>
-
             <div class="form-group">
               <label>Equipo</label>
-              <input type="text" id="equipo" placeholder="Nombre del equipo (opcional)">
+              <input type="text" id="equipo" placeholder="Opcional">
             </div>
           </div>
-
           <div class="form-row">
             <div class="form-group">
               <label>Tipo de Sangre *</label>
               <select id="tipo_sangre" required>
                 <option value="">Selecciona...</option>
-                <option value="A+">A+</option>
-                <option value="A-">A-</option>
-                <option value="B+">B+</option>
-                <option value="B-">B-</option>
-                <option value="AB+">AB+</option>
-                <option value="AB-">AB-</option>
-                <option value="O+">O+</option>
-                <option value="O-">O-</option>
+                <option value="A+">A+</option><option value="A-">A-</option>
+                <option value="B+">B+</option><option value="B-">B-</option>
+                <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                <option value="O+">O+</option><option value="O-">O-</option>
               </select>
             </div>
-
             <div class="form-group">
               <label>Alergias</label>
-              <input type="text" id="alergias" placeholder="Ej: Penicilina (o dejar vacío)">
+              <input type="text" id="alergias" placeholder="Opcional">
             </div>
           </div>
         </div>
 
-        <!-- Contacto de Emergencia -->
-        <div class="form-card">
-          <h3>🚨 Contacto de Emergencia</h3>
-
+        <!-- Emergencia -->
+        <div class="card">
+          <div class="card-title">Contacto de Emergencia</div>
           <div class="form-row">
             <div class="form-group">
               <label>Nombre del Contacto *</label>
               <input type="text" id="emergencia_nombre" required placeholder="Nombre completo">
             </div>
-
             <div class="form-group">
-              <label>Teléfono del Contacto *</label>
+              <label>Telefono del Contacto *</label>
               <input type="tel" id="emergencia_telefono" required placeholder="5512345678">
             </div>
           </div>
         </div>
 
-        <!-- Playera -->
-        <div class="form-card">
-          <h3>👕 Playera Oficial</h3>
-
+        <!-- Jersey -->
+        <div class="card">
+          <div class="card-title">Playera Oficial</div>
           <div id="jerseyContainer">
-            <p class="jersey-info">Selecciona una sede para verificar disponibilidad...</p>
+            <p class="jersey-pending">Selecciona una sede para verificar disponibilidad</p>
           </div>
         </div>
 
-        <!-- Submit -->
-        <button type="submit" class="submit-btn" id="submitBtn">
-          Inscribir Corredor
-        </button>
+        <!-- Tipo de pago -->
+        <div class="card">
+          <div class="card-title">Metodo de Pago</div>
+          <div class="form-group">
+            <label>Forma de pago *</label>
+            <div class="btn-group">
+              <button type="button" class="chip-btn" data-value="deposito" onclick="selectMetodo(this)">Deposito</button>
+              <button type="button" class="chip-btn" data-value="transferencia" onclick="selectMetodo(this)">Transferencia</button>
+              <button type="button" class="chip-btn" data-value="efectivo" onclick="selectMetodo(this)">Efectivo</button>
+              <button type="button" class="chip-btn chip-green" data-value="patrocinado" onclick="selectMetodo(this)">Patrocinado</button>
+            </div>
+            <input type="hidden" id="tipo_pago" required>
+          </div>
+          <div class="form-group" id="montoGroup">
+            <label>Monto *</label>
+            <div class="btn-group">
+              <button type="button" class="chip-btn chip-precio" data-value="1300" onclick="selectMonto(this)">$1,300</button>
+              <button type="button" class="chip-btn chip-precio" data-value="1500" onclick="selectMonto(this)">$1,500</button>
+              <button type="button" class="chip-btn chip-precio" data-value="1800" onclick="selectMonto(this)">$1,800</button>
+              <button type="button" class="chip-btn chip-precio" data-value="custom" onclick="selectMontoCustom(this)">Otro</button>
+            </div>
+            <div id="customMontoWrap" style="display:none; margin-top:10px;">
+              <input type="number" id="customMontoInput" placeholder="Ej: 2000" min="0" step="1" style="max-width:200px;" oninput="document.getElementById('monto_pago').value=this.value">
+            </div>
+            <input type="hidden" id="monto_pago" required>
+          </div>
+        </div>
 
+        <button type="submit" class="submit-btn" id="submitBtn">Inscribir Corredor</button>
       </form>
 
-      <!-- Result -->
       <div class="result" id="result">
         <h4 id="resultTitle"></h4>
         <div id="resultContent"></div>
-        <button class="new-btn" onclick="newRegistration()">+ Nueva Inscripción</button>
+        <button class="new-btn" onclick="newRegistration()">+ Nueva Inscripcion</button>
       </div>
-
     </div>
+
   </div>
 
   <script>
     let adminPassword = '';
     let jerseyDisponible = false;
 
+    function selectMetodo(btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const val = btn.dataset.value;
+      document.getElementById('tipo_pago').value = val;
+
+      const montoGroup = document.getElementById('montoGroup');
+      if (val === 'patrocinado') {
+        montoGroup.classList.add('monto-hidden');
+        document.getElementById('monto_pago').value = '0';
+        document.querySelectorAll('.chip-precio').forEach(b => b.classList.remove('active'));
+      } else {
+        montoGroup.classList.remove('monto-hidden');
+        if (document.getElementById('monto_pago').value === '0') {
+          document.getElementById('monto_pago').value = '';
+        }
+      }
+    }
+
+    function selectMonto(btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('monto_pago').value = btn.dataset.value;
+      document.getElementById('customMontoWrap').style.display = 'none';
+      document.getElementById('customMontoInput').value = '';
+    }
+
+    function selectMontoCustom(btn) {
+      btn.parentElement.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('monto_pago').value = '';
+      document.getElementById('customMontoWrap').style.display = 'block';
+      document.getElementById('customMontoInput').focus();
+    }
+
     function login() {
       const password = document.getElementById('passwordInput').value;
-      if (!password) {
-        alert('Ingresa la contraseña');
-        return;
-      }
+      if (!password) return;
       adminPassword = password;
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('formSection').classList.add('active');
+      document.getElementById('logoutBtn').classList.remove('hidden');
     }
 
     function logout() {
       adminPassword = '';
-      document.getElementById('loginSection').style.display = 'block';
+      document.getElementById('loginSection').style.display = '';
       document.getElementById('formSection').classList.remove('active');
+      document.getElementById('logoutBtn').classList.add('hidden');
       document.getElementById('passwordInput').value = '';
     }
 
@@ -494,12 +573,12 @@
       const container = document.getElementById('jerseyContainer');
 
       if (!sede) {
-        container.innerHTML = '<p class="jersey-info">Selecciona una sede para verificar disponibilidad...</p>';
+        container.innerHTML = '<p class="jersey-pending">Selecciona una sede para verificar disponibilidad</p>';
         jerseyDisponible = false;
         return;
       }
 
-      container.innerHTML = '<p class="jersey-info">Verificando disponibilidad...</p>';
+      container.innerHTML = '<p class="jersey-pending">Verificando disponibilidad...</p>';
 
       try {
         const response = await fetch(`/api/inventory?sede=${sede}`);
@@ -508,9 +587,9 @@
         if (data.success && !data.playeras.agotadas && data.playeras.disponibles > 0) {
           jerseyDisponible = true;
           container.innerHTML = `
-            <div class="jersey-section">
-              <label>👕 Talla de Playera (${data.playeras.disponibles} disponibles)</label>
-              <p class="jersey-info">¡Hay playeras disponibles para esta sede!</p>
+            <div class="jersey-available">
+              <label>Playera disponible (${data.playeras.disponibles} restantes)</label>
+              <p class="jersey-info">Selecciona la talla</p>
               <select id="talla_playera">
                 <option value="">Sin playera</option>
                 <option value="S">S - Chica</option>
@@ -523,33 +602,38 @@
         } else {
           jerseyDisponible = false;
           container.innerHTML = `
-            <div class="jersey-section no-disponible">
-              <label>👕 Playeras Agotadas</label>
-              <p class="jersey-info">Ya no hay playeras disponibles para esta sede.</p>
+            <div class="jersey-sold-out">
+              <label>Playeras agotadas</label>
+              <p class="jersey-info">No hay playeras disponibles para esta sede</p>
             </div>
           `;
         }
       } catch (error) {
-        console.error('Error checking jersey:', error);
         jerseyDisponible = false;
-        container.innerHTML = `
-          <div class="jersey-section no-disponible">
-            <label>⚠️ Error</label>
-            <p class="jersey-info">No se pudo verificar disponibilidad.</p>
-          </div>
-        `;
+        container.innerHTML = '<div class="jersey-sold-out"><label>Error</label><p class="jersey-info">No se pudo verificar disponibilidad</p></div>';
       }
     }
 
     async function submitForm(event) {
       event.preventDefault();
 
+      const tipoPago = document.getElementById('tipo_pago').value;
+      const montoPago = document.getElementById('monto_pago').value;
+
+      if (!tipoPago) {
+        alert('Selecciona un metodo de pago');
+        return;
+      }
+      if (tipoPago !== 'patrocinado' && !montoPago) {
+        alert('Selecciona el monto del pago');
+        return;
+      }
+
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
       btn.textContent = 'Procesando...';
 
       const tallaEl = document.getElementById('talla_playera');
-
       const corredor = {
         nombre: document.getElementById('nombre').value.trim(),
         email: document.getElementById('email').value.trim(),
@@ -562,19 +646,17 @@
         emergencia_telefono: document.getElementById('emergencia_telefono').value.trim(),
         sede: document.getElementById('sede').value,
         categoria: document.getElementById('categoria').value,
-        talla_playera: tallaEl ? tallaEl.value : ''
+        talla_playera: tallaEl ? tallaEl.value : '',
+        tipo_pago: tipoPago,
+        monto_pago: tipoPago === 'patrocinado' ? 0 : parseInt(montoPago)
       };
 
       try {
         const response = await fetch('/api/manual-registration', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            password: adminPassword,
-            corredor: corredor
-          })
+          body: JSON.stringify({ password: adminPassword, corredor })
         });
-
         const data = await response.json();
 
         const resultDiv = document.getElementById('result');
@@ -583,29 +665,25 @@
 
         if (data.success) {
           resultDiv.className = 'result success';
-          resultTitle.textContent = '✅ ¡Inscripción Exitosa!';
+          resultTitle.textContent = 'Inscripcion exitosa';
           resultContent.innerHTML = `
             <p><strong>Corredor:</strong> ${data.corredor.nombre}</p>
             <p><strong>Orden:</strong> <span class="code">${data.orderNumber}</span></p>
-            <p><strong>Código QR:</strong> <span class="code">${data.checkInCode}</span></p>
+            <p><strong>Codigo QR:</strong> <span class="code">${data.checkInCode}</span></p>
+            <p><strong>Numero:</strong> <span class="code">#${data.runnerNumber || 'N/A'}</span></p>
             <p><strong>Boleto Rifa:</strong> <span class="code">#${data.raffleNumber || 'N/A'}</span></p>
-            <p><strong>Email:</strong> ${data.email.status === 'sent' ? '✅ Enviado' : '❌ ' + (data.email.error || 'No enviado')}</p>
+            <p><strong>Email:</strong> ${data.email.status === 'sent' ? 'Enviado' : 'Error: ' + (data.email.error || 'No enviado')}</p>
           `;
-
-          // Ocultar formulario
           document.getElementById('registrationForm').style.display = 'none';
-
         } else {
           resultDiv.className = 'result error';
-          resultTitle.textContent = '❌ Error';
+          resultTitle.textContent = 'Error';
           resultContent.innerHTML = `<p>${data.error || 'Error desconocido'}</p>`;
         }
-
       } catch (error) {
-        console.error('Error:', error);
         const resultDiv = document.getElementById('result');
         resultDiv.className = 'result error';
-        document.getElementById('resultTitle').textContent = '❌ Error de conexión';
+        document.getElementById('resultTitle').textContent = 'Error de conexion';
         document.getElementById('resultContent').innerHTML = `<p>${error.message}</p>`;
       }
 
@@ -615,12 +693,17 @@
 
     function newRegistration() {
       document.getElementById('registrationForm').reset();
-      document.getElementById('registrationForm').style.display = 'block';
+      document.getElementById('registrationForm').style.display = '';
       document.getElementById('result').className = 'result';
-      document.getElementById('jerseyContainer').innerHTML = '<p class="jersey-info">Selecciona una sede para verificar disponibilidad...</p>';
+      document.getElementById('jerseyContainer').innerHTML = '<p class="jersey-pending">Selecciona una sede para verificar disponibilidad</p>';
       jerseyDisponible = false;
+      document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tipo_pago').value = '';
+      document.getElementById('monto_pago').value = '';
+      document.getElementById('montoGroup').classList.remove('monto-hidden');
+      document.getElementById('customMontoWrap').style.display = 'none';
+      document.getElementById('customMontoInput').value = '';
     }
   </script>
-
 </body>
 </html>

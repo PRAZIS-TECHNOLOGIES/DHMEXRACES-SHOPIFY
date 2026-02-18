@@ -4,22 +4,22 @@
 
 <section class="cart-custom">
   <div class="cart-custom__container">
-    <h1 class="cart-custom__title" data-aos="fade-up">Carrito de Inscripciones</h1>
+    {%- comment -%} Count inscriptions first for conditional display {%- endcomment -%}
+    {% assign total_inscriptions = 0 %}
+    {% for item in cart.items %}
+      {% assign item_title_check = item.product.title | downcase %}
+      {% if item_title_check contains 'inscripcion' or item_title_check contains 'inscripción' %}
+        {% assign total_inscriptions = total_inscriptions | plus: item.quantity %}
+      {% endif %}
+    {% endfor %}
+
+    <h1 class="cart-custom__title" data-aos="fade-up">Carrito de {% if total_inscriptions > 0 %}Inscripciones{% else %}Compras{% endif %}</h1>
 
     {% if cart.item_count > 0 %}
       <div class="cart-custom__content">
         {%- comment -%} Cart Items {%- endcomment -%}
         <div class="cart-custom__items" data-aos="fade-up" data-aos-delay="100">
-          <h2 class="cart-custom__section-title">Resumen de Inscripciones</h2>
-
-          {%- comment -%} First, count total inscriptions in cart {%- endcomment -%}
-          {% assign total_inscriptions = 0 %}
-          {% for item in cart.items %}
-            {% assign item_title_check = item.product.title | downcase %}
-            {% if item_title_check contains 'inscripcion' or item_title_check contains 'inscripción' %}
-              {% assign total_inscriptions = total_inscriptions | plus: item.quantity %}
-            {% endif %}
-          {% endfor %}
+          <h2 class="cart-custom__section-title">Resumen de {% if total_inscriptions > 0 %}Inscripciones{% else %}Productos{% endif %}</h2>
 
           <div class="cart-custom__list">
             {% for item in cart.items %}
@@ -121,6 +121,7 @@
         {%- comment -%} Summary {%- endcomment -%}
         {%- comment -%} Calculate correct total excluding promo jerseys {%- endcomment -%}
         {% assign promo_jersey_total = 0 %}
+        {% assign promo_jersey_count = 0 %}
         {% assign inscription_count = 0 %}
         {% for item in cart.items %}
           {% assign item_title_calc = item.product.title | downcase %}
@@ -129,6 +130,7 @@
           {% endif %}
           {% if item.properties['_promo_jersey'] == 'true' %}
             {% assign promo_jersey_total = promo_jersey_total | plus: item.final_line_price %}
+            {% assign promo_jersey_count = promo_jersey_count | plus: item.quantity %}
           {% endif %}
         {% endfor %}
         {% assign correct_total = cart.total_price | minus: promo_jersey_total %}
@@ -144,7 +146,7 @@
 
             {% if promo_jersey_total > 0 %}
             <div class="cart-summary__row cart-summary__row--promo">
-              <span>Jersey Oficial (x{{ inscription_count }}):</span>
+              <span>Jersey Oficial (x{{ promo_jersey_count }}):</span>
               <strong class="cart-summary__promo-value">
                 <span class="cart-summary__original-price">{{ promo_jersey_total | money }}</span>
                 GRATIS
@@ -173,6 +175,7 @@
               <p class="cart-discount__note-small">Si ya aplicaste un código en checkout y se ve reflejado, no necesitas ponerlo de nuevo</p>
             </div>
 
+            {% if inscription_count > 0 %}
             <div class="cart-summary__info">
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M10 18C14.4183 18 18 14.4183 18 10C18 5.58172 14.4183 2 10 2C5.58172 2 2 5.58172 2 10C2 14.4183 5.58172 18 10 18Z" stroke="currentColor" stroke-width="2"/>
@@ -180,13 +183,23 @@
               </svg>
               <p>Necesitarás completar un formulario por cada inscripción</p>
             </div>
+            {% endif %}
 
+            {% if inscription_count > 0 %}
             <button type="button" class="cart-summary__button" onclick="proceedToRegistration()">
               Continuar al Registro
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </button>
+            {% else %}
+            <button type="button" class="cart-summary__button" onclick="window.location.href='/checkout'">
+              Pagar Ahora
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M4 10H16M16 10L10 4M16 10L10 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            {% endif %}
 
             <a href="/" class="cart-summary__link">← Seguir comprando</a>
           </div>
@@ -417,14 +430,27 @@
         promoJerseys = cart.items.filter(item => isPromoJersey(item));
       }
 
-      // Step 7: Add ONE promo jersey with the correct quantity
-      if (jerseyVariantId && totalInscriptions > 0) {
+      // Step 7: Fetch inventory to cap jersey quantity
+      let jerseyQty = totalInscriptions;
+      try {
+        const invResponse = await fetch('https://dhmexraces-webhooks.vercel.app/api/inventory');
+        const invData = await invResponse.json();
+        // Use first sede with inscritos, default to guanajuato
+        const sedeKey = Object.keys(invData.sedes || {}).find(s => invData.sedes[s].inscritos > 0) || 'guanajuato';
+        const disponibles = invData.sedes?.[sedeKey]?.playeras?.disponibles ?? 50;
+        jerseyQty = Math.min(totalInscriptions, disponibles);
+      } catch (invErr) {
+        console.error('Error fetching inventory for jersey cap:', invErr);
+      }
+
+      // Step 8: Add ONE promo jersey with the capped quantity
+      if (jerseyVariantId && jerseyQty > 0) {
         await fetch('/cart/add.js', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             id: jerseyVariantId,
-            quantity: totalInscriptions,
+            quantity: jerseyQty,
             properties: {
               '_promo_jersey': 'true'
             }
@@ -432,7 +458,7 @@
         });
       }
 
-      console.log(`Synced: ${totalInscriptions} inscriptions = ${totalInscriptions} promo jerseys`);
+      console.log(`Synced: ${totalInscriptions} inscriptions = ${jerseyQty} promo jerseys (capped by inventory)`);
 
     } catch (error) {
       console.error('Error syncing promo jerseys:', error);
@@ -472,9 +498,11 @@
 
         sessionStorage.setItem('registrationCartData', JSON.stringify(cartData));
 
-        // Store jersey availability for registration form
+        // Store jersey availability and count for registration form
         if (hasPromoJersey) {
-          sessionStorage.setItem('jerseyDisponible', JSON.stringify({ disponible: true }));
+          const promoJersey = cart.items.find(item => (item.properties || {})['_promo_jersey'] === 'true');
+          const jerseyCount = promoJersey ? promoJersey.quantity : 0;
+          sessionStorage.setItem('jerseyDisponible', JSON.stringify({ disponible: true, count: jerseyCount }));
         } else {
           sessionStorage.removeItem('jerseyDisponible');
         }

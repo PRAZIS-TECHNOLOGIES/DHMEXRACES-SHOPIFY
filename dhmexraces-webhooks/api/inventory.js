@@ -68,8 +68,14 @@ module.exports = async function handler(req, res) {
 
       const rows = await sheet.getRows();
 
-      // Contar solo filas con NOMBRE (inscritos válidos)
-      const inscritos = rows.filter(row => row.NOMBRE && row.NOMBRE.trim() !== '').length;
+      // Contar solo inscritos que pagaron (excluir patrocinados)
+      const inscritos = rows.filter(row => {
+        if (!row.NOMBRE || row.NOMBRE.trim() === '') return false;
+        const pago = (row.PAGO || '').trim().toLowerCase();
+        // Patrocinados no cuentan para playeras/medallas
+        if (pago === 'patrocinado') return false;
+        return true;
+      }).length;
       totalInscritos += inscritos;
 
       // Calcular disponibilidad

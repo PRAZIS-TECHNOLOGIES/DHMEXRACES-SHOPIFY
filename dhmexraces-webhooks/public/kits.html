@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHMEXRACES - Kits</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      --border: #E2E8F0;
+      --border-light: #F1F5F9;
+      --red: #DC2626;
+      --red-hover: #B91C1C;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --green-border: #BBF7D0;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --amber-border: #FDE68A;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo-pill {
+      display: flex;
+      align-items: center;
+    }
+    .logo-pill img { height: 90px; display: block; }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-tab {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .nav-tab:hover { color: var(--text); background: var(--bg); }
+    .nav-tab.active {
+      color: var(--white);
+      background: var(--text);
+      font-weight: 600;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .sede-select {
+      appearance: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 32px 6px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+
+    /* Progress bar */
+    .progress-strip {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 20px;
+    }
+    .progress-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .progress-stats {
+      display: flex;
+      gap: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      flex-shrink: 0;
+    }
+    .progress-stats strong { color: var(--text); font-weight: 700; }
+    .progress-stats .green { color: var(--green); }
+    .progress-stats .amber { color: var(--amber); }
+    .progress-bar-wrap {
+      flex: 1;
+      height: 6px;
+      background: var(--border-light);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--green);
+      border-radius: 3px;
+      transition: width 0.4s ease;
+    }
+    .progress-pct {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      flex-shrink: 0;
+    }
+
+    /* Main layout */
+    .main {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 20px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+      height: calc(100vh - 56px - 48px - 40px);
+    }
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; height: auto; }
+    }
+
+    /* Card base */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Left panel - list */
+    .list-panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .list-toolbar {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .list-search {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+    }
+    .list-search:focus { border-color: var(--text); }
+    .list-search::placeholder { color: var(--text-3); }
+    .list-tabs {
+      display: flex;
+      gap: 4px;
+    }
+    .list-tab {
+      flex: 1;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.1s;
+    }
+    .list-tab:hover { background: var(--bg); }
+    .list-tab.active {
+      background: var(--text);
+      color: var(--white);
+      border-color: var(--text);
+    }
+    .list-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    /* Runner item */
+    .runner-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.1s;
+      border: 2px solid transparent;
+      margin-bottom: 4px;
+    }
+    .runner-item:hover { background: var(--bg); }
+    .runner-item.selected {
+      background: var(--bg);
+      border-color: var(--text);
+    }
+    .runner-item.kit-done {
+      opacity: 0.55;
+    }
+    .runner-item.kit-done.selected {
+      opacity: 1;
+    }
+    .runner-num {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text);
+      min-width: 40px;
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+    .runner-info { flex: 1; min-width: 0; }
+    .runner-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .runner-meta {
+      font-size: 11px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+    .runner-kit-badge {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .runner-kit-badge.done {
+      background: var(--green-bg);
+      color: var(--green);
+    }
+    .runner-kit-badge.pending {
+      background: var(--bg);
+      color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+
+    .list-empty {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+    .list-loading {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+
+    /* Right panel - detail */
+    .detail-panel {
+      overflow-y: auto;
+    }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 400px;
+      text-align: center;
+      color: var(--text-3);
+    }
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+      border: 1px solid var(--border);
+    }
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+    .empty-state p { font-size: 13px; }
+
+    /* Rider detail card */
+    .rider-card { padding: 24px; }
+    .number-section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .number-block { text-align: left; }
+    .number-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .number-value {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .number-value.empty { color: var(--text-3); font-size: 36px; }
+    .cat-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 8px;
+    }
+    .rider-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .rider-order {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+    }
+
+    /* Badges row */
+    .badges-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-jersey-yes {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .badge-jersey-no {
+      background: var(--bg);
+      color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+    .badge-rifa {
+      background: var(--bg);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+
+    /* Details */
+    .details-section { margin-bottom: 20px; }
+    .details-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    .detail-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 2px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Kit button */
+    .kit-btn {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+      margin-top: 8px;
+    }
+    .kit-btn.mark-ready {
+      background: var(--text);
+      color: var(--white);
+    }
+    .kit-btn.mark-ready:hover { opacity: 0.85; }
+    .kit-btn.mark-ready:disabled {
+      background: var(--border);
+      color: var(--text-3);
+      cursor: not-allowed;
+    }
+    .kit-btn-subtitle {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    /* Kit done state */
+    .kit-done-banner {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: var(--radius-sm);
+      margin-top: 8px;
+    }
+    .kit-done-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .kit-done-text strong {
+      display: block;
+      font-size: 14px;
+      color: var(--green);
+    }
+    .kit-done-text span {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    .kit-undo-btn {
+      margin-top: 8px;
+      width: 100%;
+      padding: 10px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      cursor: pointer;
+    }
+    .kit-undo-btn:hover {
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-pill">
+        <img src="https://endhurorace.com/cdn/shop/files/LOGO_OFICIAL_26_DHMEX_1.png?v=1769553497&width=600" alt="DHMEXRACES">
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/check-in-pro.html" class="nav-tab">Check-in</a>
+      <a href="/admin.html" class="nav-tab">Inscripciones</a>
+      <a href="/gestion.html" class="nav-tab">Gestión</a>
+      <a href="/kits.html" class="nav-tab active">Kits</a>
+    </nav>
+    <div class="header-right">
+      <select id="sede-select" class="sede-select">
+        <option value="GUANAJUATO">Guanajuato</option>
+        <option value="PUEBLA">Puebla</option>
+        <option value="GUADALAJARA">Guadalajara</option>
+        <option value="IXTAPAN">Ixtapan</option>
+        <option value="TAXCO">Taxco</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Progress strip -->
+  <div class="progress-strip">
+    <div class="progress-inner">
+      <div class="progress-stats">
+        <span>Total: <strong id="stat-total">--</strong></span>
+        <span>Listos: <strong id="stat-ready" class="green">--</strong></span>
+        <span>Pendientes: <strong id="stat-pending" class="amber">--</strong></span>
+      </div>
+      <div class="progress-bar-wrap">
+        <div id="progress-fill" class="progress-fill" style="width:0%"></div>
+      </div>
+      <span id="progress-pct" class="progress-pct">--%</span>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Left panel: list -->
+    <div class="list-panel card">
+      <div class="list-toolbar">
+        <input id="list-search" class="list-search" type="text" placeholder="Buscar corredor..." autocomplete="off">
+        <div class="list-tabs">
+          <button class="list-tab active" data-tab="all" onclick="setTab('all')">Todos</button>
+          <button class="list-tab" data-tab="pending" onclick="setTab('pending')">Pendientes</button>
+          <button class="list-tab" data-tab="ready" onclick="setTab('ready')">Listos</button>
+        </div>
+      </div>
+      <div id="list-scroll" class="list-scroll">
+        <div class="list-loading">Cargando corredores...</div>
+      </div>
+    </div>
+
+    <!-- Right panel: detail -->
+    <div class="detail-panel">
+      <!-- Empty state -->
+      <div id="empty-state" class="card empty-state">
+        <div class="empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+        </div>
+        <h3>Selecciona un corredor</h3>
+        <p>Elige de la lista para ver su kit</p>
+      </div>
+
+      <!-- Rider detail -->
+      <div id="rider-card" class="card rider-card hidden">
+        <div class="number-section">
+          <div class="number-block">
+            <span class="number-label">Numero de corredor</span>
+            <span id="r-number" class="number-value">---</span>
+          </div>
+          <span id="r-category" class="cat-badge">---</span>
+        </div>
+
+        <h2 id="r-name" class="rider-name">---</h2>
+        <p id="r-order" class="rider-order">Orden #---</p>
+
+        <div class="badges-row">
+          <span id="r-jersey" class="badge badge-jersey-no">---</span>
+          <span id="r-rifa" class="badge badge-rifa hidden">---</span>
+        </div>
+
+        <div class="details-section">
+          <div class="details-title">Datos personales</div>
+          <div class="details-grid">
+            <div>
+              <span class="detail-label">Email</span>
+              <span id="r-email" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Telefono</span>
+              <span id="r-phone" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Fecha de nacimiento</span>
+              <span id="r-dob" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Equipo</span>
+              <span id="r-team" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Pago</span>
+              <span id="r-payment" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Sede</span>
+              <span id="r-sede" class="detail-value">---</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-title">Contacto de emergencia</div>
+          <div class="details-grid">
+            <div>
+              <span class="detail-label">Nombre</span>
+              <span id="r-emergency-name" class="detail-value">---</span>
+            </div>
+            <div>
+              <span class="detail-label">Telefono</span>
+              <span id="r-emergency-phone" class="detail-value">---</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Kit action area -->
+        <div id="kit-action"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const API = '/api/check-in-pro';
+    let allRunners = [];
+    let selectedRunner = null;
+    let currentTab = 'all';
+
+    const $ = id => document.getElementById(id);
+    function norm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+    function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+    // ═══════════════════════════════════════════
+    // LOAD DATA
+    // ═══════════════════════════════════════════
+    async function loadData() {
+      const sede = $('sede-select').value;
+      try {
+        const res = await fetch(`${API}?action=runners&sede=${sede}`);
+        const data = await res.json();
+        if (data.success) {
+          allRunners = data.runners;
+          updateStats();
+          renderList();
+          if (selectedRunner) {
+            const updated = allRunners.find(r => r.qrCode === selectedRunner.qrCode);
+            if (updated) {
+              selectedRunner = updated;
+              renderDetail(updated);
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Load error:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // STATS
+    // ═══════════════════════════════════════════
+    function updateStats() {
+      const total = allRunners.length;
+      const ready = allRunners.filter(r => r.kitReady).length;
+      const pending = total - ready;
+      const pct = total > 0 ? Math.round((ready / total) * 100) : 0;
+
+      $('stat-total').textContent = total;
+      $('stat-ready').textContent = ready;
+      $('stat-pending').textContent = pending;
+      $('progress-pct').textContent = pct + '%';
+      $('progress-fill').style.width = pct + '%';
+    }
+
+    // ═══════════════════════════════════════════
+    // LIST
+    // ═══════════════════════════════════════════
+    function getFilteredRunners() {
+      let filtered = allRunners;
+
+      if (currentTab === 'pending') {
+        filtered = filtered.filter(r => !r.kitReady);
+      } else if (currentTab === 'ready') {
+        filtered = filtered.filter(r => r.kitReady);
+      }
+
+      const search = $('list-search').value.trim();
+      if (search.length >= 2) {
+        const sq = norm(search);
+        filtered = filtered.filter(r =>
+          norm(r.nombre).includes(sq) ||
+          (r.runnerNumber || '').includes(search) ||
+          (r.orden || '').includes(search)
+        );
+      }
+
+      return filtered;
+    }
+
+    function renderList() {
+      const container = $('list-scroll');
+      const filtered = getFilteredRunners();
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div class="list-empty">No se encontraron corredores</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      for (const r of filtered) {
+        const item = document.createElement('div');
+        const isSelected = selectedRunner && selectedRunner.qrCode === r.qrCode;
+        let cls = 'runner-item';
+        if (isSelected) cls += ' selected';
+        if (r.kitReady) cls += ' kit-done';
+        item.className = cls;
+
+        const num = r.runnerNumber ? r.runnerNumber.padStart(3, '0') : '---';
+        const kitBadge = r.kitReady
+          ? '<span class="runner-kit-badge done">Listo</span>'
+          : '<span class="runner-kit-badge pending">Pendiente</span>';
+
+        item.innerHTML = `
+          <span class="runner-num">${esc(num)}</span>
+          <div class="runner-info">
+            <div class="runner-name">${esc(r.nombre)}</div>
+            <div class="runner-meta">${esc(r.categoria)} &middot; #${esc(r.orden)}</div>
+          </div>
+          ${kitBadge}
+        `;
+
+        item.addEventListener('click', () => {
+          selectedRunner = r;
+          renderList();
+          renderDetail(r);
+        });
+
+        container.appendChild(item);
+      }
+    }
+
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.list-tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      renderList();
+    }
+
+    $('list-search').addEventListener('input', renderList);
+
+    // ═══════════════════════════════════════════
+    // DETAIL
+    // ═══════════════════════════════════════════
+    function renderDetail(r) {
+      $('empty-state').classList.add('hidden');
+      $('rider-card').classList.remove('hidden');
+
+      // Number
+      if (r.runnerNumber) {
+        $('r-number').textContent = r.runnerNumber.padStart(3, '0');
+        $('r-number').classList.remove('empty');
+      } else {
+        $('r-number').textContent = 'S/N';
+        $('r-number').classList.add('empty');
+      }
+
+      $('r-category').textContent = r.categoria || '---';
+      $('r-name').textContent = r.nombre;
+      $('r-order').textContent = `Orden #${r.orden}`;
+
+      // Jersey
+      if (r.jersey) {
+        $('r-jersey').className = 'badge badge-jersey-yes';
+        $('r-jersey').textContent = 'Jersey: ' + r.jersey;
+      } else {
+        $('r-jersey').className = 'badge badge-jersey-no';
+        $('r-jersey').textContent = 'Sin jersey';
+      }
+
+      // Rifa
+      if (r.raffleNumber) {
+        $('r-rifa').textContent = 'Rifa: #' + r.raffleNumber;
+        $('r-rifa').classList.remove('hidden');
+      } else {
+        $('r-rifa').classList.add('hidden');
+      }
+
+      // Details
+      $('r-email').textContent = r.email || '---';
+      $('r-phone').textContent = r.telefono || '---';
+      $('r-dob').textContent = r.fechaNacimiento || '---';
+      $('r-team').textContent = r.equipo || 'Independiente';
+      $('r-payment').textContent = r.pago || '---';
+      $('r-sede').textContent = $('sede-select').value;
+      $('r-emergency-name').textContent = r.emergenciaNombre || '---';
+      $('r-emergency-phone').textContent = r.emergenciaTel || '---';
+
+      // Kit action
+      renderKitAction(r);
+    }
+
+    function renderKitAction(r) {
+      const container = $('kit-action');
+
+      if (r.kitReady) {
+        container.innerHTML = `
+          <div class="kit-done-banner">
+            <div class="kit-done-icon">&#10003;</div>
+            <div class="kit-done-text">
+              <strong>Kit listo</strong>
+              <span>Kit preparado y empacado</span>
+            </div>
+          </div>
+          <button class="kit-undo-btn" onclick="undoKit()">Desmarcar kit</button>
+        `;
+      } else {
+        container.innerHTML = `
+          <button id="kit-btn" class="kit-btn mark-ready" onclick="markKit()">
+            Marcar Kit Listo
+            <span class="kit-btn-subtitle">Kit preparado y empacado</span>
+          </button>
+        `;
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // KIT ACTIONS
+    // ═══════════════════════════════════════════
+    async function markKit() {
+      if (!selectedRunner || !selectedRunner.qrCode) return;
+
+      const btn = document.getElementById('kit-btn');
+      if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
+
+      try {
+        const res = await fetch(`${API}?action=kit-confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ qrCode: selectedRunner.qrCode, sede: $('sede-select').value })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          selectedRunner.kitReady = true;
+          updateRunnerInList(selectedRunner.qrCode, true);
+          updateStats();
+          renderList();
+          renderKitAction(selectedRunner);
+        } else {
+          alert(data.error || 'Error al marcar kit');
+          if (btn) { btn.disabled = false; btn.innerHTML = 'Marcar Kit Listo<span class="kit-btn-subtitle">Kit preparado y empacado</span>'; }
+        }
+      } catch (err) {
+        console.error('Kit error:', err);
+        alert('Error de conexion');
+        if (btn) { btn.disabled = false; btn.innerHTML = 'Marcar Kit Listo<span class="kit-btn-subtitle">Kit preparado y empacado</span>'; }
+      }
+    }
+
+    async function undoKit() {
+      if (!selectedRunner || !selectedRunner.qrCode) return;
+      if (!confirm('Desmarcar kit de ' + selectedRunner.nombre + '?')) return;
+
+      try {
+        const res = await fetch(`${API}?action=kit-undo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ qrCode: selectedRunner.qrCode, sede: $('sede-select').value })
+        });
+        const data = await res.json();
+
+        if (data.success) {
+          selectedRunner.kitReady = false;
+          updateRunnerInList(selectedRunner.qrCode, false);
+          updateStats();
+          renderList();
+          renderKitAction(selectedRunner);
+        } else {
+          alert(data.error || 'Error al desmarcar kit');
+        }
+      } catch (err) {
+        console.error('Kit undo error:', err);
+        alert('Error de conexion');
+      }
+    }
+
+    function updateRunnerInList(qrCode, kitReady) {
+      const runner = allRunners.find(r => r.qrCode === qrCode);
+      if (runner) runner.kitReady = kitReady;
+    }
+
+    // ═══════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════
+    $('sede-select').addEventListener('change', () => {
+      selectedRunner = null;
+      $('empty-state').classList.remove('hidden');
+      $('rider-card').classList.add('hidden');
+      loadData();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>

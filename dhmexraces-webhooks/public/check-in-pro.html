@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>DHMEXRACES - Check-in</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      --border: #E2E8F0;
+      --border-light: #F1F5F9;
+      --red: #DC2626;
+      --red-hover: #B91C1C;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --green-border: #BBF7D0;
+      --amber: #D97706;
+      --amber-bg: #FFFBEB;
+      --amber-border: #FDE68A;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo-pill {
+      display: flex;
+      align-items: center;
+    }
+    .logo-pill img { height: 90px; display: block; }
+    .header-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+    .header-center { display: flex; align-items: center; gap: 12px; }
+    .sede-select {
+      appearance: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 32px 6px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-tab {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .nav-tab:hover { color: var(--text); background: var(--bg); }
+    .nav-tab.active {
+      color: var(--white);
+      background: var(--text);
+      font-weight: 600;
+    }
+    .header-right { display: flex; align-items: center; gap: 16px; }
+    .live-stats {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+    .live-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* Main layout */
+    .main {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 20px;
+      max-width: 1100px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    @media (max-width: 768px) {
+      .main { grid-template-columns: 1fr; }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Left panel */
+    .panel-left { display: flex; flex-direction: column; gap: 16px; }
+    .scanner-card { padding: 16px; }
+    .scanner-card h3 {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 12px;
+    }
+    #qr-reader {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      background: var(--bg);
+      min-height: 200px;
+    }
+    #qr-reader video { border-radius: var(--radius-sm); }
+    .camera-btn {
+      width: 100%;
+      padding: 10px;
+      margin-top: 12px;
+      background: var(--text);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .camera-btn:hover { opacity: 0.85; }
+    .camera-btn.active { background: var(--text-2); }
+
+    .divider {
+      text-align: center;
+      position: relative;
+      color: var(--text-3);
+      font-size: 12px;
+    }
+    .divider::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: var(--border);
+    }
+    .divider span {
+      background: var(--bg);
+      padding: 0 12px;
+      position: relative;
+    }
+
+    .search-card { padding: 16px; }
+    .search-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--text); }
+    .search-input::placeholder { color: var(--text-3); }
+
+    .search-results {
+      margin-top: 8px;
+      max-height: 280px;
+      overflow-y: auto;
+    }
+    .search-loading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px;
+      color: var(--text-3);
+      font-size: 13px;
+    }
+    .search-loading .dot-loader {
+      display: flex;
+      gap: 4px;
+    }
+    .search-loading .dot-loader span {
+      width: 5px;
+      height: 5px;
+      background: var(--text-3);
+      border-radius: 50%;
+      animation: dotPulse 1s infinite;
+    }
+    .search-loading .dot-loader span:nth-child(2) { animation-delay: 0.15s; }
+    .search-loading .dot-loader span:nth-child(3) { animation-delay: 0.3s; }
+    @keyframes dotPulse {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    .search-no-results {
+      padding: 12px;
+      color: var(--text-3);
+      font-size: 13px;
+      text-align: center;
+    }
+    .search-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+    .search-item:hover { background: var(--bg); }
+    .search-item-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .search-item-detail {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 2px;
+    }
+    .search-item-cat {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+      background: var(--bg);
+      padding: 2px 8px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .search-item-checked {
+      font-size: 11px;
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    /* Right panel */
+    .panel-right { min-height: 500px; }
+
+    /* Empty state */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 400px;
+      text-align: center;
+      color: var(--text-3);
+    }
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 24px;
+      border: 1px solid var(--border);
+    }
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-2);
+      margin-bottom: 4px;
+    }
+    .empty-state p { font-size: 13px; }
+
+    /* Loading state */
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 400px;
+      color: var(--text-3);
+      font-size: 14px;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--text);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-bottom: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Error state */
+    .error-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      min-height: 400px;
+      text-align: center;
+    }
+    .error-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #FEF2F2;
+      color: var(--red);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .error-state h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .error-state p { font-size: 13px; color: var(--text-3); }
+
+    /* Rider card */
+    .rider-card { padding: 24px; }
+    .number-section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .number-block { text-align: left; }
+    .number-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .number-value {
+      font-size: 56px;
+      font-weight: 900;
+      color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .number-value.empty { color: var(--text-3); font-size: 36px; }
+    .cat-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 8px;
+    }
+
+    .rider-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .rider-order {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+    }
+
+    /* Badges row */
+    .badges-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-jersey-yes {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .badge-jersey-no {
+      background: var(--bg);
+      color: var(--text-3);
+      border: 1px solid var(--border);
+    }
+    .badge-rifa {
+      background: var(--bg);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .badge-kit-yes {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .badge-kit-no {
+      background: var(--amber-bg);
+      color: var(--amber);
+      border: 1px solid var(--amber-border);
+    }
+
+    /* Already checked warning */
+    .already-checked {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--amber-bg);
+      border: 1px solid var(--amber-border);
+      border-radius: var(--radius-sm);
+      margin-bottom: 20px;
+    }
+    .already-checked-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      color: var(--amber);
+    }
+    .already-checked strong {
+      display: block;
+      font-size: 14px;
+      color: var(--amber);
+    }
+    .already-checked p {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    /* Details */
+    .details-section {
+      margin-bottom: 20px;
+    }
+    .details-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    .detail-item {}
+    .detail-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 2px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Confirm button */
+    .confirm-btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
+    }
+    .confirm-btn:hover { background: var(--red-hover); }
+    .confirm-btn:disabled {
+      background: var(--border);
+      color: var(--text-3);
+      cursor: not-allowed;
+    }
+    .confirm-subtitle {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    /* Success overlay */
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.97);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .success-check {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--green);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .success-overlay h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .success-overlay p {
+      font-size: 14px;
+      color: var(--text-2);
+    }
+    .success-overlay .sub {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-top: 20px;
+    }
+
+    /* Utilities */
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-pill">
+        <img src="https://endhurorace.com/cdn/shop/files/LOGO_OFICIAL_26_DHMEX_1.png?v=1769553497&width=600" alt="DHMEXRACES">
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/check-in-pro.html" class="nav-tab active">Check-in</a>
+      <a href="/admin.html" class="nav-tab">Inscripciones</a>
+      <a href="/gestion.html" class="nav-tab">Gestión</a>
+      <a href="/kits.html" class="nav-tab">Kits</a>
+    </nav>
+    <div class="header-right">
+      <span class="live-stats"><span class="live-dot"></span><span id="stats-text">0 / 0</span></span>
+      <select id="sede-select" class="sede-select">
+        <option value="GUANAJUATO">Guanajuato</option>
+        <option value="PUEBLA">Puebla</option>
+        <option value="GUADALAJARA">Guadalajara</option>
+        <option value="IXTAPAN">Ixtapan</option>
+        <option value="TAXCO">Taxco</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- Left panel -->
+    <div class="panel-left">
+      <div class="scanner-card card">
+        <h3>Escaner QR</h3>
+        <div id="qr-reader"></div>
+        <button id="camera-btn" class="camera-btn" onclick="toggleCamera()">Activar camara</button>
+      </div>
+
+      <div class="divider"><span>o buscar manualmente</span></div>
+
+      <div class="search-card card">
+        <input id="search-input" type="text" class="search-input" placeholder="Nombre, email, telefono o codigo QR..." autocomplete="off">
+        <div id="search-results" class="search-results hidden"></div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="panel-right">
+      <!-- Empty state -->
+      <div id="empty-state" class="card empty-state">
+        <div class="empty-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        </div>
+        <h3>Escanea un codigo QR</h3>
+        <p>o busca al corredor por nombre</p>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading-state" class="card loading-state hidden">
+        <div class="spinner"></div>
+        <p>Buscando corredor...</p>
+      </div>
+
+      <!-- Error -->
+      <div id="error-state" class="card error-state hidden">
+        <div class="error-icon">!</div>
+        <h3 id="error-title">No encontrado</h3>
+        <p id="error-message">El codigo QR no esta registrado</p>
+      </div>
+
+      <!-- Rider card -->
+      <div id="rider-card" class="card rider-card hidden">
+        <div class="number-section">
+          <div class="number-block">
+            <span class="number-label">Numero de corredor</span>
+            <span id="r-number" class="number-value">---</span>
+          </div>
+          <span id="r-category" class="cat-badge">---</span>
+        </div>
+
+        <h2 id="r-name" class="rider-name">---</h2>
+        <p id="r-order" class="rider-order">Orden #---</p>
+
+        <div class="badges-row">
+          <span id="r-jersey" class="badge badge-jersey-no">---</span>
+          <span id="r-rifa" class="badge badge-rifa hidden">---</span>
+          <span id="r-kit" class="badge badge-kit-no hidden">---</span>
+        </div>
+
+        <div id="already-checked" class="already-checked hidden">
+          <span class="already-checked-icon">!</span>
+          <div>
+            <strong>Ya tiene check-in</strong>
+            <p id="checked-time">Kit ya fue entregado</p>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-title">Datos personales</div>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Email</span>
+              <span id="r-email" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Telefono</span>
+              <span id="r-phone" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Fecha de nacimiento</span>
+              <span id="r-dob" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Equipo</span>
+              <span id="r-team" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Pago</span>
+              <span id="r-payment" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Sede</span>
+              <span id="r-sede" class="detail-value">---</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="details-section">
+          <div class="details-title">Contacto de emergencia</div>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Nombre</span>
+              <span id="r-emergency-name" class="detail-value">---</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Telefono</span>
+              <span id="r-emergency-phone" class="detail-value">---</span>
+            </div>
+          </div>
+        </div>
+
+        <button id="confirm-btn" class="confirm-btn" onclick="confirmCheckIn()">
+          Confirmar Check-in
+          <span class="confirm-subtitle">Kit entregado al corredor</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Success overlay -->
+  <div id="success-overlay" class="success-overlay hidden">
+    <div class="success-check">&#10003;</div>
+    <h2 id="success-name">---</h2>
+    <p id="success-detail">---</p>
+    <p class="sub">Listo para el siguiente corredor...</p>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════
+    // STATE
+    // ═══════════════════════════════════════════
+    const API = '/api/check-in-pro';
+    let currentRider = null;
+    let scanner = null;
+    let cameraActive = false;
+    let isProcessing = false;
+    let debounceTimer = null;
+
+    // ═══════════════════════════════════════════
+    // ELEMENTS
+    // ═══════════════════════════════════════════
+    const $ = id => document.getElementById(id);
+
+    // ═══════════════════════════════════════════
+    // CAMERA / QR SCANNER
+    // ═══════════════════════════════════════════
+    async function toggleCamera() {
+      const btn = $('camera-btn');
+      if (cameraActive) {
+        await stopCamera();
+        btn.textContent = 'Activar camara';
+        btn.classList.remove('active');
+      } else {
+        await startCamera();
+        btn.textContent = 'Detener camara';
+        btn.classList.add('active');
+      }
+    }
+
+    async function startCamera() {
+      try {
+        scanner = new Html5Qrcode('qr-reader');
+        await scanner.start(
+          { facingMode: 'environment' },
+          { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1 },
+          onQRScan,
+          () => {}
+        );
+        cameraActive = true;
+      } catch (err) {
+        console.error('Camera error:', err);
+        showError('Camara no disponible', 'Usa la busqueda manual para encontrar al corredor');
+      }
+    }
+
+    async function stopCamera() {
+      if (scanner && cameraActive) {
+        try { await scanner.stop(); } catch (e) {}
+        cameraActive = false;
+      }
+    }
+
+    function onQRScan(text) {
+      if (isProcessing) return;
+      if (navigator.vibrate) navigator.vibrate(100);
+      playSound('scan');
+      searchRider(text.trim());
+    }
+
+    // ═══════════════════════════════════════════
+    // SEARCH
+    // ═══════════════════════════════════════════
+    $('search-input').addEventListener('input', function() {
+      const q = this.value.trim();
+      clearTimeout(debounceTimer);
+
+      if (q.length < 2) {
+        $('search-results').classList.add('hidden');
+        return;
+      }
+
+      if (/^DHMEX-/i.test(q) && q.length > 10) {
+        searchRider(q);
+        return;
+      }
+
+      showSearchLoading();
+      debounceTimer = setTimeout(() => searchByName(q), 300);
+    });
+
+    $('search-input').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const q = this.value.trim();
+        if (q) searchRider(q);
+      }
+    });
+
+    function showSearchLoading() {
+      const container = $('search-results');
+      container.innerHTML = '<div class="search-loading"><div class="dot-loader"><span></span><span></span><span></span></div>Buscando...</div>';
+      container.classList.remove('hidden');
+    }
+
+    async function searchByName(q) {
+      const sede = $('sede-select').value;
+      try {
+        const res = await fetch(`${API}?action=search&q=${encodeURIComponent(q)}&sede=${sede}`);
+        const data = await res.json();
+
+        if (!data.success || data.count === 0) {
+          $('search-results').innerHTML = '<div class="search-no-results">Sin resultados</div>';
+          return;
+        }
+
+        renderSearchResults(data.results);
+      } catch (err) {
+        console.error('Search error:', err);
+        $('search-results').innerHTML = '<div class="search-no-results">Error de conexion</div>';
+      }
+    }
+
+    function renderSearchResults(results) {
+      const container = $('search-results');
+      container.innerHTML = '';
+
+      for (const r of results) {
+        const item = document.createElement('div');
+        item.className = 'search-item';
+        item.innerHTML = `
+          <div>
+            <div class="search-item-name">${esc(r.nombre)}</div>
+            <div class="search-item-detail">#${esc(r.runnerNumber || '---')} &middot; ${esc(r.orden)}</div>
+          </div>
+          <div style="text-align:right">
+            <span class="search-item-cat">${esc(r.categoria)}</span>
+            ${r.checkedIn ? '<div class="search-item-checked">Check-in</div>' : ''}
+          </div>
+        `;
+        item.addEventListener('click', () => {
+          currentRider = r;
+          renderRider(r);
+          container.classList.add('hidden');
+          $('search-input').value = r.nombre;
+        });
+        container.appendChild(item);
+      }
+
+      container.classList.remove('hidden');
+    }
+
+    async function searchRider(q) {
+      if (isProcessing) return;
+      isProcessing = true;
+
+      showState('loading');
+      $('search-results').classList.add('hidden');
+
+      const sede = $('sede-select').value;
+
+      try {
+        const res = await fetch(`${API}?action=search&q=${encodeURIComponent(q)}&sede=${sede}`);
+        const data = await res.json();
+
+        if (!data.success) {
+          showError('Error', data.error || 'Error al buscar');
+          playSound('error');
+          isProcessing = false;
+          return;
+        }
+
+        if (data.count === 0) {
+          showError('No encontrado', 'No se encontro ningun corredor con esa busqueda');
+          playSound('error');
+          isProcessing = false;
+          return;
+        }
+
+        if (data.count === 1) {
+          currentRider = data.results[0];
+          renderRider(currentRider);
+          if (currentRider.checkedIn) {
+            playSound('warning');
+          } else {
+            playSound('found');
+          }
+        } else {
+          renderSearchResults(data.results);
+          showState('empty');
+        }
+      } catch (err) {
+        console.error('Search error:', err);
+        showError('Error de conexion', 'No se pudo conectar con el servidor');
+        playSound('error');
+      }
+
+      isProcessing = false;
+    }
+
+    // ═══════════════════════════════════════════
+    // RENDER RIDER
+    // ═══════════════════════════════════════════
+    function renderRider(r) {
+      showState('rider');
+
+      // Number
+      if (r.runnerNumber) {
+        $('r-number').textContent = r.runnerNumber.padStart(3, '0');
+        $('r-number').classList.remove('empty');
+      } else {
+        $('r-number').textContent = 'S/N';
+        $('r-number').classList.add('empty');
+      }
+
+      $('r-category').textContent = r.categoria || '---';
+      $('r-name').textContent = r.nombre;
+      $('r-order').textContent = `Orden #${r.orden}`;
+
+      // Jersey badge
+      if (r.jersey) {
+        $('r-jersey').className = 'badge badge-jersey-yes';
+        $('r-jersey').textContent = 'Jersey: ' + r.jersey;
+      } else {
+        $('r-jersey').className = 'badge badge-jersey-no';
+        $('r-jersey').textContent = 'Sin jersey';
+      }
+
+      // Raffle badge
+      if (r.raffleNumber) {
+        $('r-rifa').textContent = 'Rifa: #' + r.raffleNumber;
+        $('r-rifa').classList.remove('hidden');
+      } else {
+        $('r-rifa').classList.add('hidden');
+      }
+
+      // Kit badge
+      if (r.kitReady) {
+        $('r-kit').className = 'badge badge-kit-yes';
+        $('r-kit').textContent = 'Kit preparado';
+      } else {
+        $('r-kit').className = 'badge badge-kit-no';
+        $('r-kit').textContent = 'Kit pendiente';
+      }
+      $('r-kit').classList.remove('hidden');
+
+      // Already checked in warning
+      if (r.checkedIn) {
+        $('already-checked').classList.remove('hidden');
+        $('checked-time').textContent = r.checkInTime ? 'Check-in: ' + r.checkInTime : 'Kit ya fue entregado';
+        $('confirm-btn').classList.add('hidden');
+      } else {
+        $('already-checked').classList.add('hidden');
+        $('confirm-btn').classList.remove('hidden');
+        $('confirm-btn').disabled = false;
+      }
+
+      // Details
+      $('r-email').textContent = r.email || '---';
+      $('r-phone').textContent = r.telefono || '---';
+      $('r-dob').textContent = r.fechaNacimiento || '---';
+      $('r-team').textContent = r.equipo || 'Independiente';
+      $('r-payment').textContent = r.pago || '---';
+      $('r-sede').textContent = r.sede || '---';
+      $('r-emergency-name').textContent = r.emergenciaNombre || '---';
+      $('r-emergency-phone').textContent = r.emergenciaTel || '---';
+    }
+
+    // ═══════════════════════════════════════════
+    // CONFIRM CHECK-IN
+    // ═══════════════════════════════════════════
+    async function confirmCheckIn() {
+      if (!currentRider || !currentRider.qrCode) return;
+
+      const btn = $('confirm-btn');
+      btn.disabled = true;
+      btn.textContent = 'Procesando...';
+
+      try {
+        const res = await fetch(`${API}?action=confirm`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ qrCode: currentRider.qrCode })
+        });
+        const data = await res.json();
+
+        if (!data.success) {
+          if (data.alreadyCheckedIn) {
+            playSound('warning');
+            currentRider.checkedIn = true;
+            currentRider.checkInTime = data.checkInTime;
+            renderRider(currentRider);
+          } else {
+            playSound('error');
+            alert(data.error || 'Error al confirmar');
+            btn.disabled = false;
+            btn.innerHTML = 'Confirmar Check-in<span class="confirm-subtitle">Kit entregado al corredor</span>';
+          }
+          return;
+        }
+
+        playSound('success');
+        showSuccess(data.runner.nombre, `#${(data.runner.runnerNumber || '').padStart(3, '0')} / ${data.runner.categoria}`);
+        loadStats();
+
+        setTimeout(() => {
+          resetForNext();
+        }, 2500);
+
+      } catch (err) {
+        console.error('Confirm error:', err);
+        playSound('error');
+        alert('Error de conexion. Intenta de nuevo.');
+        btn.disabled = false;
+        btn.innerHTML = 'Confirmar Check-in<span class="confirm-subtitle">Kit entregado al corredor</span>';
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // UI STATES
+    // ═══════════════════════════════════════════
+    function showState(state) {
+      $('empty-state').classList.toggle('hidden', state !== 'empty');
+      $('loading-state').classList.toggle('hidden', state !== 'loading');
+      $('error-state').classList.toggle('hidden', state !== 'error');
+      $('rider-card').classList.toggle('hidden', state !== 'rider');
+    }
+
+    function showError(title, message) {
+      showState('error');
+      $('error-title').textContent = title;
+      $('error-message').textContent = message;
+    }
+
+    function showSuccess(name, detail) {
+      $('success-name').textContent = name;
+      $('success-detail').textContent = detail;
+      $('success-overlay').classList.remove('hidden');
+    }
+
+    function resetForNext() {
+      $('success-overlay').classList.add('hidden');
+      currentRider = null;
+      isProcessing = false;
+      showState('empty');
+      $('search-input').value = '';
+      $('search-results').classList.add('hidden');
+      $('search-input').focus();
+    }
+
+    // ═══════════════════════════════════════════
+    // LIVE STATS
+    // ═══════════════════════════════════════════
+    async function loadStats() {
+      try {
+        const sede = $('sede-select').value;
+        const res = await fetch(`${API}?action=stats&sede=${sede}`);
+        const data = await res.json();
+        if (data.success) {
+          $('stats-text').textContent = `${data.summary.checkedIn} / ${data.summary.total}`;
+        }
+      } catch (e) {}
+    }
+
+    $('sede-select').addEventListener('change', () => {
+      resetForNext();
+      loadStats();
+    });
+
+    // ═══════════════════════════════════════════
+    // SOUND
+    // ═══════════════════════════════════════════
+    let audioCtx;
+    function getAudioCtx() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = 0.15;
+
+        switch (type) {
+          case 'scan':
+          case 'found':
+            osc.frequency.value = 880;
+            osc.start();
+            setTimeout(() => osc.stop(), 80);
+            break;
+          case 'success':
+            osc.frequency.value = 660;
+            osc.start();
+            setTimeout(() => { osc.frequency.value = 880; }, 100);
+            setTimeout(() => osc.stop(), 200);
+            break;
+          case 'warning':
+            osc.frequency.value = 440;
+            osc.start();
+            setTimeout(() => osc.stop(), 120);
+            setTimeout(() => {
+              const o2 = ctx.createOscillator();
+              const g2 = ctx.createGain();
+              o2.connect(g2); g2.connect(ctx.destination);
+              g2.gain.value = 0.15; o2.frequency.value = 440;
+              o2.start(); setTimeout(() => o2.stop(), 120);
+            }, 180);
+            break;
+          case 'error':
+            osc.frequency.value = 220;
+            osc.start();
+            setTimeout(() => osc.stop(), 200);
+            break;
+        }
+      } catch (e) {}
+    }
+
+    // ═══════════════════════════════════════════
+    // UTILS
+    // ═══════════════════════════════════════════
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    // ═══════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════
+    loadStats();
+    setInterval(loadStats, 30000);
+    $('search-input').focus();
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.search-card')) {
+        $('search-results').classList.add('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

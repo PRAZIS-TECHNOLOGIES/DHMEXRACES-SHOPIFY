@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DHMEXRACES - Gestion de Corredores</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #FFFFFF;
+      --bg: #F8FAFC;
+      --text: #0F172A;
+      --text-2: #475569;
+      --text-3: #94A3B8;
+      --border: #E2E8F0;
+      --border-light: #F1F5F9;
+      --red: #DC2626;
+      --green: #16A34A;
+      --green-bg: #F0FDF4;
+      --amber: #D97706;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Header */
+    .header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-left { display: flex; align-items: center; gap: 16px; }
+    .logo-pill {
+      display: flex;
+      align-items: center;
+    }
+    .logo-pill img { height: 90px; display: block; }
+    .header-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .sede-select {
+      appearance: none;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 6px 32px 6px 12px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+    }
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .nav-tab {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-3);
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      transition: all 0.15s;
+    }
+    .nav-tab:hover { color: var(--text); background: var(--bg); }
+    .nav-tab.active {
+      color: var(--white);
+      background: var(--text);
+      font-weight: 600;
+    }
+
+    /* Content */
+    .content {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 640px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+    .stat-value.green { color: var(--green); }
+    .stat-value.amber { color: var(--amber); }
+
+    /* Progress bar */
+    .progress-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-label { font-size: 13px; font-weight: 500; color: var(--text-2); }
+    .progress-pct { font-size: 13px; font-weight: 700; color: var(--text); }
+    .progress-bar {
+      height: 8px;
+      background: var(--border-light);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      border-radius: 4px;
+      transition: width 0.4s ease;
+    }
+
+    /* Toolbar */
+    .toolbar {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .tabs { display: flex; gap: 4px; }
+    .tab {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.1s;
+    }
+    .tab:hover { background: var(--bg); }
+    .tab.active {
+      background: var(--text);
+      color: var(--white);
+      border-color: var(--text);
+    }
+    .search-sm {
+      padding: 6px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text);
+      outline: none;
+      min-width: 200px;
+    }
+    .search-sm:focus { border-color: var(--text); }
+    .search-sm::placeholder { color: var(--text-3); }
+
+    /* Category pills */
+    .categories {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .cat-pill {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+      transition: all 0.1s;
+      white-space: nowrap;
+    }
+    .cat-pill:hover { background: var(--bg); }
+    .cat-pill.active {
+      background: var(--text);
+      color: var(--white);
+      border-color: var(--text);
+    }
+
+    /* Table */
+    .table-wrap {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    thead th {
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+      white-space: nowrap;
+    }
+    tbody td {
+      padding: 10px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--bg); }
+    .cell-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .cell-email {
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 1px;
+    }
+    .cell-num {
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+    .cell-cat {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--bg);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-2);
+    }
+    .cell-jersey {
+      font-size: 12px;
+      color: var(--text-2);
+    }
+    .cell-jersey.has { color: var(--green); font-weight: 500; }
+    .status-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .status-dot.checked { background: var(--green); }
+    .status-dot.pending { background: var(--border); }
+    .status-text {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-text.checked { color: var(--green); }
+    .status-text.pending { color: var(--text-3); }
+    .cell-time {
+      font-size: 12px;
+      color: var(--text-3);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Table footer */
+    .table-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--bg);
+    }
+    .table-footer span {
+      font-size: 12px;
+      color: var(--text-3);
+    }
+    .export-btn {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-2);
+      cursor: pointer;
+    }
+    .export-btn:hover { background: var(--bg); }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .hide-mobile { display: none; }
+      thead th, tbody td { padding: 8px 10px; }
+    }
+
+    /* Loading */
+    .table-loading {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-3);
+      font-size: 14px;
+    }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo-pill">
+        <img src="https://endhurorace.com/cdn/shop/files/LOGO_OFICIAL_26_DHMEX_1.png?v=1769553497&width=600" alt="DHMEXRACES">
+      </div>
+    </div>
+    <nav class="header-nav">
+      <a href="/check-in-pro.html" class="nav-tab">Check-in</a>
+      <a href="/admin.html" class="nav-tab">Inscripciones</a>
+      <a href="/gestion.html" class="nav-tab active">Gestión</a>
+      <a href="/kits.html" class="nav-tab">Kits</a>
+    </nav>
+    <div class="header-right">
+      <select id="sede-select" class="sede-select">
+        <option value="GUANAJUATO">Guanajuato</option>
+        <option value="PUEBLA">Puebla</option>
+        <option value="GUADALAJARA">Guadalajara</option>
+        <option value="IXTAPAN">Ixtapan</option>
+        <option value="TAXCO">Taxco</option>
+      </select>
+    </div>
+  </header>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Inscritos</div>
+        <div id="stat-total" class="stat-value">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Check-in</div>
+        <div id="stat-checked" class="stat-value green">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pendientes</div>
+        <div id="stat-pending" class="stat-value amber">--</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Completado</div>
+        <div id="stat-pct" class="stat-value">--%</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-header">
+        <span class="progress-label">Progreso de check-in</span>
+        <span id="progress-text" class="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div id="progress-fill" class="progress-fill" style="width: 0%"></div>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <div class="tabs">
+        <button class="tab active" data-tab="all" onclick="setTab('all')">Todos <span id="tab-all-count"></span></button>
+        <button class="tab" data-tab="checked" onclick="setTab('checked')">Check-in <span id="tab-checked-count"></span></button>
+        <button class="tab" data-tab="pending" onclick="setTab('pending')">Pendientes <span id="tab-pending-count"></span></button>
+      </div>
+      <input id="search" class="search-sm" type="text" placeholder="Buscar corredor..." oninput="applyFilters()">
+    </div>
+
+    <!-- Categories -->
+    <div id="categories" class="categories"></div>
+
+    <!-- Table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Num</th>
+            <th>Nombre</th>
+            <th>Categoria</th>
+            <th class="hide-mobile">Jersey</th>
+            <th>Status</th>
+            <th class="hide-mobile">Hora</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <tr><td colspan="6" class="table-loading">Cargando...</td></tr>
+        </tbody>
+      </table>
+      <div class="table-footer">
+        <span id="footer-info">--</span>
+        <button class="export-btn" onclick="exportCSV()">Exportar CSV</button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const API = '/api/check-in-pro';
+    let allRunners = [];
+    let statsData = null;
+    let currentTab = 'all';
+    let currentCategory = null;
+    let refreshTimer = null;
+
+    const $ = id => document.getElementById(id);
+    function norm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
+
+    // ═══════════════════════════════════════════
+    // LOAD DATA
+    // ═══════════════════════════════════════════
+    async function loadData() {
+      const sede = $('sede-select').value;
+
+      try {
+        const [statsRes, runnersRes] = await Promise.all([
+          fetch(`${API}?action=stats&sede=${sede}`).then(r => r.json()),
+          fetch(`${API}?action=runners&sede=${sede}`).then(r => r.json())
+        ]);
+
+        if (statsRes.success) {
+          statsData = statsRes;
+          renderStats(statsRes);
+        }
+
+        if (runnersRes.success) {
+          allRunners = runnersRes.runners;
+          renderCategories(statsRes.byCategory || {});
+          applyFilters();
+        }
+      } catch (err) {
+        console.error('Load error:', err);
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // RENDER STATS
+    // ═══════════════════════════════════════════
+    function renderStats(data) {
+      const s = data.summary;
+      $('stat-total').textContent = s.total;
+      $('stat-checked').textContent = s.checkedIn;
+      $('stat-pending').textContent = s.pending;
+      $('stat-pct').textContent = s.percentage + '%';
+
+      $('progress-text').textContent = s.percentage + '%';
+      $('progress-fill').style.width = s.percentage + '%';
+
+      $('tab-all-count').textContent = s.total;
+      $('tab-checked-count').textContent = s.checkedIn;
+      $('tab-pending-count').textContent = s.pending;
+    }
+
+    // ═══════════════════════════════════════════
+    // RENDER CATEGORIES
+    // ═══════════════════════════════════════════
+    function renderCategories(byCategory) {
+      const container = $('categories');
+      container.innerHTML = '';
+
+      const cats = Object.entries(byCategory).sort((a, b) => b[1].total - a[1].total);
+
+      for (const [cat, data] of cats) {
+        const pill = document.createElement('button');
+        pill.className = 'cat-pill' + (currentCategory === cat ? ' active' : '');
+        pill.textContent = `${cat} ${data.checkedIn}/${data.total}`;
+        pill.addEventListener('click', () => {
+          currentCategory = currentCategory === cat ? null : cat;
+          renderCategories(byCategory);
+          applyFilters();
+        });
+        container.appendChild(pill);
+      }
+    }
+
+    // ═══════════════════════════════════════════
+    // TABS
+    // ═══════════════════════════════════════════
+    function setTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.toggle('active', t.dataset.tab === tab);
+      });
+      applyFilters();
+    }
+
+    // ═══════════════════════════════════════════
+    // FILTER & RENDER TABLE
+    // ═══════════════════════════════════════════
+    function applyFilters() {
+      const search = $('search').value.toLowerCase().trim();
+      let filtered = allRunners;
+
+      if (currentTab === 'checked') {
+        filtered = filtered.filter(r => r.checkedIn);
+      } else if (currentTab === 'pending') {
+        filtered = filtered.filter(r => !r.checkedIn);
+      }
+
+      if (currentCategory) {
+        filtered = filtered.filter(r => r.categoria === currentCategory);
+      }
+
+      if (search) {
+        const sq = norm(search);
+        filtered = filtered.filter(r =>
+          norm(r.nombre).includes(sq) ||
+          (r.runnerNumber || '').includes(search) ||
+          norm(r.email).includes(sq) ||
+          (r.orden || '').includes(search)
+        );
+      }
+
+      renderTable(filtered);
+      $('footer-info').textContent = `${filtered.length} corredor${filtered.length !== 1 ? 'es' : ''} | Auto-refresh 15s`;
+    }
+
+    function renderTable(runners) {
+      const tbody = $('table-body');
+
+      if (runners.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="table-loading">No se encontraron corredores</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = runners.map(r => {
+        const num = r.runnerNumber ? r.runnerNumber.padStart(3, '0') : '---';
+        const jerseyClass = r.jersey ? 'cell-jersey has' : 'cell-jersey';
+        const jerseyText = r.jersey || '---';
+        const statusClass = r.checkedIn ? 'checked' : 'pending';
+        const statusText = r.checkedIn ? 'Listo' : 'Pendiente';
+        const timeText = r.checkInTime || '---';
+
+        return `<tr>
+          <td><span class="cell-num">${esc(num)}</span></td>
+          <td>
+            <div class="cell-name">${esc(r.nombre)}</div>
+            <div class="cell-email hide-mobile">${esc(r.email)}</div>
+          </td>
+          <td><span class="cell-cat">${esc(r.categoria)}</span></td>
+          <td class="hide-mobile"><span class="${jerseyClass}">${esc(jerseyText)}</span></td>
+          <td>
+            <span class="status-dot ${statusClass}"></span>
+            <span class="status-text ${statusClass}">${statusText}</span>
+          </td>
+          <td class="hide-mobile"><span class="cell-time">${esc(timeText)}</span></td>
+        </tr>`;
+      }).join('');
+    }
+
+    // ═══════════════════════════════════════════
+    // EXPORT CSV
+    // ═══════════════════════════════════════════
+    function exportCSV() {
+      const sede = $('sede-select').value;
+      const headers = ['Numero', 'Nombre', 'Email', 'Categoria', 'Jersey', 'Status', 'Hora Check-in', 'Pago'];
+
+      const rows = allRunners.map(r => [
+        r.runnerNumber || '',
+        `"${(r.nombre || '').replace(/"/g, '""')}"`,
+        r.email || '',
+        r.categoria || '',
+        r.jersey || '',
+        r.checkedIn ? 'Check-in' : 'Pendiente',
+        r.checkInTime || '',
+        r.pago || ''
+      ]);
+
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const bom = '\uFEFF';
+      const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `corredores_${sede}_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ═══════════════════════════════════════════
+    // UTILS
+    // ═══════════════════════════════════════════
+    function esc(str) {
+      const d = document.createElement('div');
+      d.textContent = str || '';
+      return d.innerHTML;
+    }
+
+    // ═══════════════════════════════════════════
+    // INIT
+    // ═══════════════════════════════════════════
+    $('sede-select').addEventListener('change', () => {
+      currentCategory = null;
+      loadData();
+    });
+
+    loadData();
+    refreshTimer = setInterval(loadData, 15000);
+  </script>
+</body>
+</html>

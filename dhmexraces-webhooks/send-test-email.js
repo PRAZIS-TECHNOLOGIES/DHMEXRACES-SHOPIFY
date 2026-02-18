@@ -14,7 +14,7 @@ const RAFFLE_CONFIG = {
 };
 
 const ASSETS = {
-  logo: 'https://endhurorace.com/cdn/shop/files/dhmexscottshimanologo.png?v=1763690918&width=600',
+  logo: 'https://cdn.shopify.com/s/files/1/0691/9556/3244/files/DHMEXRACES_MARCA_REGISTRADA_1.png?v=1770853952',
   foxLogo: 'https://endhurorace.com/cdn/shop/files/FOXLOGO.png?v=1763606761&width=400',
   fox40Image: 'https://cdn.shopify.com/s/files/1/0691/9556/3244/files/910_21_280_40_MY25_F_Orange_GripX2_Front.webp?v=1768319279',
   qrApiBase: 'https://api.qrserver.com/v1/create-qr-code/'
@@ -362,21 +362,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
             </td>
           </tr>
 
-          <!-- MECÁNICA NEUTRAL SHIMANO -->
-          <tr>
-            <td style="background: linear-gradient(135deg, rgba(0,102,179,0.15) 0%, rgba(0,102,179,0.05) 100%); border: 1px solid rgba(0,102,179,0.3); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
-              <h3 style="color: #0066B3; font-size: 14px; font-weight: 700; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.1em;">
-                Mecánica Neutral Shimano
-              </h3>
-              <p style="color: rgba(255,255,255,0.8); font-size: 14px; margin: 0 0 12px 0; line-height: 1.6;">
-                Tu inscripción incluye acceso a la <strong style="color: #FFFFFF;">Mecánica Neutral</strong> operada por técnicos certificados de <strong style="color: #0066B3;">Shimano México</strong>. Un equipo de profesionales con las herramientas y experiencia para brindarte soporte técnico de clase mundial durante todo el evento.
-              </p>
-              <p style="color: rgba(255,255,255,0.6); font-size: 13px; margin: 0; font-style: italic;">
-                Un respaldo que solo encuentras en DHMEXRACES.
-              </p>
-            </td>
-          </tr>
-
           <tr><td style="height: 16px;"></td></tr>
 
           <!-- Recomendación -->
@@ -452,7 +437,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       <tr>
                         <td align="center" style="text-align: center;">
                           <img src="https://endhurorace.com/cdn/shop/files/SCOTTLOGO.png?v=1763690514&width=600" alt="Scott" class="mobile-logo" style="height: 65px; max-width: 45%; margin: 4px 8px; vertical-align: middle;">
-                          <img src="https://endhurorace.com/cdn/shop/files/SHIMANOLOGO.png?v=1763606659&width=600" alt="Shimano" class="mobile-logo" style="height: 40px; max-width: 45%; margin: 4px 8px; vertical-align: middle;">
                         </td>
                       </tr>
                     </table>
@@ -474,7 +458,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                           <img src="https://endhurorace.com/cdn/shop/files/FOXLOGO.png?v=1763606761&width=400" alt="Fox" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/GIROLOGO.png?v=1763690436&width=400" alt="Giro" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/VITTORIALOGO.webp?v=1763690758&width=400" alt="Vittoria" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
-                          <img src="https://endhurorace.com/cdn/shop/files/LAZERLOGO.png?v=1763690460&width=400" alt="Lazer" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/ALPINELOGO.png?v=1763606851&width=400" alt="Alpine" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/RFLOGO.png?v=1763606866&width=400" alt="RF" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/SYNCROSSLOGO.png?v=1763606881&width=400" alt="Syncross" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
@@ -528,7 +511,7 @@ async function sendTestEmail() {
   try {
     const { data, error } = await resend.emails.send({
       from: 'DHMEXRACES <noreply@endhurorace.com>',
-      to: 'endhurorace@gmail.com',
+      to: 'gibrangoc15@gmail.com',
       subject: '✅ Inscripción Confirmada - prueba prueba | DHMEXRACES 2026',
       html: generateEmailHTML(
         corredorPrueba,

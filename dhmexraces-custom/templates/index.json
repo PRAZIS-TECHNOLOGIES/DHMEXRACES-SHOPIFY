@@ -12,15 +12,16 @@
     "hero": {
       "type": "hero-video",
       "settings": {
-        "video_url": "https://www.youtube.com/watch?v=xzqBTyiHOXU",
+        "video_url": "https://www.youtube.com/watch?v=3CFTljT8g7s",
+        "video_url_mobile": "https://www.youtube.com/shorts/NrnFuaXEL-s",
         "overlay_color": "#000000",
         "overlay_opacity": 50,
-        "subtitle": "POWERED BY SHIMANO",
+        "subtitle": "",
         "title": "COPA SCOTT DHMEXRACES 2026",
-        "description": "$530,000 MXN en premios • Mecánica Neutral Shimano • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
-        "button_label": "Inscríbete - 12 DIC",
+        "description": "$530,000 MXN en premios • 5 Sedes • 13 Categorías • Red Bull • MOTUL • SRAM",
+        "button_label": "INSCRIPCIONES ABIERTAS. CLICK AQUI!!",
         "button_link": "shopify://products/inscripcion-guanajuato-2026",
-        "button_label_2": "Ver Sedes",
+        "button_label_2": "",
         "button_link_2": "#fechas"
       }
     },
@@ -28,18 +29,19 @@
       "type": "brand-showcase",
       "name": "Brand Showcase",
       "settings": {
-        "logo": "shopify://shop_images/dhmexscottshimanologo.png",
+        "logo": "shopify://shop_images/DHMEXRACES_MARCA_REGISTRADA_1.png",
         "logo_alt": "DHMEXRACES",
         "logo_width": 0,
-        "title": "El Campeonato Nacional de Downhill",
+        "title": "COPA SCOTT DHMEXRACES",
+        "title_line_2": "Nacional de Downhill",
         "subtitle": "Temporada 2026",
-        "description": "<p>DHMEXRACES es el campeonato de Downhill más importante de México. Cinco sedes, los mejores riders y la adrenalina al máximo.</p>",
+        "description": "<p>DHMEXRACES es la copa de downhill mas profesional de México. Cinco sedes, los mejores riders y la adrenalina al máximo.</p>",
         "button_text": "INSTAGRAM",
         "button_link": "https://www.instagram.com/dhmex_races/",
-        "background_color": "#000000",
-        "title_color": "#ffffff",
+        "background_color": "#ffffff",
+        "title_color": "#000000",
         "subtitle_color": "#e42c2c",
-        "text_color": "#cccccc"
+        "text_color": "#333333"
       }
     },
     "race_dates": {
@@ -48,14 +50,14 @@
         "race_1": {
           "type": "race",
           "settings": {
-            "status": "upcoming",
+            "status": "open",
             "round": "SEDE 1",
             "race_name": "GUANAJUATO",
             "date": "21-22 Febrero 2026",
             "location": "Guanajuato, México",
             "elevation": "+$100,000 en premios",
-            "description": "Apertura épica de la temporada COPA SCOTT. Mecánica neutral Shimano disponible.",
-            "button_label": "Inscripción 12 de Diciembre",
+            "description": "Apertura épica de la temporada COPA SCOTT.",
+            "button_label": "Inscríbete!!",
             "button_link": "/products/inscripcion-guanajuato-2026"
           }
         },
@@ -68,7 +70,7 @@
             "date": "21-22 Marzo 2026",
             "location": "Puebla, México",
             "elevation": "+$100,000 en premios",
-            "description": "Segunda válida del campeonato nacional con soporte técnico completo.",
+            "description": "Segunda válida de la copa nacional.",
             "button_label": "Próximamente",
             "button_link": "shopify://products/inscripcion-sede-1-puebla"
           }
@@ -82,7 +84,7 @@
             "date": "30-31 Mayo 2026",
             "location": "Guadalajara, Jalisco",
             "elevation": "+$100,000 en premios",
-            "description": "Mitad de temporada en una de las pistas más técnicas del circuito.",
+            "description": "Tercera válida de la copa nacional.",
             "button_label": "Próximamente",
             "button_link": "shopify://products/inscripcion-sede-2-guadalajara"
           }
@@ -151,6 +153,7 @@
         },
         "sponsor_2": {
           "type": "sponsor",
+          "disabled": true,
           "settings": {
             "name": "SHIMANO",
             "image": "shopify://shop_images/SHIMANOLOGO.png",
@@ -292,7 +295,7 @@
     "registration": {
       "type": "race-registration",
       "settings": {
-        "title": "INSCRIPCIONES ABREN 12 DICIEMBRE",
+        "title": "INSCRIPCIONES ABIERTAS",
         "subtitle": "13 Categorías Disponibles • Nueva Plataforma Digital • Gestiona inscripciones, puntos y resultados en tiempo real",
         "product": "inscripcion-guanajuato-2026",
         "container_height": 200,

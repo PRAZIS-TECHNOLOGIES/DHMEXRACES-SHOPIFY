@@ -1,0 +1,61 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "main": {
+      "type": "merch-oficial",
+      "blocks": {
+        "product_playera_oversize": {
+          "type": "product",
+          "settings": {
+            "product_handle": "playera-oversize-serigrafia-stock-limitado",
+            "title": "Playera Oversize Serigrafía",
+            "description": "Playera oversize con serigrafía exclusiva DHMEXRACES. Stock limitado.",
+            "category": "jerseys",
+            "price": "",
+            "badge": "Stock Limitado",
+            "product_url": ""
+          }
+        },
+        "product_jersey_gto": {
+          "type": "product",
+          "settings": {
+            "product_handle": "jersey-oficial-guanajuato-2026",
+            "title": "Jersey Oficial 2026",
+            "description": "Jersey oficial de la primera fecha del campeonato en Guanajuato. Diseño exclusivo y materiales premium.",
+            "category": "jerseys",
+            "price": "",
+            "badge": "Nuevo",
+            "product_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_playera_oversize",
+        "product_jersey_gto"
+      ],
+      "settings": {
+        "badge_text": "Coleccion 2026",
+        "title": "Merch Oficial",
+        "subtitle": "Representa la copa de downhill mas profesional de México con estilo",
+        "show_coming_soon": true,
+        "coming_soon_title": "Mas productos proximamente",
+        "coming_soon_text": "Estamos preparando mas productos exclusivos para ti. Mantente atento a nuestras redes sociales.",
+        "instagram_url": "https://www.instagram.com/dhmex_races/",
+        "show_newsletter": false,
+        "newsletter_title": "Se el primero en enterarte",
+        "newsletter_text": "Suscribete para recibir notificaciones de nuevos productos y ofertas exclusivas"
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

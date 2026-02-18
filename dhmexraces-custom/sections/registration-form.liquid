@@ -56,6 +56,7 @@
   let currentFormIndex = 0;
   let formsData = [];
   window.jerseyDisponible = false;
+  window.jerseyCount = 0;
 
   document.addEventListener('DOMContentLoaded', async function() {
     // Get cart data from sessionStorage
@@ -74,6 +75,7 @@
     if (jerseyInfo) {
       const info = JSON.parse(jerseyInfo);
       window.jerseyDisponible = info.disponible;
+      window.jerseyCount = info.count || 0;
     }
 
     // Calculate total number of forms needed
@@ -173,14 +175,16 @@
               <div class="reg-form__field-row">
                 <div class="reg-form__field-group">
                   <label for="emergencia_nombre-${formIndex}" class="reg-form__label">
-                    Contacto de Emergencia *
+                    Nombre de Contacto de Emergencia *
                   </label>
                   <input
                     type="text"
                     id="emergencia_nombre-${formIndex}"
                     class="reg-form__input"
                     required
-                    placeholder="Nombre del contacto">
+                    pattern="[^0-9]+"
+                    title="Ingresa un nombre, no un número de teléfono"
+                    placeholder="Nombre completo del contacto">
                 </div>
 
                 <div class="reg-form__field-group">
@@ -239,7 +243,7 @@
                 <input type="hidden" id="categoria-${formIndex}" value="${item.variant_title}">
               </div>
 
-              ${window.jerseyDisponible ? `
+              ${(window.jerseyDisponible && formIndex < window.jerseyCount) ? `
               <div class="reg-form__field-group reg-form__jersey-field">
                 <label for="talla_playera-${formIndex}" class="reg-form__label">
                   <span class="reg-form__jersey-icon">👕</span> Talla de Playera Oficial *
@@ -361,8 +365,14 @@
       return false;
     }
 
-    // Validate jersey size if field exists
-    if (window.jerseyDisponible && tallaEl && !talla_playera) {
+    // Validate emergency contact name is not a phone number
+    if (/^\d[\d\s\-+()]*$/.test(emergencia_nombre)) {
+      alert('El nombre de contacto de emergencia debe ser un nombre, no un número de teléfono');
+      return false;
+    }
+
+    // Validate jersey size if field exists (only for forms that have jersey)
+    if (window.jerseyDisponible && index < window.jerseyCount && tallaEl && !talla_playera) {
       alert('Por favor selecciona tu talla de playera');
       return false;
     }

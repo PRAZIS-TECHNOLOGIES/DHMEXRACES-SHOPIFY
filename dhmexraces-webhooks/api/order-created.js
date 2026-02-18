@@ -16,6 +16,7 @@
 
 const { Resend } = require('resend');
 const { GoogleSpreadsheet } = require('google-spreadsheet');
+const https = require('https');
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // CONFIGURACIÓN Y CONSTANTES
@@ -39,12 +40,29 @@ const SEDE_CODES = {
 /** Caracteres permitidos para códigos (sin caracteres confusos: I, O, 0, 1) */
 const ALLOWED_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
+/** Configuración del descuento automático de jersey */
+const JERSEY_DISCOUNT_CONFIG = {
+  discountId: 'gid://shopify/DiscountAutomaticNode/1888870433004',
+  shop: '18d06f-7a.myshopify.com',
+  apiVersion: '2026-01',
+  maxJerseys: 50
+};
+
 /** Configuración de la rifa */
 const RAFFLE_CONFIG = {
   sheetName: 'RIFA',
   prize: 'FOX 40 Factory GRIP 2',
   prizeValue: '$50,000 MXN',
   drawDate: 'Sede Puebla - 22 Marzo 2026'
+};
+
+/** Mapeo de sedes a hojas de números de corredor */
+const RUNNER_NUMBER_SHEETS = {
+  'GUANAJUATO': 'GUANAJUATO NUMEROS',
+  'PUEBLA': 'PUEBLA NUMEROS',
+  'GUADALAJARA': 'GUADALAJARA NUMEROS',
+  'IXTAPAN': 'IXTAPAN NUMEROS',
+  'TAXCO': 'TAXCO NUMEROS'
 };
 
 /** Configuración del email */
@@ -55,7 +73,7 @@ const EMAIL_CONFIG = {
 
 /** URLs de recursos */
 const ASSETS = {
-  logo: 'https://endhurorace.com/cdn/shop/files/dhmexscottshimanologo.png?v=1763690918&width=600',
+  logo: 'https://cdn.shopify.com/s/files/1/0691/9556/3244/files/DHMEXRACES_MARCA_REGISTRADA_1.png?v=1770853952',
   foxLogo: 'https://endhurorace.com/cdn/shop/files/FOXLOGO.png?v=1763606761&width=400',
   fox40Image: 'https://cdn.shopify.com/s/files/1/0691/9556/3244/files/910_21_280_40_MY25_F_Orange_GripX2_Front.webp?v=1768319279',
   qrApiBase: 'https://api.qrserver.com/v1/create-qr-code/'
@@ -123,7 +141,7 @@ function getSheetNameFromProduct(productTitle) {
  * @returns {string} Fecha formateada
  */
 function formatDateMX(date) {
-  return new Date(date).toLocaleDateString('es-MX');
+  return new Date(date).toLocaleDateString('en-US', { timeZone: 'America/Mexico_City' });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -182,15 +200,18 @@ async function assignRaffleTicket(corredor, orderNumber, orderDate) {
     // Obtener todas las filas
     const rows = await sheet.getRows();
 
-    // VERIFICAR DUPLICADO: Buscar si ya tiene boleto asignado con esta orden + email
+    // VERIFICAR DUPLICADO: Buscar si ya tiene boleto asignado con esta orden + email + nombre
+    // Nota: hoja RIFA no tiene columna CATEGORIA, se usa OrderID + Email + Nombre
     const existingTicket = rows.find(row =>
       row.OrderID === String(orderNumber) &&
       row.Email &&
-      row.Email.toLowerCase() === (corredor.email || '').toLowerCase()
+      row.Email.toLowerCase() === (corredor.email || '').toLowerCase() &&
+      row.Nombre &&
+      row.Nombre.toLowerCase() === (corredor.nombre || '').toLowerCase()
     );
 
     if (existingTicket) {
-      console.log(`⚠️ DUPLICADO RIFA: Orden ${orderNumber}, Email ${corredor.email} ya tiene boleto #${existingTicket.Numero}`);
+      console.log(`⚠️ DUPLICADO RIFA: Orden ${orderNumber}, ${corredor.nombre}, Email ${corredor.email} ya tiene boleto #${existingTicket.Numero}`);
       return {
         success: true,
         numero: existingTicket.Numero,
@@ -226,6 +247,85 @@ async function assignRaffleTicket(corredor, orderNumber, orderDate) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// FUNCIONES DE NÚMERO DE CORREDOR
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Asigna un número de corredor desde la hoja de números de la sede
+ *
+ * @param {Object} corredor - Datos del corredor
+ * @param {string} orderNumber - Número de orden
+ * @param {string} orderDate - Fecha de la orden
+ * @param {string} sheetName - Nombre de la hoja de la sede (ej: GUANAJUATO)
+ * @returns {Promise<{success: boolean, numero: string|null, error?: string, skipped?: boolean}>}
+ */
+async function assignRunnerNumber(corredor, orderNumber, orderDate, sheetName) {
+  try {
+    const numerosSheetName = RUNNER_NUMBER_SHEETS[sheetName];
+    if (!numerosSheetName) {
+      console.error(`❌ No hay hoja de números para sede: ${sheetName}`);
+      return { success: false, numero: null, error: `Hoja de números no configurada para ${sheetName}` };
+    }
+
+    console.log(`🏁 Asignando número de corredor a ${corredor.nombre} en ${numerosSheetName}...`);
+
+    const doc = await connectToGoogleSheets();
+    const sheet = doc.sheetsByTitle[numerosSheetName];
+
+    if (!sheet) {
+      console.error(`❌ Hoja "${numerosSheetName}" no encontrada`);
+      return { success: false, numero: null, error: `Hoja ${numerosSheetName} no encontrada` };
+    }
+
+    const rows = await sheet.getRows();
+
+    // VERIFICAR DUPLICADO: Buscar si ya tiene número asignado con esta orden + email + nombre
+    const existingNumber = rows.find(row =>
+      row.OrderID === String(orderNumber) &&
+      row.Email &&
+      row.Email.toLowerCase() === (corredor.email || '').toLowerCase() &&
+      row.Nombre &&
+      row.Nombre.toLowerCase() === (corredor.nombre || '').toLowerCase()
+    );
+
+    if (existingNumber) {
+      console.log(`⚠️ DUPLICADO NÚMERO: Orden ${orderNumber}, ${corredor.nombre} ya tiene número #${existingNumber.Numero}`);
+      return {
+        success: true,
+        numero: existingNumber.Numero,
+        skipped: true
+      };
+    }
+
+    // Buscar el primer número disponible (secuencial)
+    const availableNumber = rows.find(row => row.Ocupado === '0' || row.Ocupado === 0);
+
+    if (!availableNumber) {
+      console.error('❌ No hay números de corredor disponibles');
+      return { success: false, numero: null, error: 'No hay números disponibles' };
+    }
+
+    // Asignar el número
+    const runnerNumber = availableNumber.Numero;
+    availableNumber.Ocupado = '1';
+    availableNumber.OrderID = orderNumber || '';
+    availableNumber.Email = corredor.email || '';
+    availableNumber.Nombre = corredor.nombre || '';
+    availableNumber.Categoria = corredor.categoria || corredor.variant_title || '';
+    availableNumber.Fecha = formatDateMX(orderDate);
+
+    await availableNumber.save();
+
+    console.log(`✅ Número de corredor #${runnerNumber} asignado exitosamente`);
+    return { success: true, numero: runnerNumber };
+
+  } catch (error) {
+    console.error('❌ Error asignando número de corredor:', error.message);
+    return { success: false, numero: null, error: error.message };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // FUNCIONES DE GOOGLE SHEETS
 // ═══════════════════════════════════════════════════════════════════════════════
 
@@ -237,7 +337,7 @@ async function assignRaffleTicket(corredor, orderNumber, orderDate) {
  * @param {string} sheetName - Nombre de la hoja de la sede
  * @returns {Promise<{exists: boolean, existingCode?: string}>}
  */
-async function checkIfCorredorExists(orderNumber, email, sheetName) {
+async function checkIfCorredorExists(orderNumber, email, nombre, categoria, sheetName) {
   try {
     const doc = await connectToGoogleSheets();
     const sheet = doc.sheetsByTitle[sheetName];
@@ -250,7 +350,11 @@ async function checkIfCorredorExists(orderNumber, email, sheetName) {
     const existingRow = rows.find(row =>
       row.ORDEN === String(orderNumber) &&
       row.EMAIL &&
-      row.EMAIL.toLowerCase() === email.toLowerCase()
+      row.EMAIL.toLowerCase() === email.toLowerCase() &&
+      row.NOMBRE &&
+      row.NOMBRE.toLowerCase() === (nombre || '').toLowerCase() &&
+      row.CATEGORIA &&
+      row.CATEGORIA.toLowerCase() === (categoria || '').toLowerCase()
     );
 
     if (existingRow) {
@@ -276,7 +380,7 @@ async function checkIfCorredorExists(orderNumber, email, sheetName) {
  * @param {string} checkInCode - Código de check-in generado
  * @returns {Promise<{success: boolean, sheet?: string, error?: string, skipped?: boolean}>}
  */
-async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode) {
+async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode, orderTotal, totalCorredores) {
   try {
     console.log(`📊 Guardando corredor ${corredor.nombre} en Sheets...`);
 
@@ -289,16 +393,20 @@ async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode)
       return { success: false, error: `Hoja "${sheetName}" no encontrada` };
     }
 
-    // VERIFICAR DUPLICADO: Buscar si ya existe un registro con misma orden + email
+    // VERIFICAR DUPLICADO: Buscar si ya existe un registro con misma orden + email + nombre + categoria
     const rows = await sheet.getRows();
     const existingRow = rows.find(row =>
       row.ORDEN === String(orderNumber) &&
       row.EMAIL &&
-      row.EMAIL.toLowerCase() === (corredor.email || '').toLowerCase()
+      row.EMAIL.toLowerCase() === (corredor.email || '').toLowerCase() &&
+      row.NOMBRE &&
+      row.NOMBRE.toLowerCase() === (corredor.nombre || '').toLowerCase() &&
+      row.CATEGORIA &&
+      row.CATEGORIA.toLowerCase() === (corredor.categoria || corredor.variant_title || '').toLowerCase()
     );
 
     if (existingRow) {
-      console.log(`⚠️ DUPLICADO DETECTADO: Orden ${orderNumber}, Email ${corredor.email} ya existe con QR: ${existingRow.QR_CODE}`);
+      console.log(`⚠️ DUPLICADO DETECTADO: Orden ${orderNumber}, ${corredor.nombre}, Email ${corredor.email} ya existe con QR: ${existingRow.QR_CODE}`);
       return {
         success: true,
         sheet: sheetName,
@@ -327,7 +435,8 @@ async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode)
       'CHECK_IN': 'NO',
       'CHECK_IN_TIME': '',
       'JERSEY': jerseyTalla,
-      'PAGO': 'shopify'
+      'PAGO': orderTotal > 0 ? 'shopify' : 'patrocinado',
+      'TOTAL PAGO': orderTotal > 0 ? `$${Math.round(orderTotal / (totalCorredores || 1))}` : '$0'
     });
 
     console.log(`✅ Guardado en hoja ${sheetName}`);
@@ -361,7 +470,7 @@ async function saveToGoogleSheets(corredor, orderNumber, orderDate, checkInCode)
  * @param {string} raffleNumber - Número de boleto de rifa
  * @returns {string} HTML del email
  */
-function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumber) {
+function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumber, runnerNumber) {
   // Datos del corredor
   const nombre = corredor.nombre || 'Corredor';
   const primerNombre = nombre.split(' ')[0];
@@ -569,8 +678,93 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
           <tr><td style="height: 32px;"></td></tr>
 
           <!-- ═══════════════════════════════════════════════ -->
-          <!-- BOLETO DE RIFA FOX 40 -->
+          <!-- NUMERO DE CORREDOR (solo si tiene número) -->
           <!-- ═══════════════════════════════════════════════ -->
+          ${runnerNumber ? `
+          <tr>
+            <td>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-radius: 16px; overflow: hidden; border: 2px solid #E42C2C;">
+                <tr>
+                  <td style="background: linear-gradient(135deg, #E42C2C 0%, #B91C1C 100%); padding: 12px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <p style="color: rgba(0,0,0,0.6); font-size: 8px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 0.15em;">Copa Scott DHMEXRACES 2026</p>
+                          <p style="color: #000000; font-size: 18px; font-weight: 800; margin: 4px 0 0 0; letter-spacing: 0.02em;">NUMERO DE CORREDOR</p>
+                        </td>
+                        <td align="right" style="vertical-align: middle;">
+                          <div style="background: #000000; border-radius: 6px; padding: 6px 10px; display: inline-block;">
+                            <img src="${ASSETS.logo}" alt="DHMEXRACES" style="height: 20px; display: block;">
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 0; height: 4px; background: repeating-linear-gradient(90deg, #E42C2C 0px, #E42C2C 10px, transparent 10px, transparent 20px);"></td>
+                </tr>
+                <tr>
+                  <td style="padding: 28px 24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <p style="color: rgba(255,255,255,0.4); font-size: 9px; font-weight: 600; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.15em;">Categoría</p>
+                          <div style="display: inline-block; background: rgba(228,44,44,0.15); border: 1px solid rgba(228,44,44,0.3); border-radius: 6px; padding: 4px 14px; margin-bottom: 20px;">
+                            <p style="color: #E42C2C; font-size: 13px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 0.08em;">${categoria}</p>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center">
+                          <p style="color: rgba(255,255,255,0.5); font-size: 9px; font-weight: 600; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.15em;">Tu Número de Corredor</p>
+                          <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
+                            <tr>
+                              <td style="background: linear-gradient(180deg, #E42C2C 0%, #B91C1C 100%); border-radius: 14px; padding: 4px;">
+                                <table cellpadding="0" cellspacing="0">
+                                  <tr>
+                                    <td style="background: #000000; border-radius: 11px; padding: 16px 40px;">
+                                      <p style="font-family: 'Courier New', monospace; font-size: 52px; font-weight: 900; color: #E42C2C; margin: 0; letter-spacing: 0.15em; text-shadow: 0 0 20px rgba(228,44,44,0.5); line-height: 1;">${runnerNumber}</p>
+                                    </td>
+                                  </tr>
+                                </table>
+                              </td>
+                            </tr>
+                          </table>
+                          <p style="color: #FFFFFF; font-size: 15px; font-weight: 700; margin: 16px 0 4px 0; letter-spacing: 0.02em;">${nombre}</p>
+                          <p style="color: rgba(255,255,255,0.4); font-size: 11px; margin: 0; font-style: italic;">Este número es tu identificador oficial en la competencia</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="background: rgba(228,44,44,0.05); border-top: 1px solid rgba(228,44,44,0.2); padding: 12px 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td>
+                          <p style="color: rgba(255,255,255,0.5); font-size: 9px; margin: 0; line-height: 1.4;">${sedeNombre}<br><strong style="color: #E42C2C;">Copa Scott DHMEXRACES 2026</strong></p>
+                        </td>
+                        <td align="right">
+                          <div style="background: #FFFFFF; border-radius: 5px; padding: 5px 8px; display: inline-block;">
+                            <img src="${ASSETS.logo}" alt="DHMEXRACES" style="height: 22px; display: block;">
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <tr><td style="height: 32px;"></td></tr>
+          ` : ''}
+
+          <!-- ═══════════════════════════════════════════════ -->
+          <!-- BOLETO DE RIFA FOX 40 (solo si tiene boleto) -->
+          <!-- ═══════════════════════════════════════════════ -->
+          ${raffleNumber ? `
           <tr>
             <td>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #1a1a1a 0%, #0d0d0d 100%); border-radius: 16px; overflow: hidden; border: 2px solid #FF6B00;">
@@ -683,6 +877,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
           </tr>
 
           <tr><td style="height: 32px;"></td></tr>
+          ` : ''}
 
           <!-- ═══════════════════════════════════════════════ -->
           <!-- TU INSCRIPCIÓN INCLUYE -->
@@ -717,19 +912,19 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     <strong>Más de $100,000 MXN en premios por sede</strong>
                   </td>
                 </tr>
+                ${raffleNumber ? `
                 <tr>
                   <td style="padding: 8px 0; color: rgba(255,255,255,0.8); font-size: 14px;">
                     <span style="color: #FF6B00; margin-right: 8px;">✓</span>
                     <strong>1 Boleto para Rifa FOX 40</strong> - Sorteo en vivo Sede Puebla
                   </td>
                 </tr>
+                ` : ''}
               </table>
             </td>
           </tr>
 
-          <!-- ═══════════════════════════════════════════════ -->
-          <!-- MECÁNICA NEUTRAL SHIMANO -->
-          <!-- ═══════════════════════════════════════════════ -->
+          <!-- DESACTIVADO - Shimano ya no es patrocinador
           <tr>
             <td style="background: linear-gradient(135deg, rgba(0,102,179,0.15) 0%, rgba(0,102,179,0.05) 100%); border: 1px solid rgba(0,102,179,0.3); border-radius: 12px; padding: 24px; margin-bottom: 16px;">
               <h3 style="color: #0066B3; font-size: 14px; font-weight: 700; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.1em;">
@@ -743,6 +938,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
               </p>
             </td>
           </tr>
+          -->
 
           <tr><td style="height: 16px;"></td></tr>
 
@@ -821,7 +1017,9 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       <tr>
                         <td align="center" style="text-align: center;">
                           <img src="https://endhurorace.com/cdn/shop/files/SCOTTLOGO.png?v=1763690514&width=600" alt="Scott" class="mobile-logo" style="height: 65px; max-width: 45%; margin: 4px 8px; vertical-align: middle;">
+                          <!-- DESACTIVADO - Shimano ya no es patrocinador
                           <img src="https://endhurorace.com/cdn/shop/files/SHIMANOLOGO.png?v=1763606659&width=600" alt="Shimano" class="mobile-logo" style="height: 40px; max-width: 45%; margin: 4px 8px; vertical-align: middle;">
+                          -->
                         </td>
                       </tr>
                     </table>
@@ -843,7 +1041,6 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                           <img src="https://endhurorace.com/cdn/shop/files/FOXLOGO.png?v=1763606761&width=400" alt="Fox" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/GIROLOGO.png?v=1763690436&width=400" alt="Giro" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/VITTORIALOGO.webp?v=1763690758&width=400" alt="Vittoria" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
-                          <img src="https://endhurorace.com/cdn/shop/files/LAZERLOGO.png?v=1763690460&width=400" alt="Lazer" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/ALPINELOGO.png?v=1763606851&width=400" alt="Alpine" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/RFLOGO.png?v=1763606866&width=400" alt="RF" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
                           <img src="https://endhurorace.com/cdn/shop/files/SYNCROSSLOGO.png?v=1763606881&width=400" alt="Syncross" class="mobile-logo-sm" style="height: 18px; max-width: 20%; margin: 4px 6px; vertical-align: middle;">
@@ -897,6 +1094,7 @@ async function processCorredor(corredor, order, orderDate) {
     email: corredor.email,
     checkInCode: null,
     raffleNumber: null,
+    runnerNumber: null,
     sheetResult: null,
     emailResult: null,
     skipped: false
@@ -907,7 +1105,7 @@ async function processCorredor(corredor, order, orderDate) {
     const sheetName = getSheetNameFromProduct(corredor.product_title);
 
     // 2. VERIFICAR SI YA EXISTE (protección contra webhooks duplicados)
-    const existsCheck = await checkIfCorredorExists(orderNumber, corredor.email, sheetName);
+    const existsCheck = await checkIfCorredorExists(orderNumber, corredor.email, corredor.nombre, corredor.categoria || corredor.variant_title, sheetName);
 
     if (existsCheck.exists) {
       console.log(`⚠️ DUPLICADO: Corredor ${corredor.nombre} (Orden ${orderNumber}) ya existe. QR: ${existsCheck.existingCode}`);
@@ -916,9 +1114,18 @@ async function processCorredor(corredor, order, orderDate) {
       result.sheetResult = { success: true, skipped: true };
       result.emailResult = { status: 'skipped', reason: 'Duplicate - already processed' };
 
-      // Buscar el boleto de rifa existente
-      const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
-      result.raffleNumber = raffleResult.numero || '---';
+      // Buscar el boleto de rifa existente (solo si la orden NO es gratis)
+      const orderTotal = parseFloat(order.total_price || '0');
+      if (orderTotal > 0) {
+        const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
+        result.raffleNumber = raffleResult.numero || '---';
+      } else {
+        result.raffleNumber = null;
+      }
+
+      // Buscar número de corredor existente
+      const runnerResult = await assignRunnerNumber(corredor, orderNumber, orderDate, sheetName);
+      result.runnerNumber = runnerResult.numero || null;
 
       return result;
     }
@@ -927,13 +1134,25 @@ async function processCorredor(corredor, order, orderDate) {
     result.checkInCode = generateCheckInCode(sheetName);
     console.log(`🎫 Check-in: ${result.checkInCode}`);
 
-    // 4. Asignar boleto de rifa
-    const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
-    result.raffleNumber = raffleResult.numero || '---';
-    console.log(`🎰 Rifa: ${result.raffleNumber}`);
+    // 4. Asignar boleto de rifa (solo si la orden NO es gratis)
+    const orderTotal = parseFloat(order.total_price || '0');
+    if (orderTotal > 0) {
+      const raffleResult = await assignRaffleTicket(corredor, orderNumber, orderDate);
+      result.raffleNumber = raffleResult.numero || '---';
+      console.log(`🎰 Rifa: ${result.raffleNumber}`);
+    } else {
+      result.raffleNumber = null;
+      console.log(`🎰 Rifa: OMITIDA (orden gratis, total: $0)`);
+    }
 
-    // 5. Guardar en Google Sheets
-    result.sheetResult = await saveToGoogleSheets(corredor, orderNumber, orderDate, result.checkInCode);
+    // 5. Asignar número de corredor
+    const runnerResult = await assignRunnerNumber(corredor, orderNumber, orderDate, sheetName);
+    result.runnerNumber = runnerResult.numero || null;
+    console.log(`🏁 Número corredor: ${result.runnerNumber || 'N/A'}`);
+
+    // 6. Guardar en Google Sheets
+    const totalCorredores = order._totalCorredores || 1;
+    result.sheetResult = await saveToGoogleSheets(corredor, orderNumber, orderDate, result.checkInCode, orderTotal, totalCorredores);
 
     // Si fue skipped en el guardado (duplicado detectado ahí también), no enviar email
     if (result.sheetResult.skipped) {
@@ -943,7 +1162,7 @@ async function processCorredor(corredor, order, orderDate) {
       return result;
     }
 
-    // 6. Enviar email (si tiene email y no es duplicado)
+    // 7. Enviar email (si tiene email y no es duplicado)
     if (!corredor.email) {
       console.log(`⚠️ Corredor sin email: ${corredor.nombre}`);
       result.emailResult = { status: 'skipped', reason: 'No email provided' };
@@ -954,7 +1173,7 @@ async function processCorredor(corredor, order, orderDate) {
       from: EMAIL_CONFIG.from,
       to: corredor.email,
       subject: `${EMAIL_CONFIG.subjectPrefix} - ${corredor.categoria || corredor.variant_title} | DHMEXRACES 2026`,
-      html: generateEmailHTML(corredor, orderNumber, corredor.product_title, result.checkInCode, result.raffleNumber),
+      html: generateEmailHTML(corredor, orderNumber, corredor.product_title, result.checkInCode, result.raffleNumber, result.runnerNumber),
     });
 
     if (error) {
@@ -971,6 +1190,160 @@ async function processCorredor(corredor, order, orderDate) {
   }
 
   return result;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// GESTIÓN AUTOMÁTICA DEL DESCUENTO DE JERSEY
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Ejecuta una query/mutation GraphQL en la Shopify Admin API
+ * @param {string} query - Query o mutation GraphQL
+ * @returns {Promise<Object>} Respuesta de la API
+ */
+function shopifyGraphQL(query) {
+  return new Promise((resolve, reject) => {
+    const postData = JSON.stringify({ query });
+    const options = {
+      hostname: JERSEY_DISCOUNT_CONFIG.shop,
+      port: 443,
+      path: `/admin/api/${JERSEY_DISCOUNT_CONFIG.apiVersion}/graphql.json`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Shopify-Access-Token': (process.env.SHOPIFY_ADMIN_TOKEN || '').trim(),
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.on('data', (chunk) => data += chunk);
+      res.on('end', () => {
+        try {
+          resolve(JSON.parse(data));
+        } catch (e) {
+          reject(new Error('Failed to parse Shopify response: ' + data));
+        }
+      });
+    });
+
+    req.on('error', reject);
+    req.write(postData);
+    req.end();
+  });
+}
+
+/**
+ * Actualiza el descuento de jersey basándose en el conteo del Sheets
+ *
+ * 1. Cuenta inscritos pagados (PAGO ≠ "patrocinado") en la hoja de la sede
+ * 2. Calcula jerseys restantes (máx 50 - pagados)
+ * 3. Si restantes > 0: actualiza usesPerOrderLimit y asegura que esté activo
+ * 4. Si restantes ≤ 0: desactiva el descuento
+ *
+ * @param {string} sheetName - Nombre de la hoja de la sede (ej: GUANAJUATO)
+ * @returns {Promise<{success: boolean, remaining: number, action: string}>}
+ */
+async function updateJerseyDiscount(sheetName) {
+  try {
+    if (!process.env.SHOPIFY_ADMIN_TOKEN) {
+      console.log('⚠️ SHOPIFY_ADMIN_TOKEN no configurado, omitiendo actualización de descuento');
+      return { success: false, remaining: -1, action: 'skipped_no_token' };
+    }
+
+    console.log('🎽 Actualizando descuento de jersey...');
+
+    // 1. Contar inscritos pagados desde Google Sheets
+    const doc = await connectToGoogleSheets();
+    const sheet = doc.sheetsByTitle[sheetName];
+
+    if (!sheet) {
+      console.error(`❌ Hoja "${sheetName}" no encontrada para conteo de jersey`);
+      return { success: false, remaining: -1, action: 'sheet_not_found' };
+    }
+
+    const rows = await sheet.getRows();
+    const paidCount = rows.filter(row => {
+      if (!row.NOMBRE || row.NOMBRE.trim() === '') return false;
+      const pago = (row.PAGO || '').trim().toLowerCase();
+      if (pago === 'patrocinado') return false;
+      return true;
+    }).length;
+
+    const remaining = JERSEY_DISCOUNT_CONFIG.maxJerseys - paidCount;
+    console.log(`   Pagados: ${paidCount} | Restantes: ${remaining}/${JERSEY_DISCOUNT_CONFIG.maxJerseys}`);
+
+    // 2. Obtener estado actual del descuento
+    const statusResult = await shopifyGraphQL(`{
+      automaticDiscountNode(id: "${JERSEY_DISCOUNT_CONFIG.discountId}") {
+        automaticDiscount {
+          ... on DiscountAutomaticBxgy { status }
+        }
+      }
+    }`);
+
+    const currentStatus = statusResult?.data?.automaticDiscountNode?.automaticDiscount?.status;
+    console.log(`   Estado actual del descuento: ${currentStatus}`);
+
+    // 3. Actualizar según restantes
+    if (remaining <= 0) {
+      // Desactivar el descuento
+      if (currentStatus === 'ACTIVE') {
+        const deactivateResult = await shopifyGraphQL(`mutation {
+          discountAutomaticDeactivate(id: "${JERSEY_DISCOUNT_CONFIG.discountId}") {
+            userErrors { field message }
+          }
+        }`);
+
+        const errors = deactivateResult?.data?.discountAutomaticDeactivate?.userErrors || [];
+        if (errors.length > 0) {
+          console.error('❌ Error desactivando descuento:', JSON.stringify(errors));
+          return { success: false, remaining, action: 'deactivate_error' };
+        }
+
+        console.log('🔴 Descuento DESACTIVADO - Se alcanzó el límite de jerseys');
+      } else {
+        console.log('🔴 Descuento ya estaba inactivo');
+      }
+
+      return { success: true, remaining: 0, action: 'deactivated' };
+
+    } else {
+      // Actualizar usesPerOrderLimit con los restantes
+      const updateResult = await shopifyGraphQL(`mutation {
+        discountAutomaticBxgyUpdate(
+          id: "${JERSEY_DISCOUNT_CONFIG.discountId}"
+          automaticBxgyDiscount: { usesPerOrderLimit: "${remaining}" }
+        ) {
+          userErrors { field message }
+        }
+      }`);
+
+      const updateErrors = updateResult?.data?.discountAutomaticBxgyUpdate?.userErrors || [];
+      if (updateErrors.length > 0) {
+        console.error('❌ Error actualizando descuento:', JSON.stringify(updateErrors));
+        return { success: false, remaining, action: 'update_error' };
+      }
+
+      // Si estaba desactivado, reactivarlo
+      if (currentStatus !== 'ACTIVE') {
+        await shopifyGraphQL(`mutation {
+          discountAutomaticActivate(id: "${JERSEY_DISCOUNT_CONFIG.discountId}") {
+            userErrors { field message }
+          }
+        }`);
+        console.log('🟢 Descuento REACTIVADO');
+      }
+
+      console.log(`🟢 Descuento actualizado: máximo ${remaining} jerseys por orden`);
+      return { success: true, remaining, action: 'updated' };
+    }
+
+  } catch (error) {
+    console.error('❌ Error actualizando descuento de jersey:', error.message);
+    return { success: false, remaining: -1, action: 'error', error: error.message };
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1069,6 +1442,7 @@ module.exports = async function handler(req, res) {
     const orderDate = order.created_at || new Date().toISOString();
     const results = [];
 
+    order._totalCorredores = corredores.length;
     for (let i = 0; i < corredores.length; i++) {
       const corredor = corredores[i];
       console.log(`\n👤 Corredor ${i + 1}/${corredores.length}: ${corredor.nombre}`);
@@ -1099,6 +1473,27 @@ module.exports = async function handler(req, res) {
     console.log(`   ⚠️ Duplicados detectados: ${duplicatesDetected}`);
     console.log('═══════════════════════════════════════════════════════════════\n');
 
+    // Actualizar descuento de jersey basándose en el conteo del Sheets
+    let discountResult = null;
+    if (corredores.length > 0 && sheetsSuccess > 0) {
+      const sheetName = getSheetNameFromProduct(corredores[0].product_title);
+      discountResult = await updateJerseyDiscount(sheetName);
+      console.log(`🎽 Descuento: ${discountResult.action} (restantes: ${discountResult.remaining})`);
+    }
+
+    // Trigger sync finanzas (best effort, no await - don't block webhook response)
+    https.get('https://dhmexraces-webhooks.vercel.app/api/sync-finanzas', () => {})
+      .on('error', () => {});
+    console.log('💰 Sync finanzas triggered');
+
+    // Trigger formato de sheet (colores, estilos)
+    if (corredores.length > 0) {
+      const sede = getSheetNameFromProduct(corredores[0].product_title).toLowerCase();
+      https.get(`https://dhmexraces-webhooks.vercel.app/api/format-sheets?sede=${sede}`, () => {})
+        .on('error', () => {});
+      console.log('🎨 Format sheets triggered');
+    }
+
     return res.status(200).json({
       success: true,
       orderNumber: order.order_number || order.name,
@@ -1108,6 +1503,7 @@ module.exports = async function handler(req, res) {
       emailsError,
       savedToSheets: sheetsSuccess,
       duplicatesDetected,
+      discountUpdate: discountResult,
       results
     });
 

@@ -160,6 +160,58 @@ module.exports = (req, res) => {
       color: #fff;
     }
 
+    .btn-selector {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .selector-btn {
+      flex: 1;
+      min-width: 100px;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.4);
+      border: 2px solid rgba(255,255,255,0.15);
+      border-radius: 10px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: center;
+    }
+
+    .selector-btn:hover {
+      border-color: rgba(255,255,255,0.4);
+      color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+
+    .selector-btn.active {
+      border-color: #E42C2C;
+      background: rgba(228,44,44,0.15);
+      color: #fff;
+      box-shadow: 0 0 0 1px rgba(228,44,44,0.3);
+    }
+
+    .selector-btn.patrocinado-btn.active {
+      border-color: #22C55E;
+      background: rgba(34,197,94,0.15);
+      color: #22C55E;
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.3);
+    }
+
+    .precio-btn.active {
+      border-color: #FF6B00;
+      background: rgba(255,107,0,0.15);
+      color: #FF6B00;
+      box-shadow: 0 0 0 1px rgba(255,107,0,0.3);
+    }
+
+    #precioGroup.hidden {
+      display: none;
+    }
+
     .jersey-section {
       background: linear-gradient(135deg, rgba(34,197,94,0.1) 0%, rgba(34,197,94,0.05) 100%);
       border: 1px solid rgba(34,197,94,0.3);
@@ -439,10 +491,23 @@ module.exports = (req, res) => {
 
           <div class="form-group">
             <label>Metodo de Pago *</label>
-            <select id="tipo_pago" required>
-              <option value="deposito">Precio Normal - Deposito $1500</option>
-              <option value="patrocinado">Patrocinado - Sin Costo</option>
-            </select>
+            <div class="btn-selector" id="metodoPagoSelector">
+              <button type="button" class="selector-btn" data-value="deposito" onclick="selectMetodoPago(this)">Deposito</button>
+              <button type="button" class="selector-btn" data-value="transferencia" onclick="selectMetodoPago(this)">Transferencia</button>
+              <button type="button" class="selector-btn" data-value="efectivo" onclick="selectMetodoPago(this)">Efectivo</button>
+              <button type="button" class="selector-btn patrocinado-btn" data-value="patrocinado" onclick="selectMetodoPago(this)">Patrocinado</button>
+            </div>
+            <input type="hidden" id="tipo_pago" required>
+          </div>
+
+          <div class="form-group" id="precioGroup">
+            <label>Monto *</label>
+            <div class="btn-selector" id="precioSelector">
+              <button type="button" class="selector-btn precio-btn" data-value="1300" onclick="selectPrecio(this)">$1,300</button>
+              <button type="button" class="selector-btn precio-btn" data-value="1500" onclick="selectPrecio(this)">$1,500</button>
+              <button type="button" class="selector-btn precio-btn" data-value="1800" onclick="selectPrecio(this)">$1,800</button>
+            </div>
+            <input type="hidden" id="monto_pago" required>
           </div>
         </div>
 
@@ -472,6 +537,33 @@ module.exports = (req, res) => {
   <script>
     let adminPassword = '';
     let jerseyDisponible = false;
+
+    function selectMetodoPago(btn) {
+      document.querySelectorAll('#metodoPagoSelector .selector-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const value = btn.dataset.value;
+      document.getElementById('tipo_pago').value = value;
+
+      const precioGroup = document.getElementById('precioGroup');
+      if (value === 'patrocinado') {
+        precioGroup.classList.add('hidden');
+        document.getElementById('monto_pago').value = '0';
+        // Deselect precio buttons
+        document.querySelectorAll('#precioSelector .selector-btn').forEach(b => b.classList.remove('active'));
+      } else {
+        precioGroup.classList.remove('hidden');
+        // If no price selected yet, clear it
+        if (!document.getElementById('monto_pago').value || document.getElementById('monto_pago').value === '0') {
+          document.getElementById('monto_pago').value = '';
+        }
+      }
+    }
+
+    function selectPrecio(btn) {
+      document.querySelectorAll('#precioSelector .selector-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('monto_pago').value = btn.dataset.value;
+    }
 
     function login() {
       const password = document.getElementById('passwordInput').value;
@@ -524,6 +616,19 @@ module.exports = (req, res) => {
     async function submitForm(event) {
       event.preventDefault();
 
+      const tipoPago = document.getElementById('tipo_pago').value;
+      const montoPago = document.getElementById('monto_pago').value;
+
+      if (!tipoPago) {
+        alert('Selecciona un metodo de pago');
+        return;
+      }
+
+      if (tipoPago !== 'patrocinado' && !montoPago) {
+        alert('Selecciona el monto del pago');
+        return;
+      }
+
       const btn = document.getElementById('submitBtn');
       btn.disabled = true;
       btn.textContent = 'Procesando...';
@@ -543,7 +648,8 @@ module.exports = (req, res) => {
         sede: document.getElementById('sede').value,
         categoria: document.getElementById('categoria').value,
         talla_playera: tallaEl ? tallaEl.value : '',
-        tipo_pago: document.getElementById('tipo_pago').value
+        tipo_pago: tipoPago,
+        monto_pago: tipoPago === 'patrocinado' ? 0 : parseInt(montoPago)
       };
 
       try {
@@ -591,6 +697,11 @@ module.exports = (req, res) => {
       document.getElementById('result').className = 'result';
       document.getElementById('jerseyContainer').innerHTML = '<p class="jersey-info">Selecciona una sede para verificar disponibilidad...</p>';
       jerseyDisponible = false;
+      // Reset button selectors
+      document.querySelectorAll('.selector-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tipo_pago').value = '';
+      document.getElementById('monto_pago').value = '';
+      document.getElementById('precioGroup').classList.remove('hidden');
     }
   </script>
 
