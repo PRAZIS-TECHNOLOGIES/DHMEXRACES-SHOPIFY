@@ -213,7 +213,7 @@
         </svg>
         <h2>Tu carrito está vacío</h2>
         <p>Agrega inscripciones para continuar</p>
-        <a href="/products/inscripcion-guanajuato-2026" class="cart-custom__empty-button">
+        <a href="/products/inscripcion-sede-2-guadalajara" class="cart-custom__empty-button">
           Ver Inscripciones
         </a>
       </div>
@@ -380,8 +380,49 @@
       // Calculate total promo jerseys quantity
       const totalPromoJerseys = promoJerseys.reduce((total, item) => total + item.quantity, 0);
 
-      // Step 3: If quantities match and there's only 1 promo jersey line, we're good
-      if (promoJerseys.length === 1 && totalPromoJerseys === totalInscriptions) {
+      // Step 3: Check inventory FIRST - if jerseys are sold out, remove all promos
+      // Detect sede from inscription items in cart (not from API inscritos count)
+      let inventoryDisponibles = null;
+      try {
+        let detectedSede = 'guanajuato';
+        const inscriptionItems = cart.items.filter(item => isInscriptionItem(item));
+        for (const item of inscriptionItems) {
+          const title = (item.product_title || item.title || '').toLowerCase();
+          if (title.includes('guadalajara')) { detectedSede = 'guadalajara'; break; }
+          else if (title.includes('puebla')) { detectedSede = 'puebla'; break; }
+          else if (title.includes('ixtapan')) { detectedSede = 'ixtapan'; break; }
+          else if (title.includes('taxco')) { detectedSede = 'taxco'; break; }
+          else if (title.includes('guanajuato')) { detectedSede = 'guanajuato'; break; }
+        }
+        const invResponse = await fetch('https://dhmexraces-webhooks.vercel.app/api/inventory');
+        const invData = await invResponse.json();
+        inventoryDisponibles = invData.sedes?.[detectedSede]?.playeras?.disponibles ?? 50;
+      } catch (invErr) {
+        console.error('Error fetching inventory:', invErr);
+      }
+
+      // If jerseys are sold out, remove ALL promo jerseys regardless of quantities
+      if (inventoryDisponibles !== null && inventoryDisponibles <= 0 && totalPromoJerseys > 0) {
+        console.log('Jerseys AGOTADAS - removing all promo jerseys from cart');
+        while (promoJerseys.length > 0) {
+          const jersey = promoJerseys[0];
+          const jerseyLine = cart.items.indexOf(jersey) + 1;
+          await fetch('/cart/change.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ line: jerseyLine, quantity: 0 })
+          });
+          await new Promise(r => setTimeout(r, 150));
+          cartResponse = await fetch('/cart.js');
+          cart = await cartResponse.json();
+          promoJerseys = cart.items.filter(item => isPromoJersey(item));
+        }
+        location.reload();
+        return;
+      }
+
+      // Step 3b: If quantities match and inventory is available, we're good
+      if (promoJerseys.length === 1 && totalPromoJerseys === totalInscriptions && inventoryDisponibles > 0) {
         console.log('Promo jerseys already synced correctly');
         return;
       }
@@ -430,17 +471,10 @@
         promoJerseys = cart.items.filter(item => isPromoJersey(item));
       }
 
-      // Step 7: Fetch inventory to cap jersey quantity
+      // Step 7: Use inventory data already fetched in Step 3 to cap jersey quantity
       let jerseyQty = totalInscriptions;
-      try {
-        const invResponse = await fetch('https://dhmexraces-webhooks.vercel.app/api/inventory');
-        const invData = await invResponse.json();
-        // Use first sede with inscritos, default to guanajuato
-        const sedeKey = Object.keys(invData.sedes || {}).find(s => invData.sedes[s].inscritos > 0) || 'guanajuato';
-        const disponibles = invData.sedes?.[sedeKey]?.playeras?.disponibles ?? 50;
-        jerseyQty = Math.min(totalInscriptions, disponibles);
-      } catch (invErr) {
-        console.error('Error fetching inventory for jersey cap:', invErr);
+      if (inventoryDisponibles !== null) {
+        jerseyQty = Math.min(totalInscriptions, inventoryDisponibles);
       }
 
       // Step 8: Add ONE promo jersey with the capped quantity

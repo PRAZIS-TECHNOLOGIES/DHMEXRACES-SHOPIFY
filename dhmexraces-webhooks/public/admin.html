@@ -242,13 +242,7 @@
 
     /* Result */
     .result { display: none; margin-top: 16px; }
-    .result.success {
-      display: block;
-      background: var(--green-bg);
-      border: 1px solid var(--green-border);
-      border-radius: var(--radius);
-      padding: 24px;
-    }
+    .result.success { display: block; }
     .result.error {
       display: block;
       background: var(--red-bg);
@@ -256,33 +250,143 @@
       border-radius: var(--radius);
       padding: 24px;
     }
-    .result h4 { font-size: 15px; margin-bottom: 12px; }
-    .result.success h4 { color: var(--green); }
-    .result.error h4 { color: var(--red); }
-    .result p { font-size: 14px; color: var(--text-2); margin: 6px 0; }
-    .result .code {
-      font-family: 'SF Mono', 'Consolas', monospace;
-      font-size: 14px;
+    .result.error h4 { font-size: 15px; margin-bottom: 12px; color: var(--red); }
+    .result.error p { font-size: 14px; color: var(--text-2); margin: 6px 0; }
+
+    /* Success card - identical to check-in rider card */
+    .rider-card { padding: 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); }
+    .number-section {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .number-block { text-align: left; }
+    .number-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .number-value {
+      font-size: 56px;
+      font-weight: 900;
       color: var(--text);
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .cat-badge {
+      display: inline-block;
+      padding: 4px 12px;
       background: var(--bg);
       border: 1px solid var(--border);
-      padding: 4px 10px;
       border-radius: 6px;
-      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 8px;
+    }
+    .rider-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .rider-order {
+      font-size: 13px;
+      color: var(--text-3);
+      margin-bottom: 20px;
+    }
+    .badges-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .badge-rifa {
+      background: var(--bg);
+      color: var(--text-2);
+      border: 1px solid var(--border);
+    }
+    .badge-email-ok {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green-border);
+    }
+    .badge-email-err {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1px solid var(--red-border);
+    }
+    .details-section {
+      margin-bottom: 20px;
+    }
+    .details-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 500px) {
+      .details-grid { grid-template-columns: 1fr; }
+    }
+    .detail-label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-3);
+      margin-bottom: 2px;
+    }
+    .detail-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
     }
     .new-btn {
-      margin-top: 16px;
-      padding: 10px 20px;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-sm);
+      width: 100%;
+      padding: 16px;
+      background: var(--green);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius);
       font-family: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--text-2);
+      font-size: 15px;
+      font-weight: 700;
       cursor: pointer;
+      transition: background 0.15s;
+      margin-top: 8px;
     }
-    .new-btn:hover { background: var(--bg); }
+    .new-btn:hover { opacity: 0.9; }
+    .new-btn-sub {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
 
     .hidden { display: none !important; }
 
@@ -386,19 +490,19 @@
               <label>Categoria *</label>
               <select id="categoria" required>
                 <option value="">Selecciona...</option>
-                <option value="Minis">Minis</option>
-                <option value="Infantil">Infantil</option>
-                <option value="Cadetes">Cadetes</option>
-                <option value="Junior">Junior</option>
-                <option value="Senior">Senior</option>
-                <option value="Principiantes">Principiantes</option>
-                <option value="Master 30">Master 30</option>
-                <option value="Master 40">Master 40</option>
-                <option value="Master 50">Master 50</option>
-                <option value="Femenil">Femenil</option>
-                <option value="Pro Elite">Pro Elite</option>
-                <option value="Ebike">Ebike</option>
-                <option value="Ebike Full Power">Ebike Full Power</option>
+                <option value="MINIS">Minis</option>
+                <option value="INFANTIL">Infantil</option>
+                <option value="CADETES">Cadetes</option>
+                <option value="JUNIOR">Junior</option>
+                <option value="SENIOR">Senior</option>
+                <option value="PRINCIPIANTES">Principiantes</option>
+                <option value="MASTER 30">Master 30</option>
+                <option value="MASTER 40">Master 40</option>
+                <option value="MASTER 50">Master 50</option>
+                <option value="FEMENIL">Femenil</option>
+                <option value="PRO ELITE">Pro Elite</option>
+                <option value="EBIKE">Ebike</option>
+                <option value="EBIKE FULL POWER">Ebike Full Power</option>
               </select>
             </div>
           </div>
@@ -433,8 +537,8 @@
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label>Tipo de Sangre *</label>
-              <select id="tipo_sangre" required>
+              <label>Tipo de Sangre</label>
+              <select id="tipo_sangre">
                 <option value="">Selecciona...</option>
                 <option value="A+">A+</option><option value="A-">A-</option>
                 <option value="B+">B+</option><option value="B-">B-</option>
@@ -454,12 +558,12 @@
           <div class="card-title">Contacto de Emergencia</div>
           <div class="form-row">
             <div class="form-group">
-              <label>Nombre del Contacto *</label>
-              <input type="text" id="emergencia_nombre" required placeholder="Nombre completo">
+              <label>Nombre del Contacto</label>
+              <input type="text" id="emergencia_nombre" placeholder="Nombre completo">
             </div>
             <div class="form-group">
-              <label>Telefono del Contacto *</label>
-              <input type="tel" id="emergencia_telefono" required placeholder="5512345678">
+              <label>Telefono del Contacto</label>
+              <input type="tel" id="emergencia_telefono" placeholder="5512345678">
             </div>
           </div>
         </div>
@@ -506,7 +610,6 @@
       <div class="result" id="result">
         <h4 id="resultTitle"></h4>
         <div id="resultContent"></div>
-        <button class="new-btn" onclick="newRegistration()">+ Nueva Inscripcion</button>
       </div>
     </div>
 
@@ -555,6 +658,7 @@
       const password = document.getElementById('passwordInput').value;
       if (!password) return;
       adminPassword = password;
+      sessionStorage.setItem('adminPwd', password);
       document.getElementById('loginSection').style.display = 'none';
       document.getElementById('formSection').classList.add('active');
       document.getElementById('logoutBtn').classList.remove('hidden');
@@ -562,11 +666,23 @@
 
     function logout() {
       adminPassword = '';
+      sessionStorage.removeItem('adminPwd');
       document.getElementById('loginSection').style.display = '';
       document.getElementById('formSection').classList.remove('active');
       document.getElementById('logoutBtn').classList.add('hidden');
       document.getElementById('passwordInput').value = '';
     }
+
+    // Auto-login si ya tiene sesion
+    (function() {
+      const saved = sessionStorage.getItem('adminPwd');
+      if (saved) {
+        adminPassword = saved;
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('formSection').classList.add('active');
+        document.getElementById('logoutBtn').classList.remove('hidden');
+      }
+    })();
 
     async function checkJerseyAvailability() {
       const sede = document.getElementById('sede').value;
@@ -665,24 +781,89 @@
 
         if (data.success) {
           resultDiv.className = 'result success';
-          resultTitle.textContent = 'Inscripcion exitosa';
+          resultTitle.style.display = 'none';
+          const emailOk = data.email.status === 'sent';
+          const f = id => (document.getElementById(id) || {}).value || '';
+          const numPad = data.runnerNumber ? String(data.runnerNumber).padStart(3, '0') : '---';
           resultContent.innerHTML = `
-            <p><strong>Corredor:</strong> ${data.corredor.nombre}</p>
-            <p><strong>Orden:</strong> <span class="code">${data.orderNumber}</span></p>
-            <p><strong>Codigo QR:</strong> <span class="code">${data.checkInCode}</span></p>
-            <p><strong>Numero:</strong> <span class="code">#${data.runnerNumber || 'N/A'}</span></p>
-            <p><strong>Boleto Rifa:</strong> <span class="code">#${data.raffleNumber || 'N/A'}</span></p>
-            <p><strong>Email:</strong> ${data.email.status === 'sent' ? 'Enviado' : 'Error: ' + (data.email.error || 'No enviado')}</p>
+            <div class="rider-card">
+              <div class="number-section">
+                <div class="number-block">
+                  <span class="number-label">Numero de corredor</span>
+                  <span class="number-value">${numPad}</span>
+                </div>
+                <span class="cat-badge">${data.corredor.categoria || '---'}</span>
+              </div>
+
+              <h2 class="rider-name">${data.corredor.nombre}</h2>
+              <p class="rider-order">Orden #${data.orderNumber}</p>
+
+              <div class="badges-row">
+                <span class="badge badge-rifa">Rifa #${data.raffleNumber || '---'}</span>
+                <span class="badge ${emailOk ? 'badge-email-ok' : 'badge-email-err'}">${emailOk ? 'Email enviado' : 'Email error'}</span>
+              </div>
+
+              <div class="details-section">
+                <div class="details-title">Datos personales</div>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">${data.corredor.email || f('email')}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Telefono</span>
+                    <span class="detail-value">${f('telefono')}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Fecha de nacimiento</span>
+                    <span class="detail-value">${f('fecha_nacimiento')}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Equipo</span>
+                    <span class="detail-value">${f('equipo') || '---'}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Pago</span>
+                    <span class="detail-value">${f('tipo_pago')}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Sede</span>
+                    <span class="detail-value">${(data.corredor.sede || '').toUpperCase()}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="details-section">
+                <div class="details-title">Contacto de emergencia</div>
+                <div class="details-grid">
+                  <div class="detail-item">
+                    <span class="detail-label">Nombre</span>
+                    <span class="detail-value">${f('emergencia_nombre')}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Telefono</span>
+                    <span class="detail-value">${f('emergencia_telefono')}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button class="new-btn" onclick="newRegistration()">
+                Inscribir Nuevo Corredor
+                <span class="new-btn-sub">Registrar otra inscripcion</span>
+              </button>
+            </div>
           `;
           document.getElementById('registrationForm').style.display = 'none';
         } else {
           resultDiv.className = 'result error';
+          resultTitle.style.display = '';
           resultTitle.textContent = 'Error';
           resultContent.innerHTML = `<p>${data.error || 'Error desconocido'}</p>`;
         }
       } catch (error) {
         const resultDiv = document.getElementById('result');
         resultDiv.className = 'result error';
+        document.getElementById('resultTitle').style.display = '';
         document.getElementById('resultTitle').textContent = 'Error de conexion';
         document.getElementById('resultContent').innerHTML = `<p>${error.message}</p>`;
       }
@@ -695,6 +876,7 @@
       document.getElementById('registrationForm').reset();
       document.getElementById('registrationForm').style.display = '';
       document.getElementById('result').className = 'result';
+      document.getElementById('resultTitle').style.display = '';
       document.getElementById('jerseyContainer').innerHTML = '<p class="jersey-pending">Selecciona una sede para verificar disponibilidad</p>';
       jerseyDisponible = false;
       document.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('active'));

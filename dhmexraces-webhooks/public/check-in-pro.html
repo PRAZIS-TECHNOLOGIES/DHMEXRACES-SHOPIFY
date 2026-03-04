@@ -632,7 +632,7 @@
       <div class="divider"><span>o buscar manualmente</span></div>
 
       <div class="search-card card">
-        <input id="search-input" type="text" class="search-input" placeholder="Nombre, email, telefono o codigo QR..." autocomplete="off">
+        <input id="search-input" type="text" class="search-input" placeholder="Buscar por nombre..." autocomplete="off">
         <div id="search-results" class="search-results hidden"></div>
       </div>
     </div>
@@ -757,12 +757,63 @@
     let scanner = null;
     let cameraActive = false;
     let isProcessing = false;
-    let debounceTimer = null;
+    let allRunners = [];
+    let runnersLoaded = false;
 
     // ═══════════════════════════════════════════
     // ELEMENTS
     // ═══════════════════════════════════════════
     const $ = id => document.getElementById(id);
+
+    // ═══════════════════════════════════════════
+    // LOCAL CACHE - Load all runners once
+    // ═══════════════════════════════════════════
+    async function loadRunners() {
+      const sede = $('sede-select').value;
+      runnersLoaded = false;
+      try {
+        const res = await fetch(`${API}?action=runners&sede=${sede}`);
+        const data = await res.json();
+        if (data.success) {
+          allRunners = data.runners || [];
+          runnersLoaded = true;
+        }
+      } catch (e) {
+        console.error('Error loading runners:', e);
+      }
+    }
+
+    function normalizar(str) {
+      return (str || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    }
+
+    function searchLocal(q) {
+      const ql = normalizar(q);
+      if (ql.length < 2) return [];
+
+      const results = [];
+      for (const r of allRunners) {
+        if (normalizar(r.nombre).includes(ql)) {
+          results.push(r);
+          if (results.length >= 10) break;
+        }
+      }
+
+      results.sort((a, b) => {
+        const an = normalizar(a.nombre);
+        const bn = normalizar(b.nombre);
+        const aStarts = an.startsWith(ql) ? 0 : 1;
+        const bStarts = bn.startsWith(ql) ? 0 : 1;
+        return aStarts - bStarts;
+      });
+
+      return results;
+    }
+
+    function findByQR(qr) {
+      const qrUp = (qr || '').toUpperCase().trim();
+      return allRunners.find(r => (r.qrCode || '').toUpperCase().trim() === qrUp) || null;
+    }
 
     // ═══════════════════════════════════════════
     // CAMERA / QR SCANNER
@@ -807,15 +858,14 @@
       if (isProcessing) return;
       if (navigator.vibrate) navigator.vibrate(100);
       playSound('scan');
-      searchRider(text.trim());
+      handleQRSearch(text.trim());
     }
 
     // ═══════════════════════════════════════════
-    // SEARCH
+    // SEARCH (100% local - instant)
     // ═══════════════════════════════════════════
     $('search-input').addEventListener('input', function() {
       const q = this.value.trim();
-      clearTimeout(debounceTimer);
 
       if (q.length < 2) {
         $('search-results').classList.add('hidden');
@@ -823,44 +873,59 @@
       }
 
       if (/^DHMEX-/i.test(q) && q.length > 10) {
-        searchRider(q);
+        handleQRSearch(q);
         return;
       }
 
-      showSearchLoading();
-      debounceTimer = setTimeout(() => searchByName(q), 300);
+      const results = searchLocal(q);
+      if (results.length === 0) {
+        $('search-results').innerHTML = '<div class="search-no-results">Sin resultados</div>';
+        $('search-results').classList.remove('hidden');
+      } else {
+        renderSearchResults(results);
+      }
     });
 
     $('search-input').addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
         const q = this.value.trim();
-        if (q) searchRider(q);
+        if (!q) return;
+        if (/^DHMEX-/i.test(q)) {
+          handleQRSearch(q);
+        } else {
+          const results = searchLocal(q);
+          if (results.length === 1) {
+            currentRider = results[0];
+            renderRider(currentRider);
+            $('search-results').classList.add('hidden');
+            $('search-input').value = currentRider.nombre;
+            playSound(currentRider.checkedIn ? 'warning' : 'found');
+          } else if (results.length > 1) {
+            renderSearchResults(results);
+          } else {
+            showError('No encontrado', 'No se encontro ningun corredor con ese nombre');
+            playSound('error');
+          }
+        }
       }
     });
 
-    function showSearchLoading() {
-      const container = $('search-results');
-      container.innerHTML = '<div class="search-loading"><div class="dot-loader"><span></span><span></span><span></span></div>Buscando...</div>';
-      container.classList.remove('hidden');
-    }
+    function handleQRSearch(qr) {
+      if (isProcessing) return;
+      isProcessing = true;
+      $('search-results').classList.add('hidden');
 
-    async function searchByName(q) {
-      const sede = $('sede-select').value;
-      try {
-        const res = await fetch(`${API}?action=search&q=${encodeURIComponent(q)}&sede=${sede}`);
-        const data = await res.json();
-
-        if (!data.success || data.count === 0) {
-          $('search-results').innerHTML = '<div class="search-no-results">Sin resultados</div>';
-          return;
-        }
-
-        renderSearchResults(data.results);
-      } catch (err) {
-        console.error('Search error:', err);
-        $('search-results').innerHTML = '<div class="search-no-results">Error de conexion</div>';
+      const found = findByQR(qr);
+      if (found) {
+        currentRider = found;
+        renderRider(found);
+        playSound(found.checkedIn ? 'warning' : 'found');
+      } else {
+        showError('No encontrado', 'El codigo QR no esta registrado');
+        playSound('error');
       }
+      isProcessing = false;
     }
 
     function renderSearchResults(results) {
@@ -890,54 +955,6 @@
       }
 
       container.classList.remove('hidden');
-    }
-
-    async function searchRider(q) {
-      if (isProcessing) return;
-      isProcessing = true;
-
-      showState('loading');
-      $('search-results').classList.add('hidden');
-
-      const sede = $('sede-select').value;
-
-      try {
-        const res = await fetch(`${API}?action=search&q=${encodeURIComponent(q)}&sede=${sede}`);
-        const data = await res.json();
-
-        if (!data.success) {
-          showError('Error', data.error || 'Error al buscar');
-          playSound('error');
-          isProcessing = false;
-          return;
-        }
-
-        if (data.count === 0) {
-          showError('No encontrado', 'No se encontro ningun corredor con esa busqueda');
-          playSound('error');
-          isProcessing = false;
-          return;
-        }
-
-        if (data.count === 1) {
-          currentRider = data.results[0];
-          renderRider(currentRider);
-          if (currentRider.checkedIn) {
-            playSound('warning');
-          } else {
-            playSound('found');
-          }
-        } else {
-          renderSearchResults(data.results);
-          showState('empty');
-        }
-      } catch (err) {
-        console.error('Search error:', err);
-        showError('Error de conexion', 'No se pudo conectar con el servidor');
-        playSound('error');
-      }
-
-      isProcessing = false;
     }
 
     // ═══════════════════════════════════════════
@@ -1045,6 +1062,12 @@
         showSuccess(data.runner.nombre, `#${(data.runner.runnerNumber || '').padStart(3, '0')} / ${data.runner.categoria}`);
         loadStats();
 
+        // Update local cache: mark rider as checked in
+        if (currentRider) {
+          currentRider.checkedIn = true;
+          currentRider.checkInTime = data.checkInTime;
+        }
+
         setTimeout(() => {
           resetForNext();
         }, 2500);
@@ -1107,6 +1130,7 @@
     $('sede-select').addEventListener('change', () => {
       resetForNext();
       loadStats();
+      loadRunners();
     });
 
     // ═══════════════════════════════════════════
@@ -1173,8 +1197,10 @@
     // ═══════════════════════════════════════════
     // INIT
     // ═══════════════════════════════════════════
+    loadRunners();
     loadStats();
     setInterval(loadStats, 30000);
+    setInterval(loadRunners, 60000);
     $('search-input').focus();
 
     document.addEventListener('click', (e) => {

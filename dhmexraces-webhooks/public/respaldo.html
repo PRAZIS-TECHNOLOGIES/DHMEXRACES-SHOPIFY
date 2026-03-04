@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Respaldo Inscritos - DHMEXRACES GTO</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @page {
+      size: letter landscape;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f5f5f5;
+      color: #000;
+    }
+
+    /* === CONTROLS === */
+    .controls {
+      max-width: 1200px;
+      margin: 20px auto 0;
+      padding: 16px 24px;
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .controls h1 { font-size: 16px; font-weight: 900; letter-spacing: 0.5px; }
+
+    .controls-right { display: flex; align-items: center; gap: 16px; }
+
+    .count { font-size: 13px; color: rgba(255,255,255,0.7); }
+    .count span { color: #E42C2C; font-weight: 900; font-size: 18px; }
+
+    .btn {
+      padding: 8px 20px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .btn-print { background: #E42C2C; color: #fff; }
+    .btn-print:hover { background: #ff3b3b; }
+
+    .search-bar {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      background: #fff;
+      display: flex;
+      gap: 10px;
+      border-bottom: 2px solid #000;
+    }
+
+    .search-bar input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      font-size: 13px;
+      font-family: inherit;
+      border-radius: 5px;
+    }
+    .search-bar input:focus { outline: none; border-color: #E42C2C; }
+
+    .search-bar select {
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: 600;
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    /* === TABLE === */
+    .table-wrap {
+      max-width: 1200px;
+      margin: 0 auto 30px;
+      background: #fff;
+      overflow-x: auto;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+
+    thead { background: #1a1a1a; color: #fff; }
+
+    th {
+      padding: 10px 6px;
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+      white-space: nowrap;
+      border-bottom: 3px solid #E42C2C;
+    }
+
+    td {
+      padding: 7px 6px;
+      font-size: 11px;
+      border-bottom: 1px solid #eee;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) { background: #fafafa; }
+    tbody tr:hover { background: #fff3f3; }
+
+    /* Columnas clave */
+    .col-num {
+      font-weight: 900;
+      font-size: 15px;
+      text-align: center;
+      color: #E42C2C;
+      min-width: 40px;
+    }
+
+    .col-orden {
+      font-weight: 700;
+      font-size: 11px;
+      text-align: center;
+      color: #666;
+    }
+
+    .col-nombre {
+      font-weight: 700;
+      font-size: 12px;
+      min-width: 160px;
+    }
+
+    .col-cat {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .col-equipo { font-size: 11px; color: #333; }
+
+    .col-tel { font-size: 11px; font-family: monospace; }
+
+    .col-jersey {
+      font-weight: 700;
+      font-size: 10px;
+      text-align: center;
+    }
+
+    .col-pago {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 9px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .pago-shopify { background: #d4edda; color: #155724; }
+    .pago-deposito { background: #fff3cd; color: #856404; }
+    .pago-patrocinado { background: #e2d4f0; color: #4a1d96; }
+    .pago-otro { background: #d1ecf1; color: #0c5460; }
+
+    .col-sangre { font-weight: 700; text-align: center; font-size: 11px; }
+
+    .col-rifa { font-weight: 800; color: #FF6B00; text-align: center; font-size: 12px; }
+
+    .col-emergencia { font-size: 10px; color: #555; }
+
+    .col-checkin-si { color: #28a745; font-weight: 800; text-align: center; }
+    .col-checkin-no { color: #ccc; text-align: center; }
+
+    /* === PRINT HEADER === */
+    .print-header {
+      display: none;
+      padding: 12px 20px;
+      border-bottom: 3px solid #000;
+      margin-bottom: 4px;
+    }
+    .print-header h1 { font-size: 14px; font-weight: 900; }
+    .print-header p { font-size: 10px; color: #666; }
+
+    .loading-screen, .error-screen { max-width: 600px; margin: 80px auto; text-align: center; }
+    .loading-screen h2 { font-size: 18px; margin-bottom: 8px; }
+    .loading-screen p { color: #666; }
+    .error-screen { color: #dc3545; }
+
+    /* === PRINT === */
+    @media print {
+      body { background: #fff; padding: 0.3in 0.5in; }
+
+      .controls, .search-bar { display: none !important; }
+
+      .print-header { display: flex !important; justify-content: space-between; align-items: center; }
+
+      .table-wrap {
+        box-shadow: none;
+        max-width: 100%;
+        border-radius: 0;
+        margin: 0;
+        overflow: visible;
+      }
+
+      table { width: 100%; table-layout: fixed; }
+
+      thead {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      th {
+        font-size: 7px;
+        padding: 5px 3px;
+        letter-spacing: 0;
+      }
+
+      td {
+        font-size: 8px;
+        padding: 4px 3px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+
+      .col-num { font-size: 10px; }
+      .col-nombre { font-size: 9px; min-width: auto; }
+      .col-cat { font-size: 7px; padding: 1px 3px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .col-pago { font-size: 7px; padding: 1px 3px;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .col-tel { font-size: 8px; }
+      .col-emergencia { font-size: 7px; }
+      .col-rifa { font-size: 9px; }
+
+      tbody tr:nth-child(even) {
+        background: #f5f5f5;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <h2>Cargando inscritos...</h2>
+    <p>Obteniendo datos de GUANAJUATO</p>
+  </div>
+
+  <div class="error-screen" id="errorScreen" style="display:none;"></div>
+
+  <div class="controls" id="controls" style="display:none;">
+    <h1>RESPALDO INSCRITOS - GUANAJUATO 2026</h1>
+    <div class="controls-right">
+      <div class="count">Inscritos: <span id="totalCount">0</span></div>
+      <button class="btn btn-print" onclick="window.print()">Imprimir</button>
+    </div>
+  </div>
+
+  <div class="search-bar" id="searchBar" style="display:none;">
+    <input type="text" id="searchInput" placeholder="Buscar nombre, email, telefono, equipo, orden..." oninput="filtrar()">
+    <select id="filterCat" onchange="filtrar()">
+      <option value="">Todas las categorias</option>
+    </select>
+    <select id="filterPago" onchange="filtrar()">
+      <option value="">Todos los pagos</option>
+    </select>
+  </div>
+
+  <div class="table-wrap" id="tableWrap" style="display:none;">
+    <!-- Print-only header -->
+    <div class="print-header">
+      <h1>RESPALDO INSCRITOS - DHMEXRACES GUANAJUATO 2026</h1>
+      <p id="printDate"></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre Completo</th>
+          <th style="width:45px">No.</th>
+          <th style="width:90px">Categoria</th>
+          <th>Equipo</th>
+          <th style="width:100px">Telefono</th>
+          <th style="width:65px">Playera</th>
+          <th style="width:65px">Pago</th>
+          <th style="width:45px">Sangre</th>
+          <th style="width:35px">Rifa</th>
+          <th style="width:30px">CI</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const API_URL = '/api/check-in-pro';
+
+    function pagoClass(pago) {
+      if (!pago) return 'pago-otro';
+      const p = pago.toLowerCase();
+      if (p.includes('shopify')) return 'pago-shopify';
+      if (p.includes('deposito') || p.includes('transferencia')) return 'pago-deposito';
+      if (p.includes('patrocin')) return 'pago-patrocinado';
+      return 'pago-otro';
+    }
+
+    function pagoLabel(pago) {
+      if (!pago) return '-';
+      const p = pago.toLowerCase();
+      if (p.includes('shopify')) return 'Shopify';
+      if (p.includes('deposito')) return 'Deposito';
+      if (p.includes('transferencia')) return 'Transfer';
+      if (p.includes('patrocin')) return 'Patrocin.';
+      if (p.includes('efectivo')) return 'Efectivo';
+      return pago;
+    }
+
+    function renderRow(r) {
+      const search = [r.nombre, r.email, r.telefono, r.equipo, r.orden].join(' ').toLowerCase();
+      return `<tr class="rider-row" data-search="${search}" data-cat="${r.categoria || ''}" data-pago="${r.pago || ''}">
+        <td class="col-nombre">${r.nombre || '-'}</td>
+        <td class="col-num">${r.runnerNumber || '-'}</td>
+        <td><span class="col-cat">${r.categoria || '-'}</span></td>
+        <td class="col-equipo">${r.equipo || '-'}</td>
+        <td class="col-tel">${r.telefono || '-'}</td>
+        <td class="col-jersey">${r.jersey || '-'}</td>
+        <td><span class="col-pago ${pagoClass(r.pago)}">${pagoLabel(r.pago)}</span></td>
+        <td class="col-sangre">${r.tipoSangre || '-'}</td>
+        <td class="col-rifa">${r.raffleNumber || '-'}</td>
+        <td class="${r.checkedIn ? 'col-checkin-si' : 'col-checkin-no'}">${r.checkedIn ? 'SI' : '-'}</td>
+      </tr>`;
+    }
+
+    function filtrar() {
+      const search = document.getElementById('searchInput').value.toLowerCase();
+      const cat = document.getElementById('filterCat').value;
+      const pago = document.getElementById('filterPago').value;
+      document.querySelectorAll('.rider-row').forEach(row => {
+        const ok = (!search || row.dataset.search.includes(search))
+          && (!cat || row.dataset.cat === cat)
+          && (!pago || row.dataset.pago === pago);
+        row.style.display = ok ? '' : 'none';
+      });
+    }
+
+    async function cargar() {
+      try {
+        const res = await fetch(`${API_URL}?action=runners&sede=GUANAJUATO`);
+        const data = await res.json();
+
+        if (!data.success) {
+          document.getElementById('loadingScreen').style.display = 'none';
+          document.getElementById('errorScreen').style.display = 'block';
+          document.getElementById('errorScreen').innerHTML = `<h2>Error</h2><p>${data.error}</p>`;
+          return;
+        }
+
+        const runners = data.runners || [];
+        if (!runners.length) {
+          document.getElementById('loadingScreen').style.display = 'none';
+          document.getElementById('errorScreen').style.display = 'block';
+          document.getElementById('errorScreen').innerHTML = '<h2>Sin inscritos</h2>';
+          return;
+        }
+
+        // Filters
+        const cats = [...new Set(runners.map(r => r.categoria).filter(Boolean))].sort();
+        const pagos = [...new Set(runners.map(r => r.pago).filter(Boolean))].sort();
+
+        const catSel = document.getElementById('filterCat');
+        cats.forEach(c => { const o = document.createElement('option'); o.value = c; o.textContent = c; catSel.appendChild(o); });
+
+        const pagoSel = document.getElementById('filterPago');
+        pagos.forEach(p => { const o = document.createElement('option'); o.value = p; o.textContent = p; pagoSel.appendChild(o); });
+
+        // Render
+        document.getElementById('tableBody').innerHTML = runners.map(renderRow).join('');
+        document.getElementById('totalCount').textContent = runners.length;
+
+        // Print date
+        const now = new Date();
+        document.getElementById('printDate').textContent = 'Generado: ' + now.toLocaleDateString('es-MX') + ' ' + now.toLocaleTimeString('es-MX', {hour:'2-digit',minute:'2-digit'});
+
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('controls').style.display = 'flex';
+        document.getElementById('searchBar').style.display = 'flex';
+        document.getElementById('tableWrap').style.display = 'block';
+
+      } catch (err) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('errorScreen').style.display = 'block';
+        document.getElementById('errorScreen').innerHTML = `<h2>Error de conexion</h2><p>${err.message}</p>`;
+      }
+    }
+
+    cargar();
+  </script>
+
+</body>
+</html>

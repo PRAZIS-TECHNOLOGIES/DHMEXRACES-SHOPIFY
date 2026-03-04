@@ -91,6 +91,7 @@ function rowToRider(row, sede) {
     kitReady: isKitReady(row),
     emergenciaNombre: row['EMERGENCIA NOMBRE'] || '',
     emergenciaTel: row['EMERGENCIA TEL'] || '',
+    tipoSangre: row['TIPO DE SANGRE'] || '',
     runnerNumber: null,
     raffleNumber: null
   };
@@ -341,6 +342,7 @@ async function handleRunners(sede, status, doc) {
       kitReady: isKitReady(row),
       emergenciaNombre: row['EMERGENCIA NOMBRE'] || '',
       emergenciaTel: row['EMERGENCIA TEL'] || '',
+      tipoSangre: row['TIPO DE SANGRE'] || '',
       runnerNumber: lookupNumero(numMap, row.ORDEN || '', row.NOMBRE || '', row.CATEGORIA || ''),
       raffleNumber: lookupRifa(rifaMap, row.ORDEN || '', row.NOMBRE || '')
     });
@@ -359,10 +361,12 @@ async function handleRunners(sede, status, doc) {
 // ACTION: KIT-CONFIRM / KIT-UNDO
 // ═══════════════════════════════════════════════════════════════
 
-async function handleKit(qrCode, sede, markReady, doc) {
-  if (!qrCode) return { success: false, error: 'Código QR requerido' };
+async function handleKit(qrCode, sede, markReady, doc, nombre, orden) {
+  if (!qrCode && !orden && !nombre) {
+    return { success: false, error: 'Se requiere código QR o datos del corredor (orden + nombre)' };
+  }
 
-  const targetSede = sedeFromQR(qrCode) || sede;
+  const targetSede = (qrCode ? sedeFromQR(qrCode) : null) || sede;
   if (!targetSede || !SEDES.includes(targetSede)) {
     return { success: false, error: 'Sede no válida' };
   }
@@ -371,8 +375,23 @@ async function handleKit(qrCode, sede, markReady, doc) {
   if (!sheet) return { success: false, error: `Hoja "${targetSede}" no encontrada` };
 
   const rows = await sheet.getRows();
-  const qr = qrCode.toUpperCase().trim();
-  const row = rows.find(r => (r.QR_CODE || '').toUpperCase().trim() === qr);
+  let row = null;
+
+  // 1. Buscar por QR_CODE (método principal)
+  if (qrCode) {
+    const qr = qrCode.toUpperCase().trim();
+    row = rows.find(r => (r.QR_CODE || '').toUpperCase().trim() === qr);
+  }
+
+  // 2. Fallback: buscar por orden + nombre (para runners sin QR)
+  if (!row && orden) {
+    const ordenClean = orden.toString().trim().replace('#', '');
+    const nombreNorm = norm(nombre || '');
+    row = rows.find(r => {
+      const rowOrden = (r.ORDEN || '').toString().trim().replace('#', '');
+      return rowOrden === ordenClean && norm(r.NOMBRE) === nombreNorm;
+    });
+  }
 
   if (!row) return { success: false, error: 'Corredor no encontrado' };
 
@@ -444,7 +463,9 @@ module.exports = async (req, res) => {
         }
         const qrCode = (req.body && req.body.qrCode) || '';
         const sede = (req.body && req.body.sede || '').toUpperCase();
-        return res.json(await handleKit(qrCode, sede, true, doc));
+        const nombre = (req.body && req.body.nombre) || '';
+        const orden = (req.body && req.body.orden) || '';
+        return res.json(await handleKit(qrCode, sede, true, doc, nombre, orden));
       }
 
       case 'kit-undo': {
@@ -453,7 +474,9 @@ module.exports = async (req, res) => {
         }
         const qrCode = (req.body && req.body.qrCode) || '';
         const sede = (req.body && req.body.sede || '').toUpperCase();
-        return res.json(await handleKit(qrCode, sede, false, doc));
+        const nombre = (req.body && req.body.nombre) || '';
+        const orden = (req.body && req.body.orden) || '';
+        return res.json(await handleKit(qrCode, sede, false, doc, nombre, orden));
       }
 
       default:

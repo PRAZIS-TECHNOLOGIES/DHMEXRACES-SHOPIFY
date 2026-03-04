@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Responsivas - DHMEXRACES</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: letter;
+      margin: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5;
+      color: #000;
+      line-height: 1.6;
+    }
+
+    /* === CONTROLS (no print) === */
+    .controls {
+      max-width: 720px;
+      margin: 30px auto;
+      padding: 24px;
+      background: #fff;
+      border: 2px solid #000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .controls-info {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .controls-info span {
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .btn {
+      padding: 14px 32px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #000;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #333;
+    }
+
+    .loading-screen {
+      max-width: 720px;
+      margin: 80px auto;
+      text-align: center;
+    }
+
+    .loading-screen h2 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .loading-screen p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .error-screen {
+      max-width: 720px;
+      margin: 80px auto;
+      text-align: center;
+      color: #dc3545;
+    }
+
+    /* === EACH RESPONSIVA === */
+    .responsiva {
+      max-width: 720px;
+      margin: 20px auto;
+      background: #fff;
+      padding: 50px 55px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 8px 30px rgba(0,0,0,0.06);
+      page-break-after: always;
+      page-break-inside: avoid;
+    }
+
+    .responsiva:last-child {
+      page-break-after: auto;
+    }
+
+    .logo {
+      display: block;
+      height: 80px;
+      width: auto;
+      margin-bottom: 40px;
+    }
+
+    .legal {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+      line-height: 1.8;
+      text-align: left;
+    }
+
+    .legal p {
+      margin-bottom: 28px;
+    }
+
+    .nombre-valor {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* === FIELDS === */
+    .fields {
+      margin-top: 32px;
+    }
+
+    .field-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      align-items: flex-end;
+    }
+
+    .field-item {
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      flex: 1;
+    }
+
+    .field-item.full {
+      flex: none;
+      width: 100%;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .field-value {
+      flex: 1;
+      border-bottom: 1.5px solid #000;
+      min-width: 60px;
+      font-size: 13px;
+      font-weight: 600;
+      padding-left: 4px;
+      padding-bottom: 2px;
+    }
+
+    .fecha-evento {
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    /* === SIGNATURE === */
+    .signature-section {
+      margin-top: 50px;
+      text-align: center;
+    }
+
+    .signature-line {
+      width: 280px;
+      border-bottom: 1.5px solid #000;
+      margin: 0 auto 12px;
+      height: 40px;
+    }
+
+    .signature-text {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .signature-sub {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* === PRINT === */
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+
+      .controls {
+        display: none !important;
+      }
+
+      .responsiva {
+        box-shadow: none;
+        margin: 0;
+        max-width: 100%;
+        padding: 0.5in 0.6in;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-screen" id="loadingScreen">
+    <h2>Cargando corredores...</h2>
+    <p>Obteniendo datos de GUANAJUATO</p>
+  </div>
+
+  <div class="error-screen" id="errorScreen" style="display:none;"></div>
+
+  <div class="controls" id="controls" style="display:none;">
+    <div class="controls-info">
+      Responsivas listas: <span id="totalCount">0</span>
+    </div>
+    <button class="btn btn-primary" onclick="window.print()">Imprimir / Guardar PDF</button>
+  </div>
+
+  <div id="responsivasContainer"></div>
+
+  <script>
+    const API_URL = '/api/check-in-pro';
+
+    function calcularEdad(fechaNacStr) {
+      if (!fechaNacStr) return '';
+      let parts, day, month, year;
+
+      if (fechaNacStr.includes('/')) {
+        parts = fechaNacStr.split('/');
+        if (parts.length === 3) {
+          day = parseInt(parts[0], 10);
+          month = parseInt(parts[1], 10);
+          year = parseInt(parts[2], 10);
+        }
+      } else if (fechaNacStr.includes('-')) {
+        parts = fechaNacStr.split('-');
+        if (parts.length === 3) {
+          year = parseInt(parts[0], 10);
+          month = parseInt(parts[1], 10);
+          day = parseInt(parts[2], 10);
+        }
+      }
+
+      if (!day || !month || !year) return '';
+
+      const birthDate = new Date(year, month - 1, day);
+      const refDate = new Date();
+      let age = refDate.getFullYear() - birthDate.getFullYear();
+      const m = refDate.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && refDate.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age > 0 && age < 120 ? age : '';
+    }
+
+    function generarResponsiva(rider) {
+      const nombre = rider.nombre || '';
+      const telefono = rider.telefono || '';
+      const tipoSangre = rider.tipoSangre || '';
+      const emergenciaNombre = rider.emergenciaNombre || '';
+      const emergenciaTel = rider.emergenciaTel || '';
+      const edad = calcularEdad(rider.fechaNacimiento || '');
+
+      return `
+        <div class="responsiva">
+          <img
+            src="https://cdn.shopify.com/s/files/1/0691/9556/3244/files/DHMEXRACES_MARCA_REGISTRADA_1.png?v=1770853952"
+            alt="DHMEXRACES"
+            class="logo"
+          >
+
+          <div class="legal">
+            <p>
+              Yo <span class="nombre-valor">${nombre}</span> reconozco que al firmar este documento libero de toda responsabilidad a DHMEXRACES, LA FRAGUA BIKE PARK y a cualquier miembro del equipo de trabajo, por cualquier accidente que me pueda ocurrir. Entiendo que este deporte es de alto riesgo y puedo incurrir en un accidente e incluso la muerte.
+            </p>
+
+            <p>
+              Afirmo que me encuentro en perfecto estado de salud y en pleno uso de mis facultades mentales y fisicas para inscribirme y participar en este evento. De igual manera deslindo totalmente a los organizadores del evento de Ciclismo MTB 1ra Fecha COPA DHMEXRACES en La Fragua Bike Park.
+            </p>
+
+            <p>
+              Con fecha del 21 y 22 de Febrero del 2026 de cualquier responsabilidad de caracter legal o compensacion monetaria en caso de algun suceso, de sufrir algun accidente o lesion, por lo que no son responsables de ningun gasto medico que este pudiera ocasionar.
+            </p>
+          </div>
+
+          <div class="fields">
+            <div class="field-row">
+              <div class="field-item">
+                <span class="field-label">Nombre.</span>
+                <div class="field-value">${nombre}</div>
+              </div>
+              <div class="field-item">
+                <span class="field-label">Edad (Cumplida 2026)</span>
+                <div class="field-value">${edad}</div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item">
+                <span class="field-label">Telefono.</span>
+                <div class="field-value">${telefono}</div>
+              </div>
+              <div class="field-item">
+                <span class="field-label">Tipo de sangre</span>
+                <div class="field-value"></div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item">
+                <span class="field-label">Alergias</span>
+                <div class="field-value"></div>
+              </div>
+              <div class="field-item" style="flex:none;">
+                <span class="fecha-evento">FECHA DEL EVENTO: 21 Y 22 FEBRERO 2026</span>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item full">
+                <span class="field-label">En caso de accidente avisar a:</span>
+                <div class="field-value">${emergenciaNombre}</div>
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field-item full">
+                <span class="field-label">Telefono del contacto de Emergencia</span>
+                <div class="field-value">${emergenciaTel}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="signature-section">
+            <div class="signature-line"></div>
+            <div class="signature-text">Nombre Completo y Firma del Competidor</div>
+            <div class="signature-sub">(En caso de ser menor Firma de Padre o Tutor)</div>
+          </div>
+        </div>
+      `;
+    }
+
+    async function cargarResponsivas() {
+      try {
+        const res = await fetch(`${API_URL}?action=runners&sede=GUANAJUATO`);
+        const data = await res.json();
+
+        if (!data.success) {
+          document.getElementById('loadingScreen').style.display = 'none';
+          document.getElementById('errorScreen').style.display = 'block';
+          document.getElementById('errorScreen').innerHTML = `<h2>Error</h2><p>${data.error || 'No se pudieron cargar los corredores'}</p>`;
+          return;
+        }
+
+        const runners = data.runners || [];
+        if (runners.length === 0) {
+          document.getElementById('loadingScreen').style.display = 'none';
+          document.getElementById('errorScreen').style.display = 'block';
+          document.getElementById('errorScreen').innerHTML = '<h2>Sin corredores</h2><p>No hay corredores registrados en GUANAJUATO</p>';
+          return;
+        }
+
+        let html = '';
+        for (const rider of runners) {
+          html += generarResponsiva(rider);
+        }
+
+        document.getElementById('responsivasContainer').innerHTML = html;
+        document.getElementById('totalCount').textContent = runners.length;
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('controls').style.display = 'flex';
+
+      } catch (err) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('errorScreen').style.display = 'block';
+        document.getElementById('errorScreen').innerHTML = `<h2>Error de conexion</h2><p>${err.message}</p>`;
+      }
+    }
+
+    cargarResponsivas();
+  </script>
+
+</body>
+</html>

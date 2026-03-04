@@ -19,3 +19,4 @@ resend-emails.js
 
 # OS artifacts
 nul
+.env*.local

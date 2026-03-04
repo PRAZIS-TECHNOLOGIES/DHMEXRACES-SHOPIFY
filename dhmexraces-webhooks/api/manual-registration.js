@@ -240,7 +240,8 @@ async function saveToGoogleSheets(doc, corredor, orderNumber, orderDate, checkIn
       'CHECK_IN_TIME': '',
       'JERSEY': jerseyTalla,
       'PAGO': pagoValue,
-      'TOTAL PAGO': corredor.tipo_pago === 'patrocinado' ? '$0' : `$${corredor.monto_pago || 1500}`
+      'TOTAL PAGO': corredor.tipo_pago === 'patrocinado' ? '$0' : `$${corredor.monto_pago || 1500}`,
+      'TIPO DE SANGRE': corredor.tipo_sangre || ''
     });
 
     return { success: true, sheet: sheetName };
@@ -912,25 +913,8 @@ module.exports = async (req, res) => {
 
     console.log('=== INSCRIPCIÓN COMPLETADA ===\n');
 
-    // Trigger sync finanzas automático (fire-and-forget)
-    https.get('https://dhmexraces-webhooks.vercel.app/api/sync-finanzas', () => {})
-      .on('error', () => {});
-    console.log('💰 Sync finanzas triggered');
-
-    // Trigger actualización de descuento jersey (solo si pagó, no patrocinado)
-    const sede = (corredor.sede || 'guanajuato').toLowerCase();
-    if (corredor.tipo_pago !== 'patrocinado') {
-      https.get(`https://dhmexraces-webhooks.vercel.app/api/update-discount?sede=${sede}`, () => {})
-        .on('error', () => {});
-      console.log('🎽 Update discount triggered');
-    }
-
-    // Trigger formato de sheet (colores, estilos)
-    https.get(`https://dhmexraces-webhooks.vercel.app/api/format-sheets?sede=${sede}`, () => {})
-      .on('error', () => {});
-    console.log('🎨 Format sheets triggered');
-
-    return res.status(200).json({
+    // Responder primero al cliente para no hacerlo esperar
+    res.status(200).json({
       success: true,
       orderNumber,
       checkInCode,
@@ -944,6 +928,42 @@ module.exports = async (req, res) => {
         sede: corredor.sede
       }
     });
+
+    // Ejecutar triggers POST-respuesta con await para que Vercel no mate el proceso
+    // Vercel mantiene la función viva hasta que el handler async termine
+    const sede = (corredor.sede || 'guanajuato').toLowerCase();
+
+    function triggerEndpoint(url, timeoutMs = 20000) {
+      return new Promise((resolve) => {
+        const req = https.get(url, (resp) => {
+          let data = '';
+          resp.on('data', c => data += c);
+          resp.on('end', () => resolve({ ok: true, data }));
+        });
+        req.on('error', (err) => resolve({ ok: false, error: err.message }));
+        req.setTimeout(timeoutMs, () => { req.destroy(); resolve({ ok: false, error: 'timeout' }); });
+      });
+    }
+
+    try {
+      // Format sheets (solo fila nueva) + Update discount en PARALELO
+      const triggers = [
+        triggerEndpoint(`https://dhmexraces-webhooks.vercel.app/api/format-sheets?sede=${sede}&last=1`)
+      ];
+      if (corredor.tipo_pago !== 'patrocinado') {
+        triggers.push(triggerEndpoint(`https://dhmexraces-webhooks.vercel.app/api/update-discount?sede=${sede}`));
+      }
+
+      console.log('🎨🎽 Format (last row) + Discount starting in parallel...');
+      const [formatResult, discountResult] = await Promise.allSettled(triggers);
+      console.log('🎨 Format sheets:', formatResult.value?.ok ? 'OK' : (formatResult.value?.error || 'failed'));
+      if (discountResult) {
+        console.log('🎽 Update discount:', discountResult.value?.ok ? 'OK' : (discountResult.value?.error || 'skipped'));
+      }
+      // sync-finanzas se ejecuta solo via CRON diario, no en cada inscripción
+    } catch (triggerError) {
+      console.error('Error en triggers post-respuesta:', triggerError.message);
+    }
 
   } catch (error) {
     console.error('Error:', error);

@@ -667,34 +667,66 @@
     const API = '/api/check-in-pro';
     let allRunners = [];
     let selectedRunner = null;
+    let selectedKey = null;
     let currentTab = 'all';
+    let isLoading = false;
 
     const $ = id => document.getElementById(id);
     function norm(s) { return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim(); }
     function esc(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
 
+    // Clave unica para cada runner (funciona con o sin QR)
+    function rKey(r) {
+      if (r.qrCode) return 'qr:' + r.qrCode;
+      return 'id:' + (r.orden || '') + '__' + (r.nombre || '');
+    }
+
+    // Payload para identificar al runner en el API
+    function rPayload(r) {
+      return {
+        qrCode: r.qrCode || '',
+        sede: $('sede-select').value,
+        nombre: r.nombre || '',
+        orden: r.orden || ''
+      };
+    }
+
     // ═══════════════════════════════════════════
     // LOAD DATA
     // ═══════════════════════════════════════════
     async function loadData() {
+      if (isLoading) return;
+      isLoading = true;
       const sede = $('sede-select').value;
+      const scroll = $('list-scroll');
+
       try {
         const res = await fetch(`${API}?action=runners&sede=${sede}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
+
         if (data.success) {
           allRunners = data.runners;
           updateStats();
           renderList();
-          if (selectedRunner) {
-            const updated = allRunners.find(r => r.qrCode === selectedRunner.qrCode);
+
+          // Mantener seleccion despues de recargar
+          if (selectedKey) {
+            const updated = allRunners.find(r => rKey(r) === selectedKey);
             if (updated) {
               selectedRunner = updated;
               renderDetail(updated);
             }
           }
+        } else {
+          scroll.innerHTML = '<div class="list-empty">Error: ' + esc(data.error || 'desconocido') + '</div>';
         }
       } catch (err) {
         console.error('Load error:', err);
+        scroll.innerHTML = '<div class="list-empty">Error de conexion. Reintentando...</div>';
+        setTimeout(loadData, 3000);
+      } finally {
+        isLoading = false;
       }
     }
 
@@ -751,7 +783,7 @@
       container.innerHTML = '';
       for (const r of filtered) {
         const item = document.createElement('div');
-        const isSelected = selectedRunner && selectedRunner.qrCode === r.qrCode;
+        const isSelected = selectedKey && rKey(r) === selectedKey;
         let cls = 'runner-item';
         if (isSelected) cls += ' selected';
         if (r.kitReady) cls += ' kit-done';
@@ -762,10 +794,13 @@
           ? '<span class="runner-kit-badge done">Listo</span>'
           : '<span class="runner-kit-badge pending">Pendiente</span>';
 
+        // Advertencia visual si no tiene QR
+        const noQrWarn = !r.qrCode ? ' <span style="color:var(--amber);font-size:10px" title="Sin codigo QR">&#9888;</span>' : '';
+
         item.innerHTML = `
           <span class="runner-num">${esc(num)}</span>
           <div class="runner-info">
-            <div class="runner-name">${esc(r.nombre)}</div>
+            <div class="runner-name">${esc(r.nombre)}${noQrWarn}</div>
             <div class="runner-meta">${esc(r.categoria)} &middot; #${esc(r.orden)}</div>
           </div>
           ${kitBadge}
@@ -773,6 +808,7 @@
 
         item.addEventListener('click', () => {
           selectedRunner = r;
+          selectedKey = rKey(r);
           renderList();
           renderDetail(r);
         });
@@ -857,10 +893,12 @@
           <button class="kit-undo-btn" onclick="undoKit()">Desmarcar kit</button>
         `;
       } else {
+        // Verificar si tiene al menos un identificador valido
+        const hasId = r.qrCode || (r.orden && r.nombre);
         container.innerHTML = `
-          <button id="kit-btn" class="kit-btn mark-ready" onclick="markKit()">
+          <button id="kit-btn" class="kit-btn mark-ready" onclick="markKit()" ${hasId ? '' : 'disabled'}>
             Marcar Kit Listo
-            <span class="kit-btn-subtitle">Kit preparado y empacado</span>
+            <span class="kit-btn-subtitle">${hasId ? 'Kit preparado y empacado' : 'Sin QR ni orden - no se puede marcar'}</span>
           </button>
         `;
       }
@@ -870,7 +908,16 @@
     // KIT ACTIONS
     // ═══════════════════════════════════════════
     async function markKit() {
-      if (!selectedRunner || !selectedRunner.qrCode) return;
+      if (!selectedRunner) {
+        alert('Selecciona un corredor primero');
+        return;
+      }
+
+      // Verificar que tenga al menos un identificador
+      if (!selectedRunner.qrCode && !selectedRunner.orden && !selectedRunner.nombre) {
+        alert('Este corredor no tiene codigo QR ni datos suficientes para identificarlo. Verifica la hoja de Google Sheets.');
+        return;
+      }
 
       const btn = document.getElementById('kit-btn');
       if (btn) { btn.disabled = true; btn.textContent = 'Procesando...'; }
@@ -879,56 +926,67 @@
         const res = await fetch(`${API}?action=kit-confirm`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ qrCode: selectedRunner.qrCode, sede: $('sede-select').value })
+          body: JSON.stringify(rPayload(selectedRunner))
         });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
         if (data.success) {
           selectedRunner.kitReady = true;
-          updateRunnerInList(selectedRunner.qrCode, true);
+          updateRunnerInList(selectedKey, true);
           updateStats();
           renderList();
           renderKitAction(selectedRunner);
         } else {
-          alert(data.error || 'Error al marcar kit');
+          alert('Error: ' + (data.error || 'No se pudo marcar el kit'));
           if (btn) { btn.disabled = false; btn.innerHTML = 'Marcar Kit Listo<span class="kit-btn-subtitle">Kit preparado y empacado</span>'; }
         }
       } catch (err) {
         console.error('Kit error:', err);
-        alert('Error de conexion');
+        alert('Error de conexion: ' + err.message);
         if (btn) { btn.disabled = false; btn.innerHTML = 'Marcar Kit Listo<span class="kit-btn-subtitle">Kit preparado y empacado</span>'; }
       }
     }
 
     async function undoKit() {
-      if (!selectedRunner || !selectedRunner.qrCode) return;
+      if (!selectedRunner) {
+        alert('Selecciona un corredor primero');
+        return;
+      }
+      if (!selectedRunner.qrCode && !selectedRunner.orden && !selectedRunner.nombre) {
+        alert('Este corredor no tiene datos suficientes para identificarlo.');
+        return;
+      }
       if (!confirm('Desmarcar kit de ' + selectedRunner.nombre + '?')) return;
 
       try {
         const res = await fetch(`${API}?action=kit-undo`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ qrCode: selectedRunner.qrCode, sede: $('sede-select').value })
+          body: JSON.stringify(rPayload(selectedRunner))
         });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
 
         if (data.success) {
           selectedRunner.kitReady = false;
-          updateRunnerInList(selectedRunner.qrCode, false);
+          updateRunnerInList(selectedKey, false);
           updateStats();
           renderList();
           renderKitAction(selectedRunner);
         } else {
-          alert(data.error || 'Error al desmarcar kit');
+          alert('Error: ' + (data.error || 'No se pudo desmarcar el kit'));
         }
       } catch (err) {
         console.error('Kit undo error:', err);
-        alert('Error de conexion');
+        alert('Error de conexion: ' + err.message);
       }
     }
 
-    function updateRunnerInList(qrCode, kitReady) {
-      const runner = allRunners.find(r => r.qrCode === qrCode);
+    function updateRunnerInList(key, kitReady) {
+      const runner = allRunners.find(r => rKey(r) === key);
       if (runner) runner.kitReady = kitReady;
     }
 
@@ -937,12 +995,16 @@
     // ═══════════════════════════════════════════
     $('sede-select').addEventListener('change', () => {
       selectedRunner = null;
+      selectedKey = null;
       $('empty-state').classList.remove('hidden');
       $('rider-card').classList.add('hidden');
       loadData();
     });
 
     loadData();
+
+    // Auto-refresh cada 30 segundos
+    setInterval(loadData, 30000);
   </script>
 </body>
 </html>

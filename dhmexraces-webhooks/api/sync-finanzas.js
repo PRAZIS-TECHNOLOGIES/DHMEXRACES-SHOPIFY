@@ -251,17 +251,13 @@ async function writeFinanzas(rows, doc, totals) {
     sheet = await doc.addSheet({ title: 'FINANZAS' });
   }
 
+  // Clear all data in 1 API call (keeps sheet), then set header
+  await sheet.clear();
   await sheet.setHeaderRow([
     'FECHA', 'FECHA DEPOSITO', 'ESTADO', 'PEDIDO', 'TIPO',
     'FORMA DE PAGO', 'SEDE', 'IMPORTE', 'COMISION', '% COM', 'NETO',
     '# CORREDORES', 'CORREDORES', 'PRODUCTO'
   ]);
-
-  // Clear
-  const existing = await sheet.getRows();
-  for (let i = existing.length - 1; i >= 0; i--) {
-    await existing[i].delete();
-  }
 
   // Write data
   for (let i = 0; i < rows.length; i += 20) {
@@ -342,15 +338,13 @@ async function writeResumen(doc, summary) {
     sheet = await doc.addSheet({ title: 'RESUMEN', headerValues: ['A', 'B', 'C', 'D', 'E', 'F'] });
   }
 
-  const existing = await sheet.getRows();
-  for (let i = existing.length - 1; i >= 0; i--) await existing[i].delete();
-
-  // Layout: max row index = 23 (Desglose por Estado). Need 24+ rows.
-  // Ensure enough rows for loadCells range
+  // Clear all data in 1 API call, then add pad rows for cell formatting
+  await sheet.clear();
+  await sheet.setHeaderRow(['A', 'B', 'C', 'D', 'E', 'F']);
   const padRows = [];
   for (let i = 0; i < 30; i++) padRows.push({ A: '', B: '', C: '', D: '', E: '', F: '' });
   await sheet.addRows(padRows);
-  // 1 header + 30 data = 31 rows (indices 0-30). Load exactly that.
+  // 1 header + 30 data = 31 rows (indices 0-30)
   await sheet.loadCells('A1:F31');
 
   const darkBg = { red: 0.12, green: 0.12, blue: 0.12 };
@@ -520,7 +514,9 @@ module.exports = async function handler(req, res) {
       const fee = Math.abs(parseFloat(t.fee || 0));
       const net = parseFloat(t.net || 0);
       const pct = amt > 0 ? ((fee / amt) * 100).toFixed(1) + '%' : '';
-      const estado = getPayoutStatus(t.payout_status);
+      // Use actual payout status when available (more accurate than transaction-level payout_status)
+      const actualPayoutStatus = payout ? payout.status : t.payout_status;
+      const estado = getPayoutStatus(actualPayoutStatus);
       const sede = d.sede || '';
       const riders = ridersMap[d.name?.replace('#', '') || ''] || [];
 
@@ -662,6 +658,13 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (error) {
+    // Retry una vez si es error 429 (quota exceeded)
+    if (error.message && error.message.includes('429') && !req._retried) {
+      console.log('Quota 429 - reintentando en 15s...');
+      req._retried = true;
+      await new Promise(r => setTimeout(r, 15000));
+      return module.exports(req, res);
+    }
     console.error('Error:', error.message);
     return res.status(500).json({ error: error.message });
   }

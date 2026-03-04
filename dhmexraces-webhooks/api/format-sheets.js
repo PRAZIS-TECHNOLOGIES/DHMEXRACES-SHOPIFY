@@ -47,6 +47,11 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true, message: 'Hoja vacía' });
     }
 
+    // ═══ Modo: last=N solo formatea las últimas N filas (ligero) ═══
+    const lastParam = parseInt(req.query.last) || 0;
+    const startRow = lastParam > 0 ? Math.max(1, rowCount - lastParam) : 1;
+    const isPartial = lastParam > 0;
+
     // ═══ Leer FINANZAS para montos de órdenes Shopify ═══
     const amountMap = {};
     const finSheet = doc.sheetsByTitle['FINANZAS'];
@@ -62,13 +67,21 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // Cargar celdas (A-S)
-    await sheet.loadCells(`A1:S${rowCount}`);
+    // Cargar celdas: solo el rango necesario
+    if (isPartial) {
+      // Cargar header + filas nuevas solamente
+      await sheet.loadCells(`A1:S1`);
+      if (startRow > 1) {
+        await sheet.loadCells(`A${startRow}:S${rowCount}`);
+      }
+    } else {
+      await sheet.loadCells(`A1:S${rowCount}`);
+    }
 
-    // Contar riders por orden
+    // Contar riders por orden (siempre necesario para TOTAL PAGO)
     const riderCount = {};
-    for (let i = 1; i < rowCount; i++) {
-      const orden = (sheet.getCell(i, COL.ORDEN).value || '').toString().trim().replace('#', '');
+    for (const row of rows) {
+      const orden = (row.ORDEN || '').toString().trim().replace('#', '');
       if (!orden) continue;
       riderCount[orden] = (riderCount[orden] || 0) + 1;
     }
@@ -89,15 +102,17 @@ module.exports = async function handler(req, res) {
     const catBold = { bold: true };
     const moneyGreen = { bold: true, fontSize: 10, foregroundColorStyle: { rgbColor: { red: 0.05, green: 0.4, blue: 0.05 } } };
 
-    // ═══ HEADER ═══
-    for (let col = 0; col < TOTAL_COLS; col++) {
-      const cell = sheet.getCell(0, col);
-      cell.backgroundColor = darkBg;
-      cell.textFormat = whiteBold;
+    // ═══ HEADER (solo en modo completo) ═══
+    if (!isPartial) {
+      for (let col = 0; col < TOTAL_COLS; col++) {
+        const cell = sheet.getCell(0, col);
+        cell.backgroundColor = darkBg;
+        cell.textFormat = whiteBold;
+      }
     }
 
-    // ═══ DATA ROWS ═══
-    for (let i = 1; i < rowCount; i++) {
+    // ═══ DATA ROWS (desde startRow) ═══
+    for (let i = startRow; i < rowCount; i++) {
       const ordenCell = sheet.getCell(i, COL.ORDEN);
       const pagoCell = sheet.getCell(i, COL.PAGO);
       const totalPagoCell = sheet.getCell(i, COL.TOTAL_PAGO);
@@ -211,26 +226,36 @@ module.exports = async function handler(req, res) {
 
     await sheet.saveUpdatedCells();
 
-    // Congelar header
-    try {
-      await doc.axios.post(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}:batchUpdate`, {
-        requests: [{
-          updateSheetProperties: {
-            properties: { sheetId: sheet.sheetId, gridProperties: { frozenRowCount: 1 } },
-            fields: 'gridProperties.frozenRowCount'
-          }
-        }]
-      });
-    } catch (e) { /* ignore */ }
+    // Congelar header (solo en modo completo)
+    if (!isPartial) {
+      try {
+        await doc.axios.post(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}:batchUpdate`, {
+          requests: [{
+            updateSheetProperties: {
+              properties: { sheetId: sheet.sheetId, gridProperties: { frozenRowCount: 1 } },
+              fields: 'gridProperties.frozenRowCount'
+            }
+          }]
+        });
+      } catch (e) { /* ignore */ }
+    }
 
+    const formattedRows = rowCount - startRow;
     return res.status(200).json({
       success: true,
       sede: sedeQuery,
-      rows: rowCount - 1,
-      message: `Formato aplicado a ${rowCount - 1} filas. Montos en TOTAL PAGO.`
+      rows: formattedRows,
+      mode: isPartial ? `last ${lastParam}` : 'full',
+      message: `Formato aplicado a ${formattedRows} fila(s). ${isPartial ? 'Modo parcial.' : 'Montos en TOTAL PAGO.'}`
     });
 
   } catch (error) {
+    if (error.message && error.message.includes('429') && !req._retried) {
+      console.log('Quota 429 - reintentando en 15s...');
+      req._retried = true;
+      await new Promise(r => setTimeout(r, 15000));
+      return module.exports(req, res);
+    }
     console.error('Error format-sheets:', error.message);
     return res.status(500).json({ error: error.message });
   }

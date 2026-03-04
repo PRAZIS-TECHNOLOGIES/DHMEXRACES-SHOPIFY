@@ -29,7 +29,7 @@
                data-aos-delay="{{ forloop.index | times: 100 }}">
             <div class="merch-card__image-wrapper">
               {% if block.settings.badge != blank %}
-                <span class="merch-card__badge">{{ block.settings.badge }}</span>
+                <span class="merch-card__badge{% if block.settings.badge == 'Sold Out' %} merch-card__badge--sold-out{% endif %}">{{ block.settings.badge }}</span>
               {% endif %}
               {% if linked_product.featured_image %}
                 <img src="{{ linked_product.featured_image | image_url: width: 600 }}"
@@ -285,6 +285,10 @@
     letter-spacing: 0.1em;
     padding: 0.4rem 0.8rem;
     border-radius: 2px;
+  }
+
+  .merch-card__badge--sold-out {
+    background: #DC2626;
   }
 
   .merch-card__image {

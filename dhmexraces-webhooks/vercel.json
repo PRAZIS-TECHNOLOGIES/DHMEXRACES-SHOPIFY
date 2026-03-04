@@ -5,7 +5,8 @@
     "api/order-created.js": { "maxDuration": 30 },
     "api/manual-registration.js": { "maxDuration": 30 },
     "api/format-sheets.js": { "maxDuration": 30 },
-    "api/update-discount.js": { "maxDuration": 15 }
+    "api/update-discount.js": { "maxDuration": 15 },
+    "api/setup-sheets.js": { "maxDuration": 60 }
   },
   "crons": [
     {
