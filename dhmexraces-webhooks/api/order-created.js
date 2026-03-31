@@ -495,7 +495,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ HEADER ═══════ -->
           <tr>
-            <td style="padding:24px 48px;background-color:#FFFFFF;">
+            <td style="padding:24px 24px;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td><img src="${ASSETS.logo}" alt="DHMEXRACES" width="140" style="display:block;height:auto;"></td>
@@ -507,7 +507,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ HERO ═══════ -->
           <tr>
-            <td style="padding:64px 48px 56px;background-color:#FFFFFF;text-align:center;">
+            <td style="padding:40px 24px 32px;background-color:#FFFFFF;text-align:center;">
               <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:#DF3382;margin-bottom:20px;">Inscripcion Confirmada</span>
               <span style="display:block;font-size:42px;font-weight:700;color:#1A1A1A;letter-spacing:-0.03em;line-height:1.1;">Felicidades, ${primerNombre}!</span>
               <span style="display:block;font-size:17px;color:#333333;margin-top:20px;line-height:1.7;">Tu lugar en la Copa Scott DHMEXRACES 2026 esta asegurado.<br>Nos vemos en la pista.</span>
@@ -534,7 +534,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ CARD DE CATEGORIA Y DATOS ═══════ -->
           <tr>
-            <td style="padding:44px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:32px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: #FAFAFA; border: 1px solid #EEEEEE; border-radius: 16px; padding: 32px;">
                 <tr>
                   <td style="padding: 32px;">
@@ -642,7 +642,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ NUMERO DE CORREDOR ═══════ -->
           ${runnerNumber ? `<tr>
-            <td style="padding:36px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #DF3382;">
                 <!-- Header del ticket -->
                 <tr>
@@ -724,7 +724,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ QR CHECK-IN ═══════ -->
           <tr>
-            <td style="padding:36px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #1A1A1A;">
                 <!-- Header del ticket -->
                 <tr>
@@ -802,7 +802,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ SORTEO FOX 40 ═══════ -->
           ${raffleNumber ? `<tr>
-            <td style="padding:36px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #FF6B00;">
                 <tr>
                   <td style="background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%); padding: 12px 20px;">
@@ -892,7 +892,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ COMPARTIR EN INSTAGRAM ═══════ -->
           <tr>
-            <td style="padding:36px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
@@ -908,7 +908,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ BOTONES ═══════ -->
           <tr>
-            <td style="padding:36px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:18px 32px;background-color:#DF3382;border-radius:12px;text-align:center;">
@@ -928,7 +928,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ ANTES DE LA CARRERA ═══════ -->
           <tr>
-            <td style="padding:40px 48px 0;background-color:#FFFFFF;">
+            <td style="padding:28px 24px 0;background-color:#FFFFFF;">
               <span style="display:block;font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#333333;margin-bottom:20px;">Antes de la Carrera</span>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F7F7F7;border-radius:12px;">
                 <tr>
@@ -962,7 +962,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ FOOTER ═══════ -->
           <tr>
-            <td style="padding:48px 48px 40px;background-color:#FFFFFF;border-top:1px solid #EEEEEE;">
+            <td style="padding:32px 24px 32px;background-color:#FFFFFF;border-top:1px solid #EEEEEE;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="text-align:center;">
