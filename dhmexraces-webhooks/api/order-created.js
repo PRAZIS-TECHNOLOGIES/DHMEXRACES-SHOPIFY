@@ -42,7 +42,7 @@ const ALLOWED_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 /** Configuración del descuento automático de jersey */
 const JERSEY_DISCOUNT_CONFIG = {
-  discountId: 'gid://shopify/DiscountAutomaticNode/1888870433004',
+  discountId: 'gid://shopify/DiscountAutomaticNode/1909614444780',
   shop: '18d06f-7a.myshopify.com',
   apiVersion: '2026-01',
   maxJerseys: 50
