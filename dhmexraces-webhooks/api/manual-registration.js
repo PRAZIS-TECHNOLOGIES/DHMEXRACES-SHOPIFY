@@ -867,14 +867,14 @@ module.exports = async (req, res) => {
     console.log(`Orden: ${orderNumber}`);
     console.log(`QR: ${checkInCode}`);
 
-    // Asignar boleto de rifa (solo si NO es patrocinado)
+    // Asignar boleto de rifa (solo si NO es patrocinado y NO es Guadalajara)
     let raffleNumber = null;
-    if (corredor.tipo_pago !== 'patrocinado') {
+    if (corredor.tipo_pago !== 'patrocinado' && sheetName !== 'GUADALAJARA') {
       const raffleResult = await assignRaffleTicket(doc, corredor, orderNumber, orderDate);
       raffleNumber = raffleResult.numero;
       console.log(`Rifa: #${raffleNumber || 'N/A'}`);
     } else {
-      console.log(`Rifa: OMITIDA (patrocinado)`);
+      console.log(`Rifa: OMITIDA (${sheetName === 'GUADALAJARA' ? 'sede Guadalajara sin rifa' : 'patrocinado'})`);
     }
 
     // Asignar número de corredor
