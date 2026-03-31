@@ -484,14 +484,23 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <meta name="supported-color-schemes" content="light">
   <title>Inscripcion Confirmada — DHMEXRACES</title>
+  <style>
+    :root { color-scheme: light only; }
+    @media (prefers-color-scheme: dark) {
+      .email-wrapper, .email-card { background-color: #FFFFFF !important; }
+      body, .email-wrapper { background-color: #E8E8E8 !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:0;background-color:#E8E8E8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1A1A1A;-webkit-font-smoothing:antialiased;">
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#E8E8E8;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background-color:#E8E8E8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
     <tr>
       <td align="center" style="padding:24px 16px;">
-        <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;border-radius:20px;overflow:hidden;">
+        <table role="presentation" width="640" cellpadding="0" cellspacing="0" class="email-card" style="max-width:640px;width:100%;border-radius:20px;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;">
 
           <!-- ═══════ HEADER ═══════ -->
           <tr>
@@ -896,7 +905,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <a href="${miPaseUrl}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-family:'Courier New',Courier,monospace;font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#DF3382;background:rgba(223,51,130,0.06);border:1px solid rgba(223,51,130,0.3);border-radius:6px;text-decoration:none;">
+                    <a href="${miPaseUrl}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:#DF3382;background:rgba(223,51,130,0.06);border:1px solid rgba(223,51,130,0.3);border-radius:6px;text-decoration:none;">
                       <img src="https://api.iconify.design/mdi/download.svg?color=%23DF3382" alt="" width="16" height="16" style="display:inline-block;">
                       Descargar para Historia de Instagram
                     </a>
@@ -912,14 +921,14 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:18px 32px;background-color:#DF3382;border-radius:12px;text-align:center;">
-                    <a href="https://endhurorace.com/pages/ranking-2026" style="font-family:'Courier New',Courier,monospace;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;display:block;">Ver Ranking 2026</a>
+                    <a href="https://endhurorace.com/pages/ranking-2026" style="font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;display:block;">Ver Ranking 2026</a>
                   </td>
                 </tr>
               </table>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
                 <tr>
                   <td style="padding:18px 32px;border:2px solid #1A1A1A;border-radius:12px;text-align:center;">
-                    <a href="https://www.instagram.com/dhmex_races/" style="font-family:'Courier New',Courier,monospace;font-size:15px;font-weight:700;color:#1A1A1A;text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;display:block;">Seguir en Instagram</a>
+                    <a href="https://www.instagram.com/dhmex_races/" style="font-size:15px;font-weight:700;color:#1A1A1A;text-decoration:none;letter-spacing:0.06em;text-transform:uppercase;display:block;">Seguir en Instagram</a>
                   </td>
                 </tr>
               </table>
