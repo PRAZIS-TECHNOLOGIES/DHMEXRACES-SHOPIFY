@@ -486,7 +486,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Inscripcion Confirmada — DHMEXRACES</title>
 </head>
-<body style="margin:0;padding:0;background-color:#E8E8E8;font-family:'Courier New',Courier,monospace;color:#1A1A1A;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#E8E8E8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#1A1A1A;-webkit-font-smoothing:antialiased;">
 
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#E8E8E8;">
     <tr>
@@ -508,7 +508,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
           <!-- ═══════ HERO ═══════ -->
           <tr>
             <td style="padding:40px 24px 32px;background-color:#FFFFFF;text-align:center;">
-              <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:#DF3382;margin-bottom:20px;">Inscripcion Confirmada</span>
+              <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#DF3382;margin-bottom:20px;">Inscripcion Confirmada</span>
               <span style="display:block;font-size:42px;font-weight:700;color:#1A1A1A;letter-spacing:-0.03em;line-height:1.1;">Felicidades, ${primerNombre}!</span>
               <span style="display:block;font-size:17px;color:#333333;margin-top:20px;line-height:1.7;">Tu lugar en la Copa Scott DHMEXRACES 2026 esta asegurado.<br>Nos vemos en la pista.</span>
             </td>
@@ -520,12 +520,12 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="50%" style="padding:28px 20px;text-align:center;border-right:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;">
-                    <span style="display:block;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#333333;margin-bottom:6px;">Categoria</span>
-                    <span style="display:block;font-size:18px;font-weight:700;color:#DF3382;text-transform:uppercase;letter-spacing:0.02em;">${categoria}</span>
+                    <span style="display:block;font-size:13px;font-weight:600;color:#333333;margin-bottom:6px;">Categoria</span>
+                    <span style="display:block;font-size:18px;font-weight:700;color:#DF3382;">${categoria}</span>
                   </td>
                   <td width="50%" style="padding:28px 20px;text-align:center;border-bottom:1px solid #EEEEEE;">
-                    <span style="display:block;font-size:12px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#333333;margin-bottom:6px;">Sede</span>
-                    <span style="display:block;font-size:18px;font-weight:700;color:#1A1A1A;text-transform:uppercase;">${sedeNombre}</span>
+                    <span style="display:block;font-size:13px;font-weight:600;color:#333333;margin-bottom:6px;">Sede</span>
+                    <span style="display:block;font-size:18px;font-weight:700;color:#1A1A1A;">${sedeNombre}</span>
                   </td>
                 </tr>
               </table>
@@ -563,7 +563,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Nombre</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Nombre</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${nombre}</span>
@@ -571,7 +571,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Fecha de Nacimiento</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Fecha de Nacimiento</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.fecha_nacimiento || 'N/A'}</span>
@@ -579,7 +579,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Equipo</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Equipo</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.equipo || 'Independiente'}</span>
@@ -587,7 +587,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Email</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Email</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.email || 'N/A'}</span>
@@ -595,7 +595,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Telefono</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Telefono</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.telefono || 'N/A'}</span>
@@ -603,7 +603,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Contacto Emergencia</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Contacto Emergencia</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.emergencia_nombre || 'N/A'}</span>
@@ -611,7 +611,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       <tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Tel. Emergencia</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Tel. Emergencia</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.emergencia_telefono || 'N/A'}</span>
@@ -619,7 +619,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>
                       ${corredor.talla_playera ? `<tr>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Talla de Playera</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Talla de Playera</span>
                         </td>
                         <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
                           <span style="color: #DF3382; font-weight: 600; font-size: 14px;">${corredor.talla_playera}</span>
@@ -627,7 +627,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                       </tr>` : ''}
                       <tr>
                         <td style="padding: 12px 0;">
-                          <span style="color: #333333; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">Confirmacion</span>
+                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Confirmacion</span>
                         </td>
                         <td style="padding: 12px 0; text-align: right;">
                           <span style="color: #DF3382; font-weight: 700; font-size: 14px;">#${orderNumber}</span>
@@ -929,7 +929,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
           <!-- ═══════ ANTES DE LA CARRERA ═══════ -->
           <tr>
             <td style="padding:28px 24px 0;background-color:#FFFFFF;">
-              <span style="display:block;font-size:14px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#333333;margin-bottom:20px;">Antes de la Carrera</span>
+              <span style="display:block;font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:20px;">Antes de la Carrera</span>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F7F7F7;border-radius:12px;">
                 <tr>
                   <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
