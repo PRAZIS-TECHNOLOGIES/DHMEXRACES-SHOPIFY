@@ -907,21 +907,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
             </td>
           </tr>` : ''}
 
-          <!-- ═══════ COMPARTIR EN INSTAGRAM ═══════ -->
-          <tr>
-            <td style="padding:24px 24px 0;background-color:#111111;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center">
-                    <a href="${miPaseUrl}" style="display:inline-flex;align-items:center;gap:8px;padding:12px 24px;font-family:'Courier New',Courier,monospace;font-size:13px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#DF3382;background:rgba(223,51,130,0.06);border:1px solid rgba(223,51,130,0.3);border-radius:6px;text-decoration:none;">
-                      <img src="https://api.iconify.design/mdi/download.svg?color=%23DF3382" alt="" width="16" height="16" style="display:inline-block;">
-                      Descargar para Historia de Instagram
-                    </a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+          <!-- ═══════ COMPARTIR EN INSTAGRAM — DESHABILITADO TEMPORALMENTE ═══════ -->
 
           <!-- ═══════ BOTONES ═══════ -->
           <tr>
