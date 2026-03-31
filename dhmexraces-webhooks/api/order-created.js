@@ -488,11 +488,25 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
   <meta name="supported-color-schemes" content="light">
   <title>Inscripcion Confirmada — DHMEXRACES</title>
   <style>
-    :root { color-scheme: light only; }
+    :root { color-scheme: light dark; }
     @media (prefers-color-scheme: dark) {
-      .email-wrapper, .email-card { background-color: #FFFFFF !important; }
-      body, .email-wrapper { background-color: #E8E8E8 !important; }
+      body, .email-wrapper { background-color: #1A1A1A !important; }
+      .email-card { background-color: #1A1A1A !important; }
+      .dm-white { background-color: #222222 !important; }
+      .dm-text { color: #FFFFFF !important; }
+      .dm-text-secondary { color: #CCCCCC !important; }
+      .dm-text-pink { color: #DF3382 !important; }
+      .dm-ticket-body { background-color: #2A2A2A !important; }
+      .dm-qr-bg { background-color: #FFFFFF !important; }
+      .dm-border { border-color: #444444 !important; }
+      .dm-checklist { background-color: #2A2A2A !important; }
+      .dm-footer { border-color: #333333 !important; }
     }
+    /* Apple Mail dark mode */
+    [data-ogsc] .dm-text { color: #FFFFFF !important; }
+    [data-ogsc] .dm-text-secondary { color: #CCCCCC !important; }
+    [data-ogsc] .dm-white { background-color: #222222 !important; }
+    [data-ogsc] .dm-ticket-body { background-color: #2A2A2A !important; }
   </style>
 </head>
 <body style="margin:0;padding:0;background-color:#E8E8E8;font-family:'Courier New',Courier,monospace;color:#1A1A1A;-webkit-font-smoothing:antialiased;">
@@ -677,19 +691,19 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                 </tr>
                 <!-- Cuerpo del ticket -->
                 <tr>
-                  <td style="padding: 28px 24px;">
+                  <td style="padding: 28px 24px; background: #1A1A1A;">
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td align="center">
-                          <p style="color: #1A1A1A; font-size: 9px; font-weight: 600; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.15em;">Categoria</p>
-                          <div style="display: inline-block; background: rgba(223,51,130,0.1); border: 1px solid rgba(223,51,130,0.25); border-radius: 6px; padding: 4px 14px; margin-bottom: 20px;">
+                          <p style="color: #AAAAAA; font-size: 9px; font-weight: 600; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.15em;">Categoria</p>
+                          <div style="display: inline-block; background: rgba(223,51,130,0.2); border: 1px solid rgba(223,51,130,0.4); border-radius: 6px; padding: 4px 14px; margin-bottom: 20px;">
                             <p style="color: #DF3382; font-size: 13px; font-weight: 700; margin: 0; text-transform: uppercase; letter-spacing: 0.08em;">${categoria}</p>
                           </div>
                         </td>
                       </tr>
                       <tr>
                         <td align="center">
-                          <p style="color: #333333; font-size: 9px; font-weight: 600; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.15em;">Tu Numero de Corredor</p>
+                          <p style="color: #AAAAAA; font-size: 9px; font-weight: 600; margin: 0 0 12px 0; text-transform: uppercase; letter-spacing: 0.15em;">Tu Numero de Corredor</p>
                           <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                             <tr>
                               <td style="background: linear-gradient(180deg, #DF3382 0%, #C42A6E 100%); border-radius: 14px; padding: 4px;">
@@ -703,8 +717,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                               </td>
                             </tr>
                           </table>
-                          <p style="color: #1A1A1A; font-size: 15px; font-weight: 700; margin: 16px 0 4px 0; letter-spacing: 0.02em;">${nombre}</p>
-                          <p style="color: #333333; font-size: 11px; margin: 0; font-style: italic;">Este numero es tu identificador oficial en la competencia</p>
+                          <p style="color: #FFFFFF; font-size: 15px; font-weight: 700; margin: 16px 0 4px 0; letter-spacing: 0.02em;">${nombre}</p>
+                          <p style="color: #AAAAAA; font-size: 11px; margin: 0; font-style: italic;">Este numero es tu identificador oficial en la competencia</p>
                         </td>
                       </tr>
                     </table>
@@ -712,11 +726,11 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                 </tr>
                 <!-- Footer del ticket -->
                 <tr>
-                  <td style="background: rgba(223,51,130,0.04); border-top: 1px solid rgba(223,51,130,0.15); padding: 12px 20px;">
+                  <td style="background: #222222; border-top: 1px solid rgba(223,51,130,0.3); padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p style="color: #333333; font-size: 9px; margin: 0; line-height: 1.4;">${sedeNombre}<br><strong style="color: #DF3382;">Copa Scott DHMEXRACES 2026</strong></p>
+                          <p style="color: #AAAAAA; font-size: 9px; margin: 0; line-height: 1.4;">${sedeNombre}<br><strong style="color: #DF3382;">Copa Scott DHMEXRACES 2026</strong></p>
                         </td>
                         <td align="right">
                           <div style="background: #FFFFFF; border-radius: 5px; padding: 5px 8px; display: inline-block;">
@@ -759,8 +773,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                 </tr>
                 <!-- Cuerpo -->
                 <tr>
-                  <td style="padding: 32px 24px; text-align: center;">
-                    <p style="color: #333333; font-size: 14px; margin: 0 0 24px 0;">
+                  <td style="padding: 32px 24px; text-align: center; background: #1A1A1A;">
+                    <p style="color: #AAAAAA; font-size: 14px; margin: 0 0 24px 0;">
                       Presenta este codigo QR el dia del evento para agilizar tu registro
                     </p>
                     <table width="100%" cellpadding="0" cellspacing="0">
@@ -768,38 +782,32 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                         <td align="center">
                           <table cellpadding="0" cellspacing="0" style="margin: 0 auto;">
                             <tr>
-                              <td style="background: linear-gradient(180deg, #1A1A1A 0%, #333333 100%); border-radius: 16px; padding: 4px;">
-                                <table cellpadding="0" cellspacing="0">
-                                  <tr>
-                                    <td style="background: #FFFFFF; border-radius: 13px; padding: 20px;">
-                                      <img src="${qrUrl}" alt="QR Check-in" style="width: 180px; height: 180px; display: block;">
-                                    </td>
-                                  </tr>
-                                </table>
+                              <td style="background: #FFFFFF; border-radius: 16px; padding: 20px;">
+                                <img src="${qrUrl}" alt="QR Check-in" style="width: 180px; height: 180px; display: block;">
                               </td>
                             </tr>
                           </table>
                         </td>
                       </tr>
                     </table>
-                    <p style="font-family: 'Courier New', monospace; font-size: 22px; font-weight: 900; color: #1A1A1A; margin: 24px 0 8px 0; letter-spacing: 0.12em;">
+                    <p style="font-family: 'Courier New', monospace; font-size: 22px; font-weight: 900; color: #FFFFFF; margin: 24px 0 8px 0; letter-spacing: 0.12em;">
                       ${checkInCode}
                     </p>
-                    <p style="color: #444444; font-size: 12px; margin: 0; font-style: italic;">
+                    <p style="color: #AAAAAA; font-size: 12px; margin: 0; font-style: italic;">
                       Guarda este correo o toma screenshot del QR
                     </p>
                   </td>
                 </tr>
                 <!-- Footer del ticket -->
                 <tr>
-                  <td style="background: rgba(0,0,0,0.02); border-top: 1px solid #EEEEEE; padding: 12px 20px;">
+                  <td style="background: #222222; border-top: 1px solid #333333; padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p style="color: #444444; font-size: 9px; margin: 0; line-height: 1.4;">Valido para<br><strong style="color: #1A1A1A;">${sedeNombre}</strong></p>
+                          <p style="color: #AAAAAA; font-size: 9px; margin: 0; line-height: 1.4;">Valido para<br><strong style="color: #FFFFFF;">${sedeNombre}</strong></p>
                         </td>
                         <td align="right">
-                          <p style="color: #444444; font-size: 9px; margin: 0; line-height: 1.4;">Corredor<br><strong style="color: #1A1A1A;">${runnerNumber ? `#${runnerNumber} — ` : ''}${categoria}</strong></p>
+                          <p style="color: #AAAAAA; font-size: 9px; margin: 0; line-height: 1.4;">Corredor<br><strong style="color: #FFFFFF;">${runnerNumber ? `#${runnerNumber} — ` : ''}${categoria}</strong></p>
                         </td>
                       </tr>
                     </table>
