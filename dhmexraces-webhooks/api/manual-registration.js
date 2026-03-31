@@ -40,6 +40,8 @@ const SEDE_TO_SHEET = {
   'guanajuato': 'GUANAJUATO',
   'puebla': 'PUEBLA',
   'guadalajara': 'GUADALAJARA',
+  'tapalpa': 'GUADALAJARA',
+  'mazati': 'GUADALAJARA',
   'ixtapan': 'IXTAPAN',
   'taxco': 'TAXCO'
 };
@@ -48,6 +50,8 @@ const SEDE_CODES = {
   'guanajuato': 'GTO',
   'puebla': 'PUE',
   'guadalajara': 'GDL',
+  'tapalpa': 'GDL',
+  'mazati': 'GDL',
   'ixtapan': 'IXT',
   'taxco': 'TAX'
 };

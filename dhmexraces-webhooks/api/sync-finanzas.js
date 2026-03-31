@@ -114,7 +114,7 @@ async function fetchOrderDetails(orderIds) {
         let sede = '';
         if (allTitles.includes('guanajuato')) sede = 'GUANAJUATO';
         else if (allTitles.includes('puebla')) sede = 'PUEBLA';
-        else if (allTitles.includes('guadalajara')) sede = 'GUADALAJARA';
+        else if (allTitles.includes('guadalajara') || allTitles.includes('tapalpa') || allTitles.includes('mazati')) sede = 'GUADALAJARA';
         else if (allTitles.includes('ixtapan')) sede = 'IXTAPAN';
         else if (allTitles.includes('taxco')) sede = 'TAXCO';
         map[id] = {

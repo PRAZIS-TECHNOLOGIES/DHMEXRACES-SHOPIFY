@@ -128,7 +128,7 @@ function getSheetNameFromProduct(productTitle) {
 
   if (title.includes('guanajuato')) return 'GUANAJUATO';
   if (title.includes('puebla')) return 'PUEBLA';
-  if (title.includes('guadalajara')) return 'GUADALAJARA';
+  if (title.includes('guadalajara') || title.includes('tapalpa') || title.includes('mazati')) return 'GUADALAJARA';
   if (title.includes('ixtapan')) return 'IXTAPAN';
   if (title.includes('taxco')) return 'TAXCO';
 
@@ -509,9 +509,9 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
     [data-ogsc] .dm-ticket-body { background-color: #2A2A2A !important; }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#E8E8E8;font-family:'Courier New',Courier,monospace;color:#1A1A1A;-webkit-font-smoothing:antialiased;">
+<body style="margin:0;padding:0;background-color:#000000;font-family:'Courier New',Courier,monospace;color:#FFFFFF;-webkit-font-smoothing:antialiased;">
 
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background-color:#E8E8E8;font-family:'Courier New',Courier,monospace;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="email-wrapper" style="background-color:#000000;font-family:'Courier New',Courier,monospace;">
     <tr>
       <td align="center" style="padding:24px 16px;">
         <table role="presentation" width="640" cellpadding="0" cellspacing="0" class="email-card" style="max-width:640px;width:100%;border-radius:20px;overflow:hidden;font-family:'Courier New',Courier,monospace;">
@@ -530,25 +530,25 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ HERO ═══════ -->
           <tr>
-            <td style="padding:40px 24px 32px;background-color:#FFFFFF;text-align:center;">
+            <td style="padding:40px 24px 32px;background-color:#111111;text-align:center;">
               <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#DF3382;margin-bottom:20px;">Inscripcion Confirmada</span>
-              <span style="display:block;font-size:42px;font-weight:700;color:#1A1A1A;letter-spacing:-0.03em;line-height:1.1;">Felicidades, ${primerNombre}!</span>
-              <span style="display:block;font-size:17px;color:#333333;margin-top:20px;line-height:1.7;">Tu lugar en la Copa Scott DHMEXRACES 2026 esta asegurado.<br>Nos vemos en la pista.</span>
+              <span style="display:block;font-size:42px;font-weight:700;color:#FFFFFF;letter-spacing:-0.03em;line-height:1.1;">Felicidades, ${primerNombre}!</span>
+              <span style="display:block;font-size:17px;color:#AAAAAA;margin-top:20px;line-height:1.7;">Tu lugar en la Copa Scott DHMEXRACES 2026 esta asegurado.<br>Nos vemos en la pista.</span>
             </td>
           </tr>
 
           <!-- ═══════ CATEGORIA + SEDE ═══════ -->
           <tr>
-            <td style="background-color:#FFFFFF;">
+            <td style="background-color:#111111;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="50%" style="padding:28px 20px;text-align:center;border-right:1px solid #EEEEEE;border-bottom:1px solid #EEEEEE;">
-                    <span style="display:block;font-size:13px;font-weight:600;color:#333333;margin-bottom:6px;">Categoria</span>
+                    <span style="display:block;font-size:13px;font-weight:600;color:#AAAAAA;margin-bottom:6px;">Categoria</span>
                     <span style="display:block;font-size:18px;font-weight:700;color:#DF3382;">${categoria}</span>
                   </td>
                   <td width="50%" style="padding:28px 20px;text-align:center;border-bottom:1px solid #EEEEEE;">
-                    <span style="display:block;font-size:13px;font-weight:600;color:#333333;margin-bottom:6px;">Sede</span>
-                    <span style="display:block;font-size:18px;font-weight:700;color:#1A1A1A;">${sedeNombre}</span>
+                    <span style="display:block;font-size:13px;font-weight:600;color:#AAAAAA;margin-bottom:6px;">Sede</span>
+                    <span style="display:block;font-size:18px;font-weight:700;color:#FFFFFF;">${sedeNombre}</span>
                   </td>
                 </tr>
               </table>
@@ -557,8 +557,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ CARD DE CATEGORIA Y DATOS ═══════ -->
           <tr>
-            <td style="padding:32px 24px 0;background-color:#FFFFFF;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: #FAFAFA; border: 1px solid #EEEEEE; border-radius: 16px; padding: 32px;">
+            <td style="padding:32px 24px 0;background-color:#111111;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background: #1A1A1A; border: 1px solid #2A2A2A; border-radius: 16px; padding: 32px;">
                 <tr>
                   <td style="padding: 32px;">
                     <!-- Badge de categoria -->
@@ -575,9 +575,9 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     <!-- Sede -->
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td align="center" style="padding-bottom: 24px; border-bottom: 1px solid #E8E8E8;">
-                          <p style="font-size: 13px; color: #444444; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.05em;">Sede</p>
-                          <p style="font-size: 20px; color: #1A1A1A; margin: 0; font-weight: 600;">${sedeNombre}</p>
+                        <td align="center" style="padding-bottom: 24px; border-bottom: 1px solid #2A2A2A;">
+                          <p style="font-size: 13px; color: #999999; margin: 0 0 8px 0; text-transform: uppercase; letter-spacing: 0.05em;">Sede</p>
+                          <p style="font-size: 20px; color: #FFFFFF; margin: 0; font-weight: 600;">${sedeNombre}</p>
                         </td>
                       </tr>
                     </table>
@@ -585,72 +585,72 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                     <!-- Datos del corredor -->
                     <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 24px;">
                       <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Nombre</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Nombre</span>
                         </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${nombre}</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Fecha de Nacimiento</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.fecha_nacimiento || 'N/A'}</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${nombre}</span>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Equipo</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Fecha de Nacimiento</span>
                         </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.equipo || 'Independiente'}</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Email</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.email || 'N/A'}</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.fecha_nacimiento || 'N/A'}</span>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Telefono</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Equipo</span>
                         </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.telefono || 'N/A'}</span>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Contacto Emergencia</span>
-                        </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.emergencia_nombre || 'N/A'}</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.equipo || 'Independiente'}</span>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Tel. Emergencia</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Email</span>
                         </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
-                          <span style="color: #1A1A1A; font-weight: 600; font-size: 14px;">${corredor.emergencia_telefono || 'N/A'}</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.email || 'N/A'}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Telefono</span>
+                        </td>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.telefono || 'N/A'}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Contacto Emergencia</span>
+                        </td>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.emergencia_nombre || 'N/A'}</span>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Tel. Emergencia</span>
+                        </td>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
+                          <span style="color: #FFFFFF; font-weight: 600; font-size: 14px;">${corredor.emergencia_telefono || 'N/A'}</span>
                         </td>
                       </tr>
                       ${corredor.talla_playera ? `<tr>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Talla de Playera</span>
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A;">
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Talla de Playera</span>
                         </td>
-                        <td style="padding: 12px 0; border-bottom: 1px solid #EEEEEE; text-align: right;">
+                        <td style="padding: 12px 0; border-bottom: 1px solid #2A2A2A; text-align: right;">
                           <span style="color: #DF3382; font-weight: 600; font-size: 14px;">${corredor.talla_playera}</span>
                         </td>
                       </tr>` : ''}
                       <tr>
                         <td style="padding: 12px 0;">
-                          <span style="color: #333333; font-size: 13px; font-weight: 600;">Confirmacion</span>
+                          <span style="color: #AAAAAA; font-size: 13px; font-weight: 600;">Confirmacion</span>
                         </td>
                         <td style="padding: 12px 0; text-align: right;">
                           <span style="color: #DF3382; font-weight: 700; font-size: 14px;">#${orderNumber}</span>
@@ -665,8 +665,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ NUMERO DE CORREDOR ═══════ -->
           ${runnerNumber ? `<tr>
-            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #DF3382;">
+            <td style="padding:24px 24px 0;background-color:#111111;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #1A1A1A; border-radius: 16px; overflow: hidden; border: 2px solid #DF3382;">
                 <!-- Header del ticket -->
                 <tr>
                   <td style="background: linear-gradient(135deg, #DF3382 0%, #C42A6E 100%); padding: 12px 20px;">
@@ -747,8 +747,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ QR CHECK-IN ═══════ -->
           <tr>
-            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #1A1A1A;">
+            <td style="padding:24px 24px 0;background-color:#111111;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #1A1A1A; border-radius: 16px; overflow: hidden; border: 2px solid #1A1A1A;">
                 <!-- Header del ticket -->
                 <tr>
                   <td style="background: #1A1A1A; padding: 12px 20px;">
@@ -819,8 +819,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ SORTEO FOX 40 ═══════ -->
           ${raffleNumber ? `<tr>
-            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: linear-gradient(145deg, #FFFFFF 0%, #F7F7F7 100%); border-radius: 16px; overflow: hidden; border: 2px solid #FF6B00;">
+            <td style="padding:24px 24px 0;background-color:#111111;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #1A1A1A; border-radius: 16px; overflow: hidden; border: 2px solid #FF6B00;">
                 <tr>
                   <td style="background: linear-gradient(135deg, #FF6B00 0%, #E55A00 100%); padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
@@ -853,8 +853,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                             <tr>
                               <td align="left" style="padding-bottom: 16px;">
                                 <p style="color: #FF6B00; font-size: 10px; font-weight: 700; margin: 0 0 6px 0; text-transform: uppercase; letter-spacing: 0.1em;">Premio</p>
-                                <p style="color: #1A1A1A; font-size: 17px; font-weight: 700; margin: 0; line-height: 1.2;">${RAFFLE_CONFIG.prize}</p>
-                                <p style="color: #444444; font-size: 11px; margin: 6px 0 0 0;">Valor: ${RAFFLE_CONFIG.prizeValue}</p>
+                                <p style="color: #FFFFFF; font-size: 17px; font-weight: 700; margin: 0; line-height: 1.2;">${RAFFLE_CONFIG.prize}</p>
+                                <p style="color: #999999; font-size: 11px; margin: 6px 0 0 0;">Valor: ${RAFFLE_CONFIG.prizeValue}</p>
                               </td>
                             </tr>
                             <tr>
@@ -864,7 +864,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                             </tr>
                             <tr>
                               <td align="left">
-                                <p style="color: #333333; font-size: 9px; font-weight: 600; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.15em;">Tu Numero de la Suerte</p>
+                                <p style="color: #AAAAAA; font-size: 9px; font-weight: 600; margin: 0 0 10px 0; text-transform: uppercase; letter-spacing: 0.15em;">Tu Numero de la Suerte</p>
                                 <table cellpadding="0" cellspacing="0">
                                   <tr>
                                     <td style="background: linear-gradient(180deg, #FF6B00 0%, #E55A00 100%); border-radius: 10px; padding: 3px;">
@@ -878,7 +878,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                                     </td>
                                   </tr>
                                 </table>
-                                <p style="color: #333333; font-size: 10px; margin: 10px 0 0 0; font-style: italic;">Conserva este boleto para el sorteo</p>
+                                <p style="color: #AAAAAA; font-size: 10px; margin: 10px 0 0 0; font-style: italic;">Conserva este boleto para el sorteo</p>
                               </td>
                             </tr>
                           </table>
@@ -888,11 +888,11 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
                   </td>
                 </tr>
                 <tr>
-                  <td style="background: rgba(255,107,0,0.05); border-top: 1px solid rgba(255,107,0,0.2); padding: 12px 20px;">
+                  <td style="background: #1A1A1A; border-top: 1px solid rgba(255,107,0,0.3); padding: 12px 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td>
-                          <p style="color: #333333; font-size: 9px; margin: 0; line-height: 1.4;">Sorteo en vivo al finalizar<br><strong style="color: #FF6B00;">${RAFFLE_CONFIG.drawDate}</strong></p>
+                          <p style="color: #AAAAAA; font-size: 9px; margin: 0; line-height: 1.4;">Sorteo en vivo al finalizar<br><strong style="color: #FF6B00;">${RAFFLE_CONFIG.drawDate}</strong></p>
                         </td>
                         <td align="right">
                           <div style="background: #FFFFFF; border-radius: 5px; padding: 5px 8px; display: inline-block;">
@@ -909,7 +909,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ COMPARTIR EN INSTAGRAM ═══════ -->
           <tr>
-            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#111111;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
@@ -925,7 +925,7 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ BOTONES ═══════ -->
           <tr>
-            <td style="padding:24px 24px 0;background-color:#FFFFFF;">
+            <td style="padding:24px 24px 0;background-color:#111111;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="padding:18px 32px;background-color:#DF3382;border-radius:12px;text-align:center;">
@@ -935,8 +935,8 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
               </table>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:12px;">
                 <tr>
-                  <td style="padding:18px 32px;border:2px solid #1A1A1A;border-radius:12px;text-align:center;">
-                    <a href="https://www.instagram.com/dhmex_races/" style="font-family:'Courier New',Courier,monospace;font-size:15px;font-weight:700;color:#1A1A1A;text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;display:block;">Seguir en Instagram</a>
+                  <td style="padding:18px 32px;border:2px solid #FFFFFF;border-radius:12px;text-align:center;">
+                    <a href="https://www.instagram.com/dhmex_races/" style="font-family:'Courier New',Courier,monospace;font-size:15px;font-weight:700;color:#FFFFFF;text-decoration:none;letter-spacing:0.08em;text-transform:uppercase;display:block;">Seguir en Instagram</a>
                   </td>
                 </tr>
               </table>
@@ -945,32 +945,32 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ ANTES DE LA CARRERA ═══════ -->
           <tr>
-            <td style="padding:28px 24px 0;background-color:#FFFFFF;">
-              <span style="display:block;font-size:16px;font-weight:700;color:#1A1A1A;margin-bottom:20px;">Antes de la Carrera</span>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#F7F7F7;border-radius:12px;">
+            <td style="padding:28px 24px 0;background-color:#111111;">
+              <span style="display:block;font-size:16px;font-weight:700;color:#FFFFFF;margin-bottom:20px;">Antes de la Carrera</span>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1A1A1A;border-radius:12px;">
                 <tr>
-                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
-                    Llega al menos <strong style="color:#1A1A1A;">1 hora antes</strong> del inicio de tu categoria para el check-in
+                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#AAAAAA;line-height:1.7;">
+                    Llega al menos <strong style="color:#FFFFFF;">1 hora antes</strong> del inicio de tu categoria para el check-in
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
-                    Presenta tu <strong style="color:#1A1A1A;">QR, nombre o numero de corredor</strong> en el area de registro
+                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#AAAAAA;line-height:1.7;">
+                    Presenta tu <strong style="color:#FFFFFF;">QR, nombre o numero de corredor</strong> en el area de registro
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
-                    Es obligatorio usar <strong style="color:#1A1A1A;">casco full face, guantes y protecciones</strong>
+                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#AAAAAA;line-height:1.7;">
+                    Es obligatorio usar <strong style="color:#FFFFFF;">casco full face, guantes y protecciones</strong>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
-                    Si alcanzaste playera, recogela en el <strong style="color:#1A1A1A;">area de check-in</strong> el dia del evento
+                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#AAAAAA;line-height:1.7;">
+                    Si alcanzaste playera, recogela en el <strong style="color:#FFFFFF;">area de check-in</strong> el dia del evento
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#333333;line-height:1.7;">
-                    Sigue <a href="https://www.instagram.com/dhmex_races/" style="color:#DF3382;font-weight:700;text-decoration:none;">@dhmex_races</a> en Instagram para anuncios de <strong style="color:#1A1A1A;">ubicacion de check-in, horarios de entrenamiento, carrera y entrega de chips</strong>
+                  <td style="padding:18px 24px;border-bottom:1px solid #EEEEEE;font-size:14px;color:#AAAAAA;line-height:1.7;">
+                    Sigue <a href="https://www.instagram.com/dhmex_races/" style="color:#DF3382;font-weight:700;text-decoration:none;">@dhmex_races</a> en Instagram para anuncios de <strong style="color:#FFFFFF;">ubicacion de check-in, horarios de entrenamiento, carrera y entrega de chips</strong>
                   </td>
                 </tr>
               </table>
@@ -979,26 +979,26 @@ function generateEmailHTML(corredor, orderNumber, sede, checkInCode, raffleNumbe
 
           <!-- ═══════ FOOTER ═══════ -->
           <tr>
-            <td style="padding:32px 24px 32px;background-color:#FFFFFF;border-top:1px solid #EEEEEE;">
+            <td style="padding:32px 24px 32px;background-color:#111111;border-top:1px solid #222222;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td style="text-align:center;">
                     <img src="${ASSETS.logo}" alt="DHMEXRACES" width="90" style="display:inline-block;height:auto;margin-bottom:16px;">
-                    <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1A1A1A;">Copa Scott DHMEXRACES 2026</span>
-                    <span style="display:block;font-size:13px;color:#333333;margin-top:6px;">La copa nacional de downhill MTB mas profesional de Mexico</span>
-                    <span style="display:block;font-size:13px;color:#333333;margin-top:2px;">5 sedes &bull; 14 categorias &bull; $530,000 MXN en premios</span>
+                    <span style="display:block;font-size:13px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#FFFFFF;">Copa Scott DHMEXRACES 2026</span>
+                    <span style="display:block;font-size:13px;color:#AAAAAA;margin-top:6px;">La copa nacional de downhill MTB mas profesional de Mexico</span>
+                    <span style="display:block;font-size:13px;color:#AAAAAA;margin-top:2px;">5 sedes &bull; 14 categorias &bull; $530,000 MXN en premios</span>
                   </td>
                 </tr>
                 <tr>
                   <td style="text-align:center;padding-top:20px;">
                     <a href="https://www.instagram.com/dhmex_races/" style="font-size:13px;font-weight:700;color:#DF3382;text-decoration:none;">@dhmex_races</a>
                     <span style="color:#DDDDDD;margin:0 8px;">&bull;</span>
-                    <a href="mailto:endhurorace@gmail.com" style="font-size:13px;color:#333333;text-decoration:none;">endhurorace@gmail.com</a>
+                    <a href="mailto:endhurorace@gmail.com" style="font-size:13px;color:#AAAAAA;text-decoration:none;">endhurorace@gmail.com</a>
                   </td>
                 </tr>
                 <tr>
                   <td style="text-align:center;padding-top:20px;">
-                    <span style="font-size:11px;color:#333333;line-height:1.7;">Recibiste este correo porque te inscribiste en la Copa Scott DHMEXRACES 2026.<br>Si fue un error, escribenos a endhurorace@gmail.com</span>
+                    <span style="font-size:11px;color:#AAAAAA;line-height:1.7;">Recibiste este correo porque te inscribiste en la Copa Scott DHMEXRACES 2026.<br>Si fue un error, escribenos a endhurorace@gmail.com</span>
                   </td>
                 </tr>
               </table>

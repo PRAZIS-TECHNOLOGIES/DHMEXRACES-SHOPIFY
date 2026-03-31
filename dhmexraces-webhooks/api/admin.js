@@ -387,7 +387,7 @@ module.exports = (req, res) => {
                 <option value="">Selecciona...</option>
                 <option value="guanajuato">Guanajuato</option>
                 <option value="puebla">Puebla</option>
-                <option value="guadalajara">Guadalajara</option>
+                <option value="guadalajara">Mazati Bike Park (Tapalpa)</option>
                 <option value="ixtapan">Ixtapan</option>
                 <option value="taxco">Taxco</option>
               </select>
